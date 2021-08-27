@@ -27,10 +27,16 @@ func main() {
 
 	switch os.Args[1] {
 	case "status":
-		statusCmd.Parse(os.Args[2:])
+		if err := statusCmd.Parse(os.Args[2:]); err != nil {
+			fmt.Println("error parsing status command:", err)
+			os.Exit(1)
+		}
 		app.HandleStatus(*statusNode, *statusGroup)
 	case "update":
-		updateCmd.Parse(os.Args[2:])
+		if err := updateCmd.Parse(os.Args[2:]); err != nil {
+			fmt.Println("error parsing update command:", err)
+			os.Exit(1)
+		}
 		app.HandleUpdate(*groupUpdate)
 	default:
 		fmt.Println("expected update or status command")

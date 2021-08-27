@@ -64,9 +64,7 @@ func (a *App) findContainersInGroup(groupName string) []string {
 	group, _ := a.config.FindGroupByName(groupName)
 
 	var containers []string
-	for _, container := range group.Containers {
-		containers = append(containers, container)
-	}
+	containers = append(containers, group.Containers...)
 
 	return containers
 }
