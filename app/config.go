@@ -22,6 +22,11 @@ type Groups struct {
 	Nodes []Node `json:"nodes"`
 }
 
+type FoundNode struct {
+	Node
+	Group string `json:"group"`
+}
+
 func NewConfig(configPath string) *Config {
 	content, err := ioutil.ReadFile(configPath)
 	if err != nil {
@@ -37,24 +42,27 @@ func NewConfig(configPath string) *Config {
 	return &config
 }
 
-func (c *Config) FindNodeByName(nodeName string) (Node, bool) {
+func (c *Config) FindNodeByName(nodeName string) (FoundNode, bool) {
 	for _, group := range c.Groups {
 		for _, node := range group.Nodes {
 			if node.NodeName == nodeName {
-				return node, true
+				return FoundNode{
+					Node:  node,
+					Group: group.Group,
+				}, true
 			}
 		}
 	}
 
-	return Node{}, false
+	return FoundNode{}, false
 }
 
-func (c *Config) FindGroupByName(groupName string) Groups {
+func (c *Config) FindGroupByName(groupName string) (Groups, bool) {
 	for _, group := range c.Groups {
 		if group.Group == groupName {
-			return group
+			return group, true
 		}
 	}
 
-	return Groups{}
+	return Groups{}, false
 }

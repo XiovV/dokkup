@@ -3,7 +3,9 @@ package app
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 )
@@ -17,8 +19,6 @@ func New(config *Config) *App {
 }
 
 func (a *App) HandleStatus(node, group string) {
-	fmt.Printf("node: %s | group: %s\n", node, group)
-
 	if node == "" && group == "" {
 		fmt.Println("either node od group need to be set.")
 		return
@@ -30,18 +30,55 @@ func (a *App) HandleStatus(node, group string) {
 	}
 
 	if node != "" {
-		foundNode, ok := a.config.FindNodeByName(node)
-		if !ok {
-			fmt.Println("couldn't find node")
-			os.Exit(1)
-		}
-
-		fmt.Println(foundNode.NodeName)
+		fmt.Printf("%s status\n", node)
+		a.GetNodeStatus(node)
 	}
 }
 
-func (a *App) Start() {
-	group := a.config.FindGroupByName(os.Args[1])
+func (a *App) GetNodeStatus(node string) {
+	foundNode, ok := a.config.FindNodeByName(node)
+	if !ok {
+		fmt.Println("couldn't find node")
+		os.Exit(1)
+	}
+
+	containers := a.findContainersInGroup(foundNode.Group)
+	var request NodeStatusRequest
+	for _, container := range containers {
+		request.Container = container
+
+		response, err := sendNodeStatusRequest(foundNode.Location, request)
+		if err != nil {
+			if errors.Is(err, ErrContainerNotFound) {
+				fmt.Printf("container %s doesn't exist\n", container)
+			}
+		} else {
+			fmt.Printf("name: %s\n", response.Name)
+			fmt.Printf("id: %s\n", response.ID)
+			fmt.Printf("image: %s\n", response.Image)
+			fmt.Printf("status: %s\n", response.Status)
+		}
+	}
+
+}
+
+func (a *App) findContainersInGroup(groupName string) []string {
+	group, _ := a.config.FindGroupByName(groupName)
+
+	var containers []string
+	for _, container := range group.Containers {
+		containers = append(containers, container)
+	}
+
+	return containers
+}
+
+func (a *App) HandleUpdate(groupName string) {
+	group, ok := a.config.FindGroupByName(groupName)
+	if !ok {
+		fmt.Printf("couldn't find a group with the name: %s\n", groupName)
+		os.Exit(1)
+	}
 
 	err := a.pullImages(group.Nodes, group.Image)
 
@@ -131,7 +168,7 @@ func (a *App) pullImages(nodes []Node, image string) error {
 		case http.StatusOK:
 			fmt.Printf("successfully pulled %s on %s\n", image, node.NodeName)
 		case http.StatusInternalServerError:
-			fmt.Printf("couldn't pull %s on %s. Error: \n", image, node.NodeName, resCode)
+			fmt.Printf("couldn't pull %s on %s. Error: %d\n", image, node.NodeName, resCode)
 		}
 	}
 	
@@ -152,4 +189,33 @@ func sendPostRequest(url string, body []byte) (int, error){
 	defer resp.Body.Close()
 
 	return resp.StatusCode, nil
+}
+
+func sendNodeStatusRequest(node string, body NodeStatusRequest) (NodeStatusResponse, error) {
+	marshalBody, _ := json.Marshal(body)
+	req, err := http.NewRequest("POST", node+"/api/nodes/status", bytes.NewBuffer(marshalBody))
+	if err != nil {
+		return NodeStatusResponse{}, err
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return NodeStatusResponse{}, err
+	}
+	defer resp.Body.Close()
+
+	switch resp.StatusCode {
+	case 404:
+		return NodeStatusResponse{}, ErrContainerNotFound
+	}
+
+	var response NodeStatusResponse
+	responseBody, _ := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(responseBody, &response)
+	if err != nil {
+		return NodeStatusResponse{}, err
+	}
+
+	return response, nil
 }
