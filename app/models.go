@@ -19,4 +19,3 @@ type NodeStatusResponse struct {
 	Image  string `json:"image"`
 	Status string `json:"status"`
 }
-

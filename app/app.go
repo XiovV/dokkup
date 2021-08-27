@@ -43,20 +43,18 @@ func (a *App) GetNodeStatus(node string) {
 	}
 
 	containers := a.findContainersInGroup(foundNode.Group)
-	var request NodeStatusRequest
 	for _, container := range containers {
-		request.Container = container
+		containerStatus, err := sendContainerStatusRequest(foundNode.Location, container)
 
-		response, err := sendNodeStatusRequest(foundNode.Location, request)
 		if err != nil {
 			if errors.Is(err, ErrContainerNotFound) {
 				fmt.Printf("container %s doesn't exist\n", container)
 			}
 		} else {
-			fmt.Printf("name: %s\n", response.Name)
-			fmt.Printf("id: %s\n", response.ID)
-			fmt.Printf("image: %s\n", response.Image)
-			fmt.Printf("status: %s\n", response.Status)
+			fmt.Printf("name: %s\n", containerStatus.Name)
+			fmt.Printf("id: %s\n", containerStatus.ID)
+			fmt.Printf("image: %s\n", containerStatus.Image)
+			fmt.Printf("status: %s\n", containerStatus.Status)
 		}
 	}
 
@@ -92,33 +90,6 @@ func (a *App) HandleUpdate(groupName string) {
 		fmt.Println(err)
 		return
 	}
-}
-
-func (a *App) pingNodes(nodes []Node) {
-	for _, node := range nodes {
-		resCode, err := sendGetRequest(node.Location+"/api/health")
-		if err != nil {
-			fmt.Println("couldn't ping:", err)
-		}
-
-		if resCode != 200 {
-			fmt.Printf("%s at %s is not online!\n", node.NodeName, node.Location)
-		} else {
-			fmt.Printf("%s is online\n", node.NodeName)
-		}
-	}
-
-}
-
-func sendGetRequest(url string) (int, error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
-
-	defer resp.Body.Close()
-
-	return resp.StatusCode, nil
 }
 
 func (a *App) updateContainersInGroup(group Groups) error {
@@ -191,7 +162,8 @@ func sendPostRequest(url string, body []byte) (int, error){
 	return resp.StatusCode, nil
 }
 
-func sendNodeStatusRequest(node string, body NodeStatusRequest) (NodeStatusResponse, error) {
+func sendContainerStatusRequest(node, containerName string) (NodeStatusResponse, error) {
+	body := NodeStatusRequest{Container: containerName}
 	marshalBody, _ := json.Marshal(body)
 	req, err := http.NewRequest("POST", node+"/api/nodes/status", bytes.NewBuffer(marshalBody))
 	if err != nil {
