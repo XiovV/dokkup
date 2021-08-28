@@ -44,7 +44,7 @@ In order to use this tool, you first have to define your own config.json.
 }
 ```
 
-####config.json explanation:
+#### config.json explanation:
 - `group` is a server group
 - `containers` an array defining which containers you'd like to update
 - `image` an image you'd like the containers to update to 
