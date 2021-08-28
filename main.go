@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/XiovV/docker_control_cli/app"
+	"github.com/XiovV/docker_control_cli/services"
 	"os"
 )
 
@@ -22,8 +23,9 @@ func main() {
 	}
 
 	config := app.NewConfig("./config.json")
+	dockerService := services.NewDockerController()
 
-	app := app.New(config)
+	app := app.New(config, dockerService)
 
 	switch os.Args[1] {
 	case "status":

@@ -1,21 +1,22 @@
 package app
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"github.com/XiovV/docker_control_cli/models"
+	"github.com/XiovV/docker_control_cli/services"
 	"net/http"
 	"os"
+	"time"
 )
 
 type App struct {
 	config *Config
+	dockerService services.DockerService
 }
 
-func New(config *Config) *App {
-	return &App{config: config}
+func New(config *Config, dockerService services.DockerService) *App {
+	return &App{config: config, dockerService: dockerService}
 }
 
 func (a *App) HandleStatus(node, group string) {
@@ -42,12 +43,12 @@ func (a *App) GetNodeStatus(node string) {
 		os.Exit(1)
 	}
 
-	containers := a.findContainersInGroup(foundNode.Group)
+	containers := a.config.FindContainersInGroup(foundNode.Group)
 	for _, container := range containers {
-		containerStatus, err := sendContainerStatusRequest(foundNode.Location, container)
+		containerStatus, err := a.dockerService.GetContainerStatus(foundNode.Location, container)
 
 		if err != nil {
-			if errors.Is(err, ErrContainerNotFound) {
+			if errors.Is(err, models.ErrContainerNotFound) {
 				fmt.Printf("container %s doesn't exist\n", container)
 			}
 		} else {
@@ -60,15 +61,6 @@ func (a *App) GetNodeStatus(node string) {
 
 }
 
-func (a *App) findContainersInGroup(groupName string) []string {
-	group, _ := a.config.FindGroupByName(groupName)
-
-	var containers []string
-	containers = append(containers, group.Containers...)
-
-	return containers
-}
-
 func (a *App) HandleUpdate(groupName string) {
 	group, ok := a.config.FindGroupByName(groupName)
 	if !ok {
@@ -76,12 +68,15 @@ func (a *App) HandleUpdate(groupName string) {
 		os.Exit(1)
 	}
 
+	start := time.Now()
 	err := a.pullImages(group.Nodes, group.Image)
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+	duration := time.Since(start)
+	fmt.Println("took:", duration)
 
 	err = a.updateContainersInGroup(group)
 	if err != nil {
@@ -91,18 +86,17 @@ func (a *App) HandleUpdate(groupName string) {
 }
 
 func (a *App) updateContainersInGroup(group Groups) error {
-	var reqBody UpdateRequest
+	var reqBody models.UpdateContainerRequest
 	reqBody.Image = group.Image
 
 	for _, node := range group.Nodes {
 		for	_, container := range group.Containers {
-			reqBody.Container = container
-			reqBodyMarshalled, err := json.Marshal(reqBody)
-			if err != nil {
-				return err
-			}
+			fmt.Printf("attempting to update %s on %s\n", container, node.NodeName)
 
-			resCode, err := sendPostRequest(node.Location + "/api/containers/update", reqBodyMarshalled)
+			reqBody.Container = container
+
+			resCode, err := a.dockerService.UpdateContainer(node.Location, reqBody)
+
 			if err != nil {
 				fmt.Printf("error while updating %s on %s: %s\n", container, node.NodeName, err)
 			}
@@ -120,14 +114,11 @@ func (a *App) updateContainersInGroup(group Groups) error {
 }
 
 func (a *App) pullImages(nodes []Node, image string) error {
-	reqBody := PullImageRequest{Image: image}
-	reqBodyMarshalled, err := json.Marshal(reqBody)
-	if err != nil {
-		return err
-	}
-	
+	reqBody := models.PullImageRequest{Image: image}
+
 	for _, node := range nodes {
-		resCode, err := sendPostRequest(node.Location + "/api/images/pull", reqBodyMarshalled)
+		fmt.Printf("attempting to pull %s on %s\n", image, node.NodeName)
+		resCode, err := a.dockerService.PullImage(node.Location, reqBody)
 		if err != nil {
 			fmt.Printf("error while pulling %s on %s: %s\n", image, node.NodeName, err)
 			continue
@@ -142,50 +133,4 @@ func (a *App) pullImages(nodes []Node, image string) error {
 	}
 	
 	return nil
-}
-
-func sendPostRequest(url string, body []byte) (int, error){
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
-	defer resp.Body.Close()
-
-	return resp.StatusCode, nil
-}
-
-func sendContainerStatusRequest(node, containerName string) (NodeStatusResponse, error) {
-	body := NodeStatusRequest{Container: containerName}
-	marshalBody, _ := json.Marshal(body)
-	req, err := http.NewRequest("POST", node+"/api/nodes/status", bytes.NewBuffer(marshalBody))
-	if err != nil {
-		return NodeStatusResponse{}, err
-	}
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return NodeStatusResponse{}, err
-	}
-	defer resp.Body.Close()
-
-	switch resp.StatusCode {
-	case 404:
-		return NodeStatusResponse{}, ErrContainerNotFound
-	}
-
-	var response NodeStatusResponse
-	responseBody, _ := ioutil.ReadAll(resp.Body)
-	err = json.Unmarshal(responseBody, &response)
-	if err != nil {
-		return NodeStatusResponse{}, err
-	}
-
-	return response, nil
 }

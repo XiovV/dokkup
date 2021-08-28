@@ -66,3 +66,12 @@ func (c *Config) FindGroupByName(groupName string) (Groups, bool) {
 
 	return Groups{}, false
 }
+
+func (c *Config) FindContainersInGroup(groupName string) []string {
+	group, _ := c.FindGroupByName(groupName)
+
+	var containers []string
+	containers = append(containers, group.Containers...)
+
+	return containers
+}
