@@ -1,7 +1,7 @@
 ## What is Docker Control (temporary name)?
 Docker Control is a simple CLI tool with an ability to mass-update docker containers.
 If you've got hundreds of servers running containers, you can update the containers running on
-all of them with this tool using a single command. Simply create your own config.json, and you're good to go.
+all of those servers with this tool using a single command. Simply create your own config.json, and you're good to go.
 
 ## Usage
 In order to use this tool, you first have to define your own config.json.
