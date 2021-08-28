@@ -2,12 +2,16 @@
   "groups": [
     {
       "group": "rest-api",
-      "containers": ["portainer2", "portainer"],
-      "image": "portainer/portainer-ce:2.6.2",
+      "containers": ["portainer"],
+      "image": "portainer/portainer-ce:2.6.3",
       "nodes": [
         {
           "location": "http://192.168.0.23:5006",
           "node_name": "personal"
+        },
+        {
+          "location": "http://localhost:5006",
+          "node_name": "local"
         }
       ]
     }

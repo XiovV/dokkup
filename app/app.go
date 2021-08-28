@@ -69,16 +69,7 @@ func (a *App) HandleUpdate(groupName string) {
 	}
 
 	start := time.Now()
-	err := a.pullImages(group.Nodes, group.Image)
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println("duration:", time.Since(start))
-
-	start = time.Now()
-	err = a.updateContainersInGroup(group)
+	err := a.updateContainersInGroup(group)
 	if err != nil {
 		fmt.Println(err)
 		return
