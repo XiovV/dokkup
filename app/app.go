@@ -75,14 +75,15 @@ func (a *App) HandleUpdate(groupName string) {
 		fmt.Println(err)
 		return
 	}
-	duration := time.Since(start)
-	fmt.Println("took:", duration)
+	fmt.Println("duration:", time.Since(start))
 
+	start = time.Now()
 	err = a.updateContainersInGroup(group)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+	fmt.Println("duration:", time.Since(start))
 }
 
 func (a *App) updateContainersInGroup(group Groups) error {
@@ -104,8 +105,8 @@ func (a *App) updateContainersInGroup(group Groups) error {
 			switch resCode {
 			case http.StatusOK:
 				fmt.Printf("successfully updated %s on %s\n", container, node.NodeName)
-			case http.StatusInternalServerError:
-				fmt.Printf("couldn't update %s on %s. Error: %d\n", container, node.NodeName, resCode)
+			case http.StatusNotFound:
+				fmt.Printf("%s doesn't exist on %s\n", container, node.NodeName)
 			}
 		}
 	}
