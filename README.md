@@ -44,6 +44,25 @@ In order to use this tool, you first have to define your own config.json.
 }
 ```
 
+```yaml
+nodes:
+ - name: node1
+   location: "https://node1:8080/"
+ - name: node2
+   location: "https://node2:8080/"
+
+groups:
+ - name: rest-api
+   nodes: 
+   - node1
+   - node2
+
+containers:
+ - group: rest-api
+   image: portainer/portainer-ce:2.6.3
+   container_names: ["portainer"]
+```
+
 #### config.json explanation:
 - `group` is a server group
 - `containers` an array defining which containers you'd like to update
