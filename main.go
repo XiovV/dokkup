@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/XiovV/docker_control_cli/app"
 	"github.com/XiovV/docker_control_cli/controller"
 	"os"
@@ -14,15 +13,26 @@ func main() {
 	container := actionCmd.String("container", "", "Name of the container you wish to update")
 	image := actionCmd.String("image", "", "The image you'd like the container to be updated to")
 	apiKey := actionCmd.String("api-key", "", "Docker Control Agent API Key")
+	keep := actionCmd.Bool("keep", false, "Keep the previous version of the container. Useful if you ever need to use the 'rollback' command")
 
-	err := actionCmd.Parse(os.Args[2:])
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+	rollbackCmd := flag.NewFlagSet("rollback", flag.ExitOnError)
+	rollbackNode := rollbackCmd.String("node", "", "Node endpoint")
+	rollbackContainer := rollbackCmd.String("container", "", "Name of the container you wish to update")
+	rollbackApiKey := rollbackCmd.String("api-key", "", "Docker Control Agent API Key")
+
+	// TODO: clean this up
+	switch os.Args[1] {
+	case "up":
+		actionCmd.Parse(os.Args[2:])
+		dockerController := controller.NewDockerController(*node, *apiKey)
+		app := app.NewUpdate(*node, *container, *image, *keep, dockerController)
+		app.Run()
+	case "rollback":
+		rollbackCmd.Parse(os.Args[2:])
+		dockerController := controller.NewDockerController(*rollbackNode, *rollbackApiKey)
+		app := app.NewRollback(*rollbackNode, *rollbackContainer, dockerController)
+		app.Run()
 	}
 
-	dockerController := controller.NewDockerController(*node, *apiKey)
-	app := app.New(os.Args[1], *node, *container, *image, dockerController)
 
-	app.Run()
 }

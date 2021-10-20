@@ -6,25 +6,25 @@ import (
 	"os"
 )
 
-type App struct {
-	action string
+type Update struct {
 	node string
 	container string
 	image string
+	keep bool
 	controller controller.DockerController
 }
 
-func New(action, node, container, image string, controller controller.DockerController) *App {
-	return &App{
-		action:    action,
+func NewUpdate(node, container, image string, keep bool, controller controller.DockerController) *Update {
+	return &Update{
 		node:      node,
 		container: container,
 		image:     image,
 		controller: controller,
+		keep: keep,
 	}
 }
 
-func (a *App) Run() {
+func (a *Update) Run() {
 	fmt.Println("pulling image:", a.image)
 	err := a.controller.PullImage(a.image)
 	if err != nil {
@@ -35,7 +35,7 @@ func (a *App) Run() {
 	fmt.Println("image pulled successfully")
 
 	fmt.Printf("updating %s to %s\n", a.container, a.image)
-	err = a.controller.UpdateContainer(a.container, a.image)
+	err = a.controller.UpdateContainer(a.container, a.image, a.keep)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

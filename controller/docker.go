@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 type DockerController struct {
@@ -12,6 +13,28 @@ type DockerController struct {
 
 func NewDockerController(node, apiKey string) DockerController {
 	return DockerController{node: node, apiKey: apiKey}
+}
+
+func (dc DockerController) RollbackContainer(containerName string) error {
+	URL := fmt.Sprintf("%s%s?container=%s", dc.node, RollbackContainerURL, containerName)
+
+	statusCode, err := dc.putRequest(URL)
+	if err != nil {
+		return err
+	}
+
+	switch statusCode {
+	case http.StatusOK:
+		return nil
+	case http.StatusNotFound:
+		return fmt.Errorf("this container does not have a rollback container")
+	case http.StatusForbidden:
+		return fmt.Errorf("invalid api key")
+	case http.StatusInternalServerError:
+		return fmt.Errorf("image couldn't be pulled")
+	default:
+		return fmt.Errorf("an unknown error has occured while pulling the image")
+	}
 }
 
 func (dc DockerController) PullImage(image string) error {
@@ -34,8 +57,8 @@ func (dc DockerController) PullImage(image string) error {
 	}
 }
 
-func (dc DockerController) UpdateContainer(containerName, image string) error {
-	URL := fmt.Sprintf("%s%s?container=%s&image=%s", dc.node, UpdateContainerURL, containerName, image)
+func (dc DockerController) UpdateContainer(containerName, image string, keepContainer bool) error {
+	URL := fmt.Sprintf("%s%s?container=%s&image=%s&keep=%s", dc.node, UpdateContainerURL, containerName, image, strconv.FormatBool(keepContainer))
 
 	statusCode, err := dc.putRequest(URL)
 	if err != nil {
