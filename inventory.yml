@@ -1,0 +1,5 @@
+nodes:
+  - name: webservers
+    hosts:
+      - node.com
+      - node2.com

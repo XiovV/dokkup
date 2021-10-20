@@ -1,0 +1,4 @@
+- name: Update postgres
+  hosts: databases
+  image: postgres:latest
+  containers: ["postgres"]

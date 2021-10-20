@@ -46,10 +46,11 @@ In order to use this tool, you first have to define your own config.json.
 
 ```yaml
 nodes:
- - name: node1
-   location: "https://node1:8080/"
- - name: node2
-   location: "https://node2:8080/"
+  - name: webservers
+    hosts:
+      - node.com
+      - node2.com
+   
 
 groups:
  - name: rest-api

@@ -1,30 +1,16 @@
 package app
 
 import (
-	"encoding/json"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 )
 
-type Config struct {
-	Groups []Groups `json:"groups"`
-}
-
-type Node struct {
-	Location string `json:"location"`
-	NodeName string `json:"node_name"`
-}
-
-type Groups struct {
-	Group      string      `json:"group"`
-	Containers []string    `json:"containers"`
-	Image string `json:"image"`
-	Nodes []Node `json:"nodes"`
-}
-
-type FoundNode struct {
-	Node
-	Group string `json:"group"`
+type Config []struct {
+	Name       string   `yaml:"name"`
+	Hosts      string   `yaml:"hosts"`
+	Image      string   `yaml:"image"`
+	Containers []string `yaml:"containers"`
 }
 
 func NewConfig(configPath string) *Config {
@@ -34,44 +20,10 @@ func NewConfig(configPath string) *Config {
 	}
 
 	var config Config
-	err = json.Unmarshal(content, &config)
+	err = yaml.Unmarshal(content, &config)
 	if err != nil {
 		log.Fatal("Error during Unmarshal(): ", err)
 	}
 
 	return &config
-}
-
-func (c *Config) FindNodeByName(nodeName string) (FoundNode, bool) {
-	for _, group := range c.Groups {
-		for _, node := range group.Nodes {
-			if node.NodeName == nodeName {
-				return FoundNode{
-					Node:  node,
-					Group: group.Group,
-				}, true
-			}
-		}
-	}
-
-	return FoundNode{}, false
-}
-
-func (c *Config) FindGroupByName(groupName string) (Groups, bool) {
-	for _, group := range c.Groups {
-		if group.Group == groupName {
-			return group, true
-		}
-	}
-
-	return Groups{}, false
-}
-
-func (c *Config) FindContainersInGroup(groupName string) []string {
-	group, _ := c.FindGroupByName(groupName)
-
-	var containers []string
-	containers = append(containers, group.Containers...)
-
-	return containers
 }

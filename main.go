@@ -22,7 +22,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	config := app.NewConfig("./config.json")
+	config := app.NewConfig("./config.yml")
+	inventory := app.NewInventory("./inventory.yml")
+
+	fmt.Printf("%+v\n", config)
+	fmt.Printf("%+v\n", inventory)
+
 	dockerService := services.NewDockerController()
 
 	app := app.New(config, dockerService)
