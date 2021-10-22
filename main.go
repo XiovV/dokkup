@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/XiovV/docker_control_cli/app"
 	"github.com/XiovV/docker_control_cli/controller"
 	"os"
@@ -38,6 +39,8 @@ func main() {
 	case "rollback":
 		app := app.NewRollback(node, container, dockerController)
 		app.Run()
+	default:
+		fmt.Println("unknown command")
+		os.Exit(1)
 	}
-
 }
