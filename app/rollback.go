@@ -7,8 +7,8 @@ import (
 )
 
 type Rollback struct {
-	node string
-	container string
+	node       string
+	container  string
 	controller controller.DockerController
 }
 

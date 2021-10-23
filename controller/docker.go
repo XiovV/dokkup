@@ -8,7 +8,7 @@ import (
 )
 
 type DockerController struct {
-	node string
+	node   string
 	apiKey string
 }
 
@@ -26,6 +26,32 @@ func (dc DockerController) handleAgentResponse(r *http.Response) error {
 	}
 
 	return nil
+}
+
+func (dc DockerController) GetContainerImage(containerName string) (string, error) {
+	URL := fmt.Sprintf("%s%s/%s", dc.node, GetContainerImageURL, containerName)
+
+	r, err := dc.getRequest(URL)
+	if err != nil {
+		return "", err
+	}
+	defer r.Body.Close()
+
+	err = dc.handleAgentResponse(r)
+
+	if err != nil {
+		return "", err
+	}
+
+	var body struct {
+		Image string `json:"image"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		return "", err
+	}
+
+	return body.Image, nil
 }
 
 func (dc DockerController) RollbackContainer(containerName string) error {
@@ -64,7 +90,24 @@ func (dc DockerController) UpdateContainer(containerName, image string, keepCont
 	return dc.handleAgentResponse(r)
 }
 
-func (dc DockerController) putRequest(location string) (*http.Response, error){
+func (dc DockerController) getRequest(location string) (*http.Response, error) {
+	request, err := http.NewRequest(http.MethodGet, location, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Set("key", dc.apiKey)
+
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func (dc DockerController) putRequest(location string) (*http.Response, error) {
 	request, err := http.NewRequest(http.MethodPut, location, nil)
 	if err != nil {
 		return nil, err
