@@ -28,8 +28,12 @@ func NewUpdate(node, container, image, tag string, keep bool, controller control
 }
 
 func (a *Update) Run() {
-	if a.image != "" && a.tag != "" {
-		fmt.Println("you can only either set the -image flag or the -tag flag")
+	errors := a.ValidateFlags()
+	if len(errors) != 0 {
+		for _, error := range errors {
+			fmt.Println(error)
+		}
+
 		os.Exit(1)
 	}
 
