@@ -26,9 +26,13 @@ func main() {
 
 	switch os.Args[1] {
 	case "up":
-		actionCmd.Parse(os.Args[2:])
+		if err := actionCmd.Parse(os.Args[2:]); err != nil {
+			fmt.Println("flag parser error:", err)
+		}
 	case "rollback":
-		rollbackCmd.Parse(os.Args[2:])
+		if err := rollbackCmd.Parse(os.Args[2:]); err != nil {
+			fmt.Println("flag parser error:", err)
+		}
 	}
 
 	dockerController := controller.NewDockerController(node, apiKey)
