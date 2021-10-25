@@ -1,3 +1,3 @@
-module github.com/XiovV/docker_control_cli
+module github.com/XiovV/dokkup
 
 go 1.17
