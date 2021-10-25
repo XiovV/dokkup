@@ -2,7 +2,7 @@ package app
 
 import (
 	"fmt"
-	"github.com/XiovV/docker_control_cli/controller"
+	"github.com/XiovV/dokkup/controller"
 	"os"
 )
 

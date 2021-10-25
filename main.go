@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/XiovV/docker_control_cli/app"
-	"github.com/XiovV/docker_control_cli/controller"
+	"github.com/XiovV/dokkup/app"
+	"github.com/XiovV/dokkup/controller"
 	"os"
 )
 
