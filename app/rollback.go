@@ -7,7 +7,7 @@ import (
 )
 
 type Rollback struct {
-	config *Config
+	config     *Config
 	controller controller.DockerController
 }
 

@@ -8,13 +8,13 @@ import (
 )
 
 type Update struct {
-	config *Config
+	config     *Config
 	controller controller.DockerController
 }
 
 func NewUpdate(config *Config, controller controller.DockerController) *Update {
 	return &Update{
-		config: config,
+		config:     config,
 		controller: controller,
 	}
 }
@@ -56,7 +56,7 @@ func (a *Update) Run() {
 	fmt.Println("image pulled successfully")
 
 	fmt.Printf("updating %s to %s\n", a.config.Container, a.config.Image)
-	err = a.controller.UpdateContainer(a.config.Container,  a.config.Image, a.config.Keep)
+	err = a.controller.UpdateContainer(a.config.Container, a.config.Image, a.config.Keep)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
