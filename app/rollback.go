@@ -7,18 +7,17 @@ import (
 )
 
 type Rollback struct {
-	node       string
-	container  string
+	config *Config
 	controller controller.DockerController
 }
 
-func NewRollback(node, container string, dockerController controller.DockerController) Rollback {
-	return Rollback{node: node, container: container, controller: dockerController}
+func NewRollback(config *Config, dockerController controller.DockerController) Rollback {
+	return Rollback{config: config, controller: dockerController}
 }
 
 func (r *Rollback) Run() {
 	fmt.Println("rolling back container...")
-	err := r.controller.RollbackContainer(r.container)
+	err := r.controller.RollbackContainer(r.config.Container)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

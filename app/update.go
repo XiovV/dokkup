@@ -8,22 +8,14 @@ import (
 )
 
 type Update struct {
-	node       string
-	container  string
-	image      string
-	tag        string
-	keep       bool
+	config *Config
 	controller controller.DockerController
 }
 
-func NewUpdate(node, container, image, tag string, keep bool, controller controller.DockerController) *Update {
+func NewUpdate(config *Config, controller controller.DockerController) *Update {
 	return &Update{
-		node:       node,
-		container:  container,
-		image:      image,
-		tag:        tag,
+		config: config,
 		controller: controller,
-		keep:       keep,
 	}
 }
 
@@ -37,8 +29,8 @@ func (a *Update) Run() {
 		os.Exit(1)
 	}
 
-	if a.tag != "" {
-		image, err := a.controller.GetContainerImage(a.container)
+	if a.config.Tag != "" {
+		image, err := a.controller.GetContainerImage(a.config.Container)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -51,11 +43,11 @@ func (a *Update) Run() {
 			os.Exit(1)
 		}
 
-		a.image = imageParts[0] + ":" + a.tag
+		a.config.Image = imageParts[0] + ":" + a.config.Tag
 	}
 
-	fmt.Println("pulling image:", a.image)
-	err := a.controller.PullImage(a.image)
+	fmt.Println("pulling image:", a.config.Image)
+	err := a.controller.PullImage(a.config.Image)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -63,8 +55,8 @@ func (a *Update) Run() {
 
 	fmt.Println("image pulled successfully")
 
-	fmt.Printf("updating %s to %s\n", a.container, a.image)
-	err = a.controller.UpdateContainer(a.container, a.image, a.keep)
+	fmt.Printf("updating %s to %s\n", a.config.Container, a.config.Image)
+	err = a.controller.UpdateContainer(a.config.Container,  a.config.Image, a.config.Keep)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
