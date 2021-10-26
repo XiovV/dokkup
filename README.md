@@ -52,6 +52,7 @@ api_key: '[YOUR_API_KEY]'
 node_location: 'http://localhost:8080'
 container: 'containerExample'
 tag: 'latest'
-# image: 'containerExample:latest' (we are using tag in this example, so it's unnecessary to specify the full image.)
+# image: 'containerExample:latest' (we are using tag in this 
+# example, so it's unnecessary to specify the full image.)
 keep: true
 ```
