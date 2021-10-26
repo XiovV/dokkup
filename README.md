@@ -44,7 +44,8 @@ dokkup rollback -node http://localhost:8080 -container containerExample -api-key
 
 # Configuration
 It's possible to use a config file instead of just using command line flags. You can configure anything using
-a `dokkup.yaml` file. `dokkup` will look for this file and load it. Please note however that command line flags have a higher priority, meaning that `dokkup` will ignore the `dokkup.yaml`
+a `dokkup.yaml` file. `dokkup` will look for this file and load it (the file needs to be named `dokkup.yaml`, at the moment it's 
+still not possible to use a custom filename). Please note however that command line flags have a higher priority, meaning that `dokkup` will ignore the `dokkup.yaml`
 file if you run `dokkup` with command line flags. Example:
 ```yaml
 api_key: '[YOUR_API_KEY]'
