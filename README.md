@@ -1,6 +1,4 @@
-# `dokkup`: Easy Container Updates
-
-<p align="center"><img src="https://raw.githubusercontent.com/XiovV/dokkup/master/logo/dokkupBlue.png" width=700></p>
+<p align="center"><img src="https://raw.githubusercontent.com/XiovV/dokkup/master/logo/dokkupBlue2.png" width=700></p>
 
 `dokkup` is a simple tool used for updating containers which can also handle rollbacks.
 
