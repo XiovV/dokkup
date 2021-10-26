@@ -26,19 +26,14 @@ func NewConfig() *Config {
 		os.Exit(1)
 	}
 
-	config := Config{}
-
 	if len(os.Args) > 2 {
-		config.parseCmdFlags()
-		return &config
+		return parseCmdFlags()
 	}
 
-	config.parseConfigFile(defaultConfigFilename)
-
-	return &config
+	return parseConfigFile(defaultConfigFilename)
 }
 
-func (config *Config) parseConfigFile(filename string) {
+func parseConfigFile(filename string) *Config {
 	file, err := os.Open(filename)
 
 	defer func(file *os.File) {
@@ -55,12 +50,18 @@ func (config *Config) parseConfigFile(filename string) {
 		panic(err)
 	}
 
+	var config Config
+
 	if err := yaml.Unmarshal(bytes, &config); err != nil {
 		panic(err)
 	}
+
+	return &config
 }
 
-func (config *Config) parseCmdFlags() {
+func parseCmdFlags() *Config {
+	var config Config
+
 	switch os.Args[1] {
 	case "up":
 		actionCmd := flag.NewFlagSet("up", flag.ExitOnError)
@@ -85,4 +86,6 @@ func (config *Config) parseCmdFlags() {
 			fmt.Println("flag parser error:", err)
 		}
 	}
+
+	return &config
 }
