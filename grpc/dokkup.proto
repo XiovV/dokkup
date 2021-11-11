@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option go_package = "github.com/XiovV/dokkup-agent/grpc";
+
+service Updater {
+  rpc UpdateContainer(UpdateRequest) returns (stream UpdateResponse) {}
+}
+
+message UpdateRequest {
+  string container_name = 1;
+  string image = 2;
+}
+
+message UpdateResponse {
+  string message = 1;
+}
