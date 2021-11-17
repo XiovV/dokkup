@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/XiovV/dokkup/app"
 	"github.com/XiovV/dokkup/controller"
-	"google.golang.org/grpc"
 	pb "github.com/XiovV/dokkup/grpc"
+	"google.golang.org/grpc"
 	"log"
 	"os"
 )
@@ -23,15 +23,17 @@ func main() {
 	}
 	defer conn.Close()
 
-	client := pb.NewUpdaterClient(conn)
+
 
 	switch os.Args[1] {
 	case "up":
+		client := pb.NewUpdaterClient(conn)
 		app := app.NewUpdate(config, dockerController)
 		app.Run(client)
 	case "rollback":
+		client := pb.NewRollbackClient(conn)
 		app := app.NewRollback(config, dockerController)
-		app.Run()
+		app.Run(client)
 	default:
 		fmt.Println("unknown command")
 		os.Exit(1)

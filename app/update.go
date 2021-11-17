@@ -33,10 +33,10 @@ func (a *Update) Run(client pb.UpdaterClient) {
 		os.Exit(1)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Minute)
 	defer cancel()
 
-	request := pb.UpdateRequest{Image: a.config.Image, ContainerName: a.config.Container}
+	request := pb.UpdateRequest{Image: a.config.Tag, ContainerName: a.config.Container}
 	stream, err := client.UpdateContainer(ctx, &request)
 	if err != nil {
 		fmt.Println(err)

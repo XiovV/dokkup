@@ -45,7 +45,7 @@ func (c *updaterClient) UpdateContainer(ctx context.Context, in *UpdateRequest, 
 }
 
 type Updater_UpdateContainerClient interface {
-	Recv() (*UpdateResponse, error)
+	Recv() (*Response, error)
 	grpc.ClientStream
 }
 
@@ -53,8 +53,8 @@ type updaterUpdateContainerClient struct {
 	grpc.ClientStream
 }
 
-func (x *updaterUpdateContainerClient) Recv() (*UpdateResponse, error) {
-	m := new(UpdateResponse)
+func (x *updaterUpdateContainerClient) Recv() (*Response, error) {
+	m := new(Response)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func _Updater_UpdateContainer_Handler(srv interface{}, stream grpc.ServerStream)
 }
 
 type Updater_UpdateContainerServer interface {
-	Send(*UpdateResponse) error
+	Send(*Response) error
 	grpc.ServerStream
 }
 
@@ -106,7 +106,7 @@ type updaterUpdateContainerServer struct {
 	grpc.ServerStream
 }
 
-func (x *updaterUpdateContainerServer) Send(m *UpdateResponse) error {
+func (x *updaterUpdateContainerServer) Send(m *Response) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -121,6 +121,119 @@ var Updater_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "UpdateContainer",
 			Handler:       _Updater_UpdateContainer_Handler,
+			ServerStreams: true,
+		},
+	},
+	Metadata: "grpc/dokkup.proto",
+}
+
+// RollbackClient is the client API for Rollback service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type RollbackClient interface {
+	RollbackContainer(ctx context.Context, in *RollbackRequest, opts ...grpc.CallOption) (Rollback_RollbackContainerClient, error)
+}
+
+type rollbackClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewRollbackClient(cc grpc.ClientConnInterface) RollbackClient {
+	return &rollbackClient{cc}
+}
+
+func (c *rollbackClient) RollbackContainer(ctx context.Context, in *RollbackRequest, opts ...grpc.CallOption) (Rollback_RollbackContainerClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Rollback_ServiceDesc.Streams[0], "/Rollback/RollbackContainer", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &rollbackRollbackContainerClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Rollback_RollbackContainerClient interface {
+	Recv() (*Response, error)
+	grpc.ClientStream
+}
+
+type rollbackRollbackContainerClient struct {
+	grpc.ClientStream
+}
+
+func (x *rollbackRollbackContainerClient) Recv() (*Response, error) {
+	m := new(Response)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// RollbackServer is the server API for Rollback service.
+// All implementations must embed UnimplementedRollbackServer
+// for forward compatibility
+type RollbackServer interface {
+	RollbackContainer(*RollbackRequest, Rollback_RollbackContainerServer) error
+	mustEmbedUnimplementedRollbackServer()
+}
+
+// UnimplementedRollbackServer must be embedded to have forward compatible implementations.
+type UnimplementedRollbackServer struct {
+}
+
+func (UnimplementedRollbackServer) RollbackContainer(*RollbackRequest, Rollback_RollbackContainerServer) error {
+	return status.Errorf(codes.Unimplemented, "method RollbackContainer not implemented")
+}
+func (UnimplementedRollbackServer) mustEmbedUnimplementedRollbackServer() {}
+
+// UnsafeRollbackServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to RollbackServer will
+// result in compilation errors.
+type UnsafeRollbackServer interface {
+	mustEmbedUnimplementedRollbackServer()
+}
+
+func RegisterRollbackServer(s grpc.ServiceRegistrar, srv RollbackServer) {
+	s.RegisterService(&Rollback_ServiceDesc, srv)
+}
+
+func _Rollback_RollbackContainer_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(RollbackRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(RollbackServer).RollbackContainer(m, &rollbackRollbackContainerServer{stream})
+}
+
+type Rollback_RollbackContainerServer interface {
+	Send(*Response) error
+	grpc.ServerStream
+}
+
+type rollbackRollbackContainerServer struct {
+	grpc.ServerStream
+}
+
+func (x *rollbackRollbackContainerServer) Send(m *Response) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+// Rollback_ServiceDesc is the grpc.ServiceDesc for Rollback service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var Rollback_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "Rollback",
+	HandlerType: (*RollbackServer)(nil),
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "RollbackContainer",
+			Handler:       _Rollback_RollbackContainer_Handler,
 			ServerStreams: true,
 		},
 	},

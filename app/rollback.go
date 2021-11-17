@@ -1,9 +1,13 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"github.com/XiovV/dokkup/controller"
-	"os"
+	pb "github.com/XiovV/dokkup/grpc"
+	"io"
+	"log"
+	"time"
 )
 
 type Rollback struct {
@@ -15,13 +19,26 @@ func NewRollback(config *Config, dockerController controller.DockerController) R
 	return Rollback{config: config, controller: dockerController}
 }
 
-func (r *Rollback) Run() {
-	fmt.Println("rolling back container...")
-	err := r.controller.RollbackContainer(r.config.Container)
+func (r *Rollback) Run(client pb.RollbackClient) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Minute)
+	defer cancel()
+
+	request := pb.RollbackRequest{Container: r.config.Container}
+	stream, err := client.RollbackContainer(ctx, &request)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
+	}
+	for {
+		response, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			log.Fatal("err", err)
+		}
+
+		fmt.Println(response.GetMessage())
 	}
 
-	fmt.Println("successfully rolled back container")
 }
