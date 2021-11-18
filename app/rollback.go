@@ -26,9 +26,8 @@ func NewRollback(config *Config, dockerController controller.DockerController, c
 	}
 }
 
-func (r *Rollback) Run() {
+func (r *Rollback) rollbackContainer() (pb.Rollback_RollbackContainerClient, context.CancelFunc) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Minute)
-	defer cancel()
 
 	header := metadata.New(map[string]string{"authorization": r.config.APIKey})
 	ctx = metadata.NewOutgoingContext(ctx, header)
@@ -38,6 +37,14 @@ func (r *Rollback) Run() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	return stream, cancel
+}
+
+func (r *Rollback) Run() {
+	stream, cancel := r.rollbackContainer()
+	defer cancel()
+
 	for {
 		response, err := stream.Recv()
 		if err == io.EOF {

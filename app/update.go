@@ -26,8 +26,21 @@ func NewUpdate(config *Config, controller controller.DockerController, conn *grp
 	}
 }
 
-func (a *Update) Run() {
-	errors := a.ValidateFlags()
+func (u *Update) updateContainer() (pb.Updater_UpdateContainerClient, context.CancelFunc) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Minute)
+
+
+	request := pb.UpdateRequest{Image: u.config.Tag, ContainerName: u.config.Container}
+	stream, err := u.client.UpdateContainer(ctx, &request)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return stream, cancel
+}
+
+func (u *Update) Run() {
+	errors := u.ValidateFlags()
 	if len(errors) != 0 {
 		for _, error := range errors {
 			fmt.Println(error)
@@ -36,14 +49,8 @@ func (a *Update) Run() {
 		os.Exit(1)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Minute)
+	stream, cancel := u.updateContainer()
 	defer cancel()
-
-	request := pb.UpdateRequest{Image: a.config.Tag, ContainerName: a.config.Container}
-	stream, err := a.client.UpdateContainer(ctx, &request)
-	if err != nil {
-		fmt.Println(err)
-	}
 
 	for {
 		response, err := stream.Recv()

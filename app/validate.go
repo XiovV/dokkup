@@ -2,30 +2,30 @@ package app
 
 import "strings"
 
-func (a *Update) ValidateFlags() []string {
+func (u *Update) ValidateFlags() []string {
 	errors := []string{}
 
-	if a.config.Image != "" && a.config.Tag != "" {
+	if u.config.Image != "" && u.config.Tag != "" {
 		errors = append(errors, "you can only either set the -image flag or the -tag flag")
 	}
 
-	if a.config.NodeLocation == "" {
-		errors = append(errors, "please provide a node")
+	if u.config.NodeLocation == "" {
+		errors = append(errors, "please provide u node")
 	}
 
-	if a.config.Image != "" {
-		imageParts := strings.Split(a.config.Image, ":")
+	if u.config.Image != "" {
+		imageParts := strings.Split(u.config.Image, ":")
 		if len(imageParts) != 2 || imageParts[0] == "" || imageParts[1] == "" {
 			errors = append(errors, "invalid image format. Example: imageName:latest")
 		}
 	}
 
-	if a.config.Image == "" && a.config.Tag == "" {
-		errors = append(errors, "please provide either an image flag or a tag flag")
+	if u.config.Image == "" && u.config.Tag == "" {
+		errors = append(errors, "please provide either an image flag or u tag flag")
 	}
 
-	if a.config.Container == "" {
-		errors = append(errors, "please provide a container")
+	if u.config.Container == "" {
+		errors = append(errors, "please provide u container")
 	}
 
 	return errors
