@@ -10,6 +10,8 @@ import (
 	"os"
 )
 
+
+
 func main() {
 	config := app.NewConfig()
 	dockerController := controller.NewDockerController(config.NodeLocation, config.APIKey)
@@ -23,10 +25,8 @@ func main() {
 	}
 	defer conn.Close()
 
-
-
 	switch os.Args[1] {
-	case "up":
+	case "update":
 		client := pb.NewUpdaterClient(conn)
 		app := app.NewUpdate(config, dockerController)
 		app.Run(client)
