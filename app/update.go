@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/XiovV/dokkup/controller"
 	pb "github.com/XiovV/dokkup/grpc"
+	"google.golang.org/grpc"
 	"io"
 	"log"
 	"os"
@@ -14,16 +15,18 @@ import (
 type Update struct {
 	config     *Config
 	controller controller.DockerController
+	client pb.UpdaterClient
 }
 
-func NewUpdate(config *Config, controller controller.DockerController) *Update {
+func NewUpdate(config *Config, controller controller.DockerController, conn *grpc.ClientConn) *Update {
 	return &Update{
 		config:     config,
 		controller: controller,
+		client: pb.NewUpdaterClient(conn),
 	}
 }
 
-func (a *Update) Run(client pb.UpdaterClient) {
+func (a *Update) Run() {
 	errors := a.ValidateFlags()
 	if len(errors) != 0 {
 		for _, error := range errors {
@@ -37,7 +40,7 @@ func (a *Update) Run(client pb.UpdaterClient) {
 	defer cancel()
 
 	request := pb.UpdateRequest{Image: a.config.Tag, ContainerName: a.config.Container}
-	stream, err := client.UpdateContainer(ctx, &request)
+	stream, err := a.client.UpdateContainer(ctx, &request)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -54,21 +57,4 @@ func (a *Update) Run(client pb.UpdaterClient) {
 
 		fmt.Println(response.GetMessage())
 	}
-
-	//err := a.controller.PullImage(a.config.Image)
-	//if err != nil {
-	//	fmt.Println(err)
-	//	os.Exit(1)
-	//}
-	//
-	//fmt.Println("image pulled successfully")
-	//
-	//fmt.Printf("updating %s to %s\n", a.config.Container, a.config.Image)
-	//err = a.controller.UpdateContainer(a.config.Container, a.config.Image, a.config.Keep)
-	//if err != nil {
-	//	fmt.Println(err)
-	//	os.Exit(1)
-	//}
-	//
-	//fmt.Println("container updated successfully")
 }

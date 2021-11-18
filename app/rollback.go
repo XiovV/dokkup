@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/XiovV/dokkup/controller"
 	pb "github.com/XiovV/dokkup/grpc"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"io"
 	"log"
@@ -14,13 +15,18 @@ import (
 type Rollback struct {
 	config     *Config
 	controller controller.DockerController
+	client pb.RollbackClient
 }
 
-func NewRollback(config *Config, dockerController controller.DockerController) Rollback {
-	return Rollback{config: config, controller: dockerController}
+func NewRollback(config *Config, dockerController controller.DockerController, conn *grpc.ClientConn) Rollback {
+	return Rollback{
+		config: config,
+		controller: dockerController,
+		client: pb.NewRollbackClient(conn),
+	}
 }
 
-func (r *Rollback) Run(client pb.RollbackClient) {
+func (r *Rollback) Run() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Minute)
 	defer cancel()
 
@@ -28,7 +34,7 @@ func (r *Rollback) Run(client pb.RollbackClient) {
 	ctx = metadata.NewOutgoingContext(ctx, header)
 
 	request := pb.RollbackRequest{Container: r.config.Container}
-	stream, err := client.RollbackContainer(ctx, &request)
+	stream, err := r.client.RollbackContainer(ctx, &request)
 	if err != nil {
 		log.Fatal(err)
 	}
