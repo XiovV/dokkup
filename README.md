@@ -1,5 +1,6 @@
 <p align="center"><img src="https://raw.githubusercontent.com/XiovV/dokkup/master/logo/dokkupBlue2.png" width=700></p>
 
+# Overview
 `dokkup` is a simple tool used for updating containers which can also handle rollbacks.
 
 It's ideal for use cases when you want to update a container on demand. It communicates with 
@@ -7,13 +8,10 @@ the `dokkup-agent` via HTTP, so it doesn't require `docker` to be installed on y
 a good fit for CI/CD.
 
 # Setup
-
-## Install
-
-### Install from [Releases](https://github.com/XiovV/dokkup/releases)
+##Install from [Releases](https://github.com/XiovV/dokkup/releases)
 To be added.
 
-### Build and install from Source
+## Build and install from Source
 With Go 1.16+, build and install the latest released version:
 
 ```
