@@ -8,8 +8,6 @@ the `dokkup-agent` via HTTP, so it doesn't require `docker` to be installed on y
 a good fit for CI/CD.
 
 # Setup
-##Install from [Releases](https://github.com/XiovV/dokkup/releases)
-To be added.
 
 ## Build and install from Source
 With Go 1.16+, build and install the latest released version:
