@@ -1,24 +1,14 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"os"
 
-	"github.com/urfave/cli/v2"
+	"github.com/XiovV/dokkup/app"
 )
 
 func main() {
-  app := &cli.App{
-    Name: "greet",
-    Usage: "test usage",
-    Action: func(*cli.Context) error {
-      fmt.Println("hello there")
-      return nil
-    },
-  }
+  app := app.NewApp()
 
-  if err := app.Run(os.Args); err != nil {
-    log.Fatal(err)
-  }
+  app.Run()
 }
+
+
