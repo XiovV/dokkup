@@ -5,17 +5,15 @@ import (
 	"log"
 	"os"
 
-	"github.com/XiovV/dokkup/config"
 	"github.com/urfave/cli/v2"
 )
 
 type App struct {
   Cli *cli.App
-  Inventory *config.Inventory
 } 
 
-func NewApp(inventory *config.Inventory) *App {
-  app := &App{Inventory: inventory}
+func NewApp() *App {
+  app := &App{}
 
 	app.Cli = &cli.App{
 		Name:  "dokkup",
