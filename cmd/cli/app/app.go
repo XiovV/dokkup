@@ -26,9 +26,9 @@ func NewApp(inventory *config.Inventory) *App {
 		},
 		Commands: []*cli.Command{
 			{
-				Name:    "add",
-				Aliases: []string{"a"},
-				Action: app.addCmd,
+				Name:    "job",
+				Aliases: []string{"j"},
+				Action: app.jobCmd,
       },
 		},
 	}
