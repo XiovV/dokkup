@@ -2,24 +2,23 @@ package main
 
 import (
 	"fmt"
-	"github.com/XiovV/dokkup/app"
-	"github.com/XiovV/dokkup/controller"
+	"log"
 	"os"
+
+	"github.com/urfave/cli/v2"
 )
 
 func main() {
-	config := app.NewConfig()
-	dockerController := controller.NewDockerController(config.NodeLocation, config.APIKey)
+  app := &cli.App{
+    Name: "greet",
+    Usage: "test usage",
+    Action: func(*cli.Context) error {
+      fmt.Println("hello there")
+      return nil
+    },
+  }
 
-	switch os.Args[1] {
-	case "up":
-		app := app.NewUpdate(config, dockerController)
-		app.Run()
-	case "rollback":
-		app := app.NewRollback(config, dockerController)
-		app.Run()
-	default:
-		fmt.Println("unknown command")
-		os.Exit(1)
-	}
+  if err := app.Run(os.Args); err != nil {
+    log.Fatal(err)
+  }
 }
