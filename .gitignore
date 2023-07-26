@@ -2,3 +2,4 @@
 cmd/cli/cli
 dokkup
 inventory.yaml
+job.yaml
