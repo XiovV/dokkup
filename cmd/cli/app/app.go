@@ -5,18 +5,20 @@ import (
 	"log"
 	"os"
 
+	"github.com/XiovV/dokkup/config"
 	"github.com/urfave/cli/v2"
 )
 
 type App struct {
   Cli *cli.App
+  Inventory *config.Inventory
 } 
 
-func NewApp() *App {
-  app := &App{}
+func NewApp(inventory *config.Inventory) *App {
+  app := &App{Inventory: inventory}
 
 	app.Cli = &cli.App{
-		Name:  "greet",
+		Name:  "dokkup",
 		Usage: "test usage",
 		Action: func(*cli.Context) error {
 			fmt.Println("hello there")
