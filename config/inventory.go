@@ -46,9 +46,7 @@ func ReadInventory(filename string) (*Inventory, error) {
 func (i *Inventory) validateGroups() error {
   for _, group := range i.Groups {
     for _, node := range group.Nodes {
-      exists := i.doesNodeExist(node)
-
-      if !exists {
+      if !i.doesNodeExist(node) {
         return fmt.Errorf("the node %s defined in group %s is not defined", node, group.Name)
       }
     }
