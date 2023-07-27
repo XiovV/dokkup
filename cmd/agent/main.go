@@ -10,12 +10,12 @@ import (
 func main() {
   key, err := checkAPIKey()
   if err != nil {
-    log.Fatal("could not check API key:", err)
+    log.Fatal("could not check API key: ", err)
   }
 
   config, err := config.ReadAgentConfig()
   if err != nil {
-    log.Fatal("could not read config", err)
+    log.Fatal("could not read config: ", err)
   }
 
   config.APIKey = key
