@@ -1,6 +1,7 @@
 .idea/
 cmd/cli/cli
 cmd/agent/agent
+cmd/agent/data
 dokkup
 inventory.yaml
 job.yaml
