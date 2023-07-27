@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package = "github.com/XiovV/dokkup";
+
+import "google/protobuf/empty.proto";
+
+service Dokkup {
+  rpc DeployContainer(DeployContainerRequest) returns (google.protobuf.Empty) {}
+}
+
+message DeployContainerRequest {
+  int32 count = 1;
+  string containerName = 2;
+  string containerImage = 3;
+}
