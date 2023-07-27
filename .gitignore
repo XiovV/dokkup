@@ -1,4 +1,5 @@
 .idea/
-docker_control_cli
+cmd/cli/cli
 dokkup
-dokkup.yaml
+inventory.yaml
+job.yaml
