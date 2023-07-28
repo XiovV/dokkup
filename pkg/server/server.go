@@ -5,6 +5,7 @@ import (
 	"net"
 
 	"github.com/XiovV/dokkup/pkg/config"
+	"github.com/XiovV/dokkup/pkg/docker"
 	pb "github.com/XiovV/dokkup/pkg/grpc"
 	"google.golang.org/grpc"
 )
@@ -12,6 +13,7 @@ import (
 type Server struct {
   pb.UnimplementedDokkupServer
   Config *config.AgentConfig
+  Controller *docker.Controller
 }
 
 func (s *Server) Serve() error {
