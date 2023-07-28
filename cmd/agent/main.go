@@ -5,7 +5,8 @@ import (
 	"log"
 
 	"github.com/XiovV/dokkup/pkg/config"
-  "github.com/XiovV/dokkup/pkg/server"
+	"github.com/XiovV/dokkup/pkg/docker"
+	"github.com/XiovV/dokkup/pkg/server"
 )
 
 func main() {
@@ -21,7 +22,12 @@ func main() {
 
   config.APIKey = key
 
-  srv := server.Server{Config: config} 
+  controller, err := docker.NewController()
+  if err != nil {
+    log.Fatal("could not instantiate controller: ", err)
+  } 
+
+  srv := server.Server{Config: config, Controller: controller} 
 
   fmt.Println("server listening on port", config.Port)
   if err := srv.Serve(); err != nil {
