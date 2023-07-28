@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/XiovV/dokkup/config"
+	"github.com/XiovV/dokkup/pkg/config"
+  "github.com/XiovV/dokkup/pkg/server"
 )
 
 func main() {
-  key, err := checkAPIKey()
+  key, err := config.CheckAPIKey()
   if err != nil {
     log.Fatal("could not check API key: ", err)
   }
@@ -20,7 +21,7 @@ func main() {
 
   config.APIKey = key
 
-  srv := Server{Config: config} 
+  srv := server.Server{Config: config} 
 
   fmt.Println("server listening on port", config.Port)
   if err := srv.Serve(); err != nil {

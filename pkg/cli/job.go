@@ -1,10 +1,10 @@
-package app
+package cli
 
 import (
 	"fmt"
 	"log"
 
-	"github.com/XiovV/dokkup/config"
+	"github.com/XiovV/dokkup/pkg/config"
 	"github.com/urfave/cli/v2"
 )
 

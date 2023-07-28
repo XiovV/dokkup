@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/XiovV/dokkup/cmd/cli/app"
+	"github.com/XiovV/dokkup/pkg/cli"
 )
 
 func main() {
-  app := app.NewApp()
+  app := cli.NewApp()
 
   app.Run()
 }

@@ -1,10 +1,10 @@
-package main
+package server
 
 import (
 	"context"
 	"fmt"
 
-	pb "github.com/XiovV/dokkup/grpc"
+	pb "github.com/XiovV/dokkup/pkg/grpc"
 	"github.com/golang/protobuf/ptypes/empty"
 )
 

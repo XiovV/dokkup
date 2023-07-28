@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"context"
@@ -23,12 +23,12 @@ func (s *Server) validateAuthHeader(ctx context.Context) error {
 
 	apiKey := apiKeyHeader[0]
 
-	if len(apiKey) > API_KEY_LENGTH {
+	if len(apiKey) > API_KEY_LENGHT {
     fmt.Println("api key too long")
 		return status.Error(codes.InvalidArgument, "api key is invalid")
 	}
 
-	if len(apiKey) < API_KEY_LENGTH {
+	if len(apiKey) < API_KEY_LENGHT {
     fmt.Println("api key too short")
 		return status.Error(codes.InvalidArgument, "api key is invalid")
 	}

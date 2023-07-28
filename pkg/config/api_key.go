@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"errors"
@@ -11,7 +11,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func checkAPIKey() (string, error) {
+const (
+  API_KEY_LENGHT = 32
+)
+
+func CheckAPIKey() (string, error) {
   key, err := readAPIKey()
   if err != nil {
     return "", err
@@ -45,7 +49,7 @@ func generateHashedAPIKey() ([]byte, string) {
   rand.Seed(time.Now().UnixNano())
 	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
-	s := make([]rune, API_KEY_LENGTH)
+	s := make([]rune, API_KEY_LENGHT)
 	for i := range s {
 		s[i] = letters[rand.Intn(len(letters))]
 	}

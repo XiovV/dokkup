@@ -1,11 +1,11 @@
-package main
+package server
 
 import (
 	"fmt"
 	"net"
 
-	"github.com/XiovV/dokkup/config"
-	pb "github.com/XiovV/dokkup/grpc"
+	"github.com/XiovV/dokkup/pkg/config"
+	pb "github.com/XiovV/dokkup/pkg/grpc"
 	"google.golang.org/grpc"
 )
 
