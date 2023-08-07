@@ -29,11 +29,6 @@ func (a *App) jobCmd(ctx *cli.Context) error {
 		return err
 	}
 
-	fmt.Println("inventory flag:", ctx.String("inventory"))
-
-	fmt.Printf("%+v\n", job)
-  fmt.Printf("%+v\n", inventory)
-
   fmt.Println("Deployment summary:\n")
 
   jobSummaryTable := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
@@ -52,10 +47,10 @@ func (a *App) jobCmd(ctx *cli.Context) error {
       log.Fatal("couldn't read input: ", err)
     }
 
-    fmt.Println("input:", input)
+    if (input == "n\n") {
+      return nil
+    }
   }
-  
-  
 
 	return nil
 }
