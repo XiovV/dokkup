@@ -12,41 +12,41 @@ import (
 )
 
 const (
-  API_KEY_LENGHT = 32
+	API_KEY_LENGHT = 32
 )
 
 func CheckAPIKey() (string, error) {
-  key, err := readAPIKey()
-  if err != nil {
-    return "", err
-  }
+	key, err := readAPIKey()
+	if err != nil {
+		return "", err
+	}
 
-  if len(key) != 0 {
-    return key, nil
-  }
+	if len(key) != 0 {
+		return key, nil
+	}
 
-  key, err = createNewAPIKey()  
-  fmt.Println("Your new API key is:", key)
-  return key, nil
+	key, err = createNewAPIKey()
+	fmt.Println("Your new API key is:", key)
+	return key, nil
 }
 
 func createNewAPIKey() (string, error) {
-  newKey, keyStr := generateHashedAPIKey()
+	newKey, keyStr := generateHashedAPIKey()
 
-  err := storeAPIKey(newKey)
-  if err != nil {
-    return "", err
-  }
+	err := storeAPIKey(newKey)
+	if err != nil {
+		return "", err
+	}
 
-  return keyStr, nil
+	return keyStr, nil
 }
 
 func storeAPIKey(key []byte) error {
-  return os.WriteFile("data", key, 0644)
+	return os.WriteFile("data", key, 0644)
 }
 
 func generateHashedAPIKey() ([]byte, string) {
-  rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano())
 	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
 	s := make([]rune, API_KEY_LENGHT)
@@ -62,26 +62,26 @@ func generateHashedAPIKey() ([]byte, string) {
 }
 
 func readAPIKey() (string, error) {
-  err := createDataFile()
-    if err != nil {
-      return "", err
-    }
+	err := createDataFile()
+	if err != nil {
+		return "", err
+	}
 
-    content, err := ioutil.ReadFile("data")
-    if err != nil {
-      return "", err
-    }
+	content, err := ioutil.ReadFile("data")
+	if err != nil {
+		return "", err
+	}
 
-  return string(content), nil
+	return string(content), nil
 }
 
 func createDataFile() error {
-if _, err := os.Stat("data"); errors.Is(err, os.ErrNotExist) {
+	if _, err := os.Stat("data"); errors.Is(err, os.ErrNotExist) {
 		_, err := os.Create("data")
 		if err != nil {
-      return err
+			return err
 		}
 	}
 
-  return nil
+	return nil
 }

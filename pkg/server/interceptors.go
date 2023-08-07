@@ -17,28 +17,28 @@ func (s *Server) validateAuthHeader(ctx context.Context) error {
 	apiKeyHeader := header["authorization"]
 
 	if len(apiKeyHeader) < 1 {
-    fmt.Println("api key not provided")
+		fmt.Println("api key not provided")
 		return status.Error(codes.InvalidArgument, "api key not provided")
 	}
 
 	apiKey := apiKeyHeader[0]
 
 	if len(apiKey) > API_KEY_LENGHT {
-    fmt.Println("api key too long")
+		fmt.Println("api key too long")
 		return status.Error(codes.InvalidArgument, "api key is invalid")
 	}
 
 	if len(apiKey) < API_KEY_LENGHT {
-    fmt.Println("api key too short")
+		fmt.Println("api key too short")
 		return status.Error(codes.InvalidArgument, "api key is invalid")
 	}
 
-	key := s.Config.APIKey 
+	key := s.Config.APIKey
 
-  fmt.Println(key, apiKey)
+	fmt.Println(key, apiKey)
 	err := bcrypt.CompareHashAndPassword([]byte(key), []byte(apiKey))
 	if err != nil {
-    fmt.Println("api key incorrect")
+		fmt.Println("api key incorrect")
 		return status.Error(codes.Unauthenticated, "api key is invalid")
 	}
 

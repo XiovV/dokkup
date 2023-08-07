@@ -5,17 +5,17 @@ import (
 )
 
 type AgentConfig struct {
-  Port string `env:"PORT" env-default:"8080"`
-  APIKey string
+	Port   string `env:"PORT" env-default:"8080"`
+	APIKey string
 }
 
 func ReadAgentConfig() (*AgentConfig, error) {
-  var config AgentConfig
+	var config AgentConfig
 
-  err := cleanenv.ReadEnv(&config)
-  if err != nil {
-    return nil, err
-  }
+	err := cleanenv.ReadEnv(&config)
+	if err != nil {
+		return nil, err
+	}
 
-  return &config, nil
+	return &config, nil
 }

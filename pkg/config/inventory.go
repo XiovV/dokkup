@@ -8,59 +8,59 @@ import (
 )
 
 type Inventory struct {
-  Nodes []Node `yaml:"nodes"`
-  Groups []Group `yaml:"groups"`
+	Nodes  []Node  `yaml:"nodes"`
+	Groups []Group `yaml:"groups"`
 }
 
 type Node struct {
-  Name string `yaml:"name"`
-  Location string `yaml:"location"`
-  Key string `yaml:"key"`
+	Name     string `yaml:"name"`
+	Location string `yaml:"location"`
+	Key      string `yaml:"key"`
 }
 
 type Group struct {
-  Name string `yaml:"name"`
-  Nodes []string `yaml:"nodes"`
+	Name  string   `yaml:"name"`
+	Nodes []string `yaml:"nodes"`
 }
 
 func ReadInventory(filename string) (*Inventory, error) {
-  content, err := ioutil.ReadFile(filename) 
-  if err != nil {
-    return nil, err
-  }
+	content, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
 
-  inventory := Inventory{} 
-  err = yaml.Unmarshal(content, &inventory)
-  if err != nil {
-    return nil, err
-  }
+	inventory := Inventory{}
+	err = yaml.Unmarshal(content, &inventory)
+	if err != nil {
+		return nil, err
+	}
 
-  err = inventory.validateGroups()
-  if err != nil {
-    return nil, err
-  }
-  
-  return &inventory, nil
+	err = inventory.validateGroups()
+	if err != nil {
+		return nil, err
+	}
+
+	return &inventory, nil
 }
 
 func (i *Inventory) validateGroups() error {
-  for _, group := range i.Groups {
-    for _, node := range group.Nodes {
-      if !i.doesNodeExist(node) {
-        return fmt.Errorf("the node %s defined in group %s is not defined", node, group.Name)
-      }
-    }
-  }
+	for _, group := range i.Groups {
+		for _, node := range group.Nodes {
+			if !i.doesNodeExist(node) {
+				return fmt.Errorf("the node %s defined in group %s is not defined", node, group.Name)
+			}
+		}
+	}
 
-  return nil
+	return nil
 }
 
 func (i *Inventory) doesNodeExist(node string) bool {
-  for _, n := range i.Nodes {
-    if n.Name == node {
-      return true
-    } 
-  } 
+	for _, n := range i.Nodes {
+		if n.Name == node {
+			return true
+		}
+	}
 
-  return false
+	return false
 }

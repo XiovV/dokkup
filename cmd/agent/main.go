@@ -10,27 +10,27 @@ import (
 )
 
 func main() {
-  key, err := config.CheckAPIKey()
-  if err != nil {
-    log.Fatal("could not check API key: ", err)
-  }
+	key, err := config.CheckAPIKey()
+	if err != nil {
+		log.Fatal("could not check API key: ", err)
+	}
 
-  config, err := config.ReadAgentConfig()
-  if err != nil {
-    log.Fatal("could not read config: ", err)
-  }
+	config, err := config.ReadAgentConfig()
+	if err != nil {
+		log.Fatal("could not read config: ", err)
+	}
 
-  config.APIKey = key
+	config.APIKey = key
 
-  controller, err := docker.NewController()
-  if err != nil {
-    log.Fatal("could not instantiate controller: ", err)
-  } 
+	controller, err := docker.NewController()
+	if err != nil {
+		log.Fatal("could not instantiate controller: ", err)
+	}
 
-  srv := server.Server{Config: config, Controller: controller} 
+	srv := server.Server{Config: config, Controller: controller}
 
-  fmt.Println("server listening on port", config.Port)
-  if err := srv.Serve(); err != nil {
-    log.Fatal(err)
-  }
+	fmt.Println("server listening on port", config.Port)
+	if err := srv.Serve(); err != nil {
+		log.Fatal(err)
+	}
 }

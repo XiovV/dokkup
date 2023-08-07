@@ -25,16 +25,16 @@ func NewApp() *App {
 					{
 						Flags: []cli.Flag{
 							&cli.StringFlag{
-								Name:  "inventory",
-                Aliases: []string{"i"},
-								Value: "inventory.yaml",
-								Usage: "name for the inventory file",
+								Name:    "inventory",
+								Aliases: []string{"i"},
+								Value:   "inventory.yaml",
+								Usage:   "name for the inventory file",
 							},
-              &cli.BoolFlag{
-                Name: "yes",
-                Aliases: []string{"y"},
-                Value: false,
-              },
+							&cli.BoolFlag{
+								Name:    "yes",
+								Aliases: []string{"y"},
+								Value:   false,
+							},
 						},
 
 						Name:   "job",
