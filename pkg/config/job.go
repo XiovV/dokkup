@@ -7,7 +7,8 @@ import (
 )
 
 type Job struct {
-	Group     string      `yaml:"group"`
+	Group     string      `yaml:"group,omitempty"`
+  Node string `yaml:"node,omitempty"`
 	Count     int         `yaml:"count"`
 	Container []Container `yaml:"container"`
 }
@@ -15,6 +16,11 @@ type Job struct {
 type Container struct {
 	Name  string `yaml:"name"`
 	Image string `yaml:"image"`
+  Networks []string `yaml:"networks"`
+  Volumes []string `yaml:"volumes"`
+  Environment []string `yaml:"environment"`
+  Restart string `yaml:"restart"` 
+  Labels []string `yaml:"labels"`
 }
 
 func ReadJob(filename string) (*Job, error) {
@@ -29,5 +35,17 @@ func ReadJob(filename string) (*Job, error) {
     return nil, err
   }
 
+  job.setDefaults()
+
   return &job, nil
+}
+
+func (j *Job) setDefaults() {
+  if len(j.Container[0].Networks) == 0 {
+    j.Container[0].Networks = []string{"bridge"}
+  }
+
+  if j.Container[0].Restart == "" {
+    j.Container[0].Restart = "always"
+  }
 }

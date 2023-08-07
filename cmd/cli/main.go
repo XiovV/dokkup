@@ -5,9 +5,7 @@ import (
 )
 
 func main() {
-  app := cli.NewApp()
+	app := cli.NewApp()
 
-  app.Run()
+	app.Run()
 }
-
-

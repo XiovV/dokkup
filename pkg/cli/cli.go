@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -9,33 +8,49 @@ import (
 )
 
 type App struct {
-  Cli *cli.App
-} 
+	Cli *cli.App
+}
 
 func NewApp() *App {
-  app := &App{}
+	app := &App{}
 
 	app.Cli = &cli.App{
 		Name:  "dokkup",
-		Usage: "test usage",
-		Action: func(*cli.Context) error {
-			fmt.Println("hello there")
-			return nil
-		},
+		Usage: "manage containers",
 		Commands: []*cli.Command{
 			{
-				Name:    "job",
+				Name:    "run",
 				Aliases: []string{"j"},
-				Action: app.jobCmd,
-      },
+				Subcommands: []*cli.Command{
+					{
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:  "inventory",
+                Aliases: []string{"i"},
+								Value: "inventory.yaml",
+								Usage: "name for the inventory file",
+							},
+              &cli.BoolFlag{
+                Name: "yes",
+                Aliases: []string{"y"},
+                Value: false,
+              },
+						},
+
+						Name:   "job",
+						Usage:  "run a job",
+						Action: app.jobCmd,
+					},
+				},
+			},
 		},
 	}
 
-  return app
+	return app
 }
 
 func (a *App) Run() {
-  if err := a.Cli.Run(os.Args); err != nil {
-    log.Fatal(err)
-  }
+	if err := a.Cli.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
 }
