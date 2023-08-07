@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.6.1
-// source: grpc/dokkup.proto
+// source: pkg/grpc/dokkup.proto
 
 package dokkup
 
@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DokkupClient interface {
 	DeployContainer(ctx context.Context, in *DeployContainerRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	CheckAPIKey(ctx context.Context, in *CheckAPIKeyRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 }
 
 type dokkupClient struct {
@@ -43,11 +44,21 @@ func (c *dokkupClient) DeployContainer(ctx context.Context, in *DeployContainerR
 	return out, nil
 }
 
+func (c *dokkupClient) CheckAPIKey(ctx context.Context, in *CheckAPIKeyRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/Dokkup/CheckAPIKey", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DokkupServer is the server API for Dokkup service.
 // All implementations must embed UnimplementedDokkupServer
 // for forward compatibility
 type DokkupServer interface {
 	DeployContainer(context.Context, *DeployContainerRequest) (*empty.Empty, error)
+	CheckAPIKey(context.Context, *CheckAPIKeyRequest) (*empty.Empty, error)
 	mustEmbedUnimplementedDokkupServer()
 }
 
@@ -57,6 +68,9 @@ type UnimplementedDokkupServer struct {
 
 func (UnimplementedDokkupServer) DeployContainer(context.Context, *DeployContainerRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeployContainer not implemented")
+}
+func (UnimplementedDokkupServer) CheckAPIKey(context.Context, *CheckAPIKeyRequest) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckAPIKey not implemented")
 }
 func (UnimplementedDokkupServer) mustEmbedUnimplementedDokkupServer() {}
 
@@ -89,6 +103,24 @@ func _Dokkup_DeployContainer_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Dokkup_CheckAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckAPIKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DokkupServer).CheckAPIKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Dokkup/CheckAPIKey",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DokkupServer).CheckAPIKey(ctx, req.(*CheckAPIKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Dokkup_ServiceDesc is the grpc.ServiceDesc for Dokkup service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -100,7 +132,11 @@ var Dokkup_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "DeployContainer",
 			Handler:    _Dokkup_DeployContainer_Handler,
 		},
+		{
+			MethodName: "CheckAPIKey",
+			Handler:    _Dokkup_CheckAPIKey_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "grpc/dokkup.proto",
+	Metadata: "pkg/grpc/dokkup.proto",
 }
