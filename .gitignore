@@ -3,5 +3,5 @@ cmd/cli/cli
 cmd/agent/agent
 cmd/agent/data
 dokkup
-pkg/cli/inventory.yaml
-pkg/cli/job.yaml
+cmd/cli/inventory.yaml
+cmd/cli/job.yaml
