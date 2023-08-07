@@ -1,12 +1,14 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"net"
 
 	"github.com/XiovV/dokkup/pkg/config"
 	"github.com/XiovV/dokkup/pkg/docker"
 	pb "github.com/XiovV/dokkup/pkg/grpc"
+	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 )
 
@@ -26,4 +28,9 @@ func (s *Server) Serve() error {
 	pb.RegisterDokkupServer(grpcServer, s)
 
 	return grpcServer.Serve(lis)
+}
+
+func (s *Server) CheckAPIKey(ctx context.Context, in *pb.CheckAPIKeyRequest) (*empty.Empty, error) {
+  // The interceptor already does the checking. This RPC is essentially used for 'pinging' nodes.
+  return new(empty.Empty), nil 
 }
