@@ -31,6 +31,6 @@ func (s *Server) Serve() error {
 }
 
 func (s *Server) CheckAPIKey(ctx context.Context, in *pb.CheckAPIKeyRequest) (*empty.Empty, error) {
-  // The interceptor already does the checking. This RPC is essentially used for 'pinging' nodes.
-  return new(empty.Empty), nil 
+	// The interceptor already does the checking. This RPC is essentially used for 'pinging' nodes.
+	return new(empty.Empty), nil
 }

@@ -17,9 +17,9 @@ import (
 )
 
 const (
-  NODE_STATUS_ONLINE = "ONLINE"
-  NODE_STATUS_OFFLINE = "OFFLINE"
-  NODE_STATUS_UNAUTHENTICATED = "API KEY INVALID"
+	NODE_STATUS_ONLINE          = "ONLINE"
+	NODE_STATUS_OFFLINE         = "OFFLINE"
+	NODE_STATUS_UNAUTHENTICATED = "API KEY INVALID"
 )
 
 func (a *App) jobCmd(ctx *cli.Context) error {
@@ -40,106 +40,106 @@ func (a *App) jobCmd(ctx *cli.Context) error {
 		return err
 	}
 
-  a.showJobSummaryTable(job)
+	a.showJobSummaryTable(job)
 
-  err = a.showNodeStatuses(inventory, job)
-  if err != nil {
-    log.Fatal("couldn't show node statuses: ", err)
-  }
+	err = a.showNodeStatuses(inventory, job)
+	if err != nil {
+		log.Fatal("couldn't show node statuses: ", err)
+	}
 
-  shouldContinue, err := a.showConfirmationPrompt(ctx)	
-  if err != nil {
-    log.Fatal("confirmation prompt error: ", err)
-  }
+	shouldContinue, err := a.showConfirmationPrompt(ctx)
+	if err != nil {
+		log.Fatal("confirmation prompt error: ", err)
+	}
 
-  if !shouldContinue {
-    return nil
-  }
-  
+	if !shouldContinue {
+		return nil
+	}
+
 	return nil
 }
 
 func (a *App) showNodeStatuses(inventory *config.Inventory, job *config.Job) error {
-  group, ok := inventory.GetGroup(job.Group)
-  if !ok {
-    return fmt.Errorf("couldn't find group '%s'", job.Group) 
-  }
+	group, ok := inventory.GetGroup(job.Group)
+	if !ok {
+		return fmt.Errorf("couldn't find group '%s'", job.Group)
+	}
 
-  var unavailableNodes int
+	var unavailableNodes int
 
-  fmt.Print("Node statuses:\n\n")
-  nodeStatusesTable := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
-  fmt.Fprintln(nodeStatusesTable, "NAME\tSTATUS")
+	fmt.Print("Node statuses:\n\n")
+	nodeStatusesTable := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
+	fmt.Fprintln(nodeStatusesTable, "NAME\tSTATUS")
 
-  for _, nodeName := range group.Nodes {
-    node, ok := inventory.GetNode(nodeName)
-    if !ok {
-      return fmt.Errorf("couldn't find node '%s", nodeName)
-    }
-        
-    nodeStatus, err := a.getNodeStatus(node)
-    if err != nil {
-      log.Fatal("couldn't get node status: ", err)
-    } 
+	for _, nodeName := range group.Nodes {
+		node, ok := inventory.GetNode(nodeName)
+		if !ok {
+			return fmt.Errorf("couldn't find node '%s", nodeName)
+		}
 
-    if nodeStatus == NODE_STATUS_OFFLINE || nodeStatus == NODE_STATUS_UNAUTHENTICATED {
-      unavailableNodes++
-    }
+		nodeStatus, err := a.getNodeStatus(node)
+		if err != nil {
+			log.Fatal("couldn't get node status: ", err)
+		}
 
-    out := fmt.Sprintf("%s\t%s", nodeName, nodeStatus)
-    fmt.Fprintln(nodeStatusesTable, out)
-  }
+		if nodeStatus == NODE_STATUS_OFFLINE || nodeStatus == NODE_STATUS_UNAUTHENTICATED {
+			unavailableNodes++
+		}
 
-  nodeStatusesTable.Flush()
+		out := fmt.Sprintf("%s\t%s", nodeName, nodeStatus)
+		fmt.Fprintln(nodeStatusesTable, out)
+	}
 
-  if unavailableNodes == 1 {
-    fmt.Printf("\nWarning! It seems that there is %d unavailable node, it will be skipped.\n", unavailableNodes)
-  }
+	nodeStatusesTable.Flush()
 
-  if unavailableNodes > 1 {
-    fmt.Printf("\nWarning! It seems that there are %d unavailable nodes, they will be skipped.\n", unavailableNodes)
-  }
+	if unavailableNodes == 1 {
+		fmt.Printf("\nWarning! It seems that there is %d unavailable node, it will be skipped.\n", unavailableNodes)
+	}
 
-  return nil
+	if unavailableNodes > 1 {
+		fmt.Printf("\nWarning! It seems that there are %d unavailable nodes, they will be skipped.\n", unavailableNodes)
+	}
+
+	return nil
 }
 
 func (a *App) getNodeStatus(node config.Node) (string, error) {
-  err := a.pingNode(node) 
-  if err != nil {
-    switch status.Code(err) {
-    case codes.Unauthenticated:
-      return NODE_STATUS_UNAUTHENTICATED, nil
-    case codes.Unavailable:
-      return NODE_STATUS_OFFLINE, nil
-    default:
-      return "", err
-    }
-  }
+	err := a.pingNode(node)
+	if err != nil {
+		switch status.Code(err) {
+		case codes.Unauthenticated:
+			return NODE_STATUS_UNAUTHENTICATED, nil
+		case codes.Unavailable:
+			return NODE_STATUS_OFFLINE, nil
+		default:
+			return "", err
+		}
+	}
 
-  return NODE_STATUS_ONLINE, nil
+	return NODE_STATUS_ONLINE, nil
 }
 
 func (a *App) pingNode(node config.Node) error {
-  client, err := a.initClient(node.Location)
-  if err != nil {
-    return fmt.Errorf("couldn't init connection: %w", err)
-  }
+	client, err := a.initClient(node.Location)
+	if err != nil {
+		return fmt.Errorf("couldn't init connection: %w", err)
+	}
 
-  ctx, cancel := context.WithCancel(context.Background())
-  defer cancel()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-  ctx = metadata.AppendToOutgoingContext(ctx, "authorization", node.Key)
+	ctx = metadata.AppendToOutgoingContext(ctx, "authorization", node.Key)
 
-  _, err = client.CheckAPIKey(ctx, &pb.CheckAPIKeyRequest{})
-  if err != nil {
-    return fmt.Errorf("couldn't check API key: %w", err)
-  }
-  
-  return nil
+	_, err = client.CheckAPIKey(ctx, &pb.CheckAPIKeyRequest{})
+	if err != nil {
+		return fmt.Errorf("couldn't check API key: %w", err)
+	}
+
+	return nil
 }
 
 func (a *App) showJobSummaryTable(job *config.Job) {
-  fmt.Print("Deployment summary:\n\n")
+	fmt.Print("Deployment summary:\n\n")
 
 	jobSummaryTable := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
 	fmt.Fprintln(jobSummaryTable, "NAME\tIMAGE\tRESTART\tCOUNT\tGROUP\tNETWORKS")
@@ -151,18 +151,18 @@ func (a *App) showJobSummaryTable(job *config.Job) {
 }
 
 func (a *App) showConfirmationPrompt(ctx *cli.Context) (bool, error) {
-  if !ctx.Bool("yes") {
+	if !ctx.Bool("yes") {
 		fmt.Print("\nAre you sure you want to proceed? (y/n) ")
 		reader := bufio.NewReader(os.Stdin)
 		input, err := reader.ReadString('\n')
 		if err != nil {
-      return false, err 
+			return false, err
 		}
 
 		if input == "n\n" {
-			return false, nil 
+			return false, nil
 		}
-	} 
+	}
 
-  return true, nil
+	return true, nil
 }

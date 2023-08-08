@@ -44,23 +44,23 @@ func ReadInventory(filename string) (*Inventory, error) {
 }
 
 func (i *Inventory) GetGroup(groupName string) (Group, bool) {
-  for _, group := range i.Groups {
-    if group.Name == groupName {
-      return group, true
-    }
-  }
+	for _, group := range i.Groups {
+		if group.Name == groupName {
+			return group, true
+		}
+	}
 
-  return Group{}, false
+	return Group{}, false
 }
 
 func (i *Inventory) GetNode(nodeName string) (Node, bool) {
-  for _, node := range i.Nodes {
-    if node.Name == nodeName {
-      return node, true
-    }
-  }
+	for _, node := range i.Nodes {
+		if node.Name == nodeName {
+			return node, true
+		}
+	}
 
-  return Node{}, false
+	return Node{}, false
 }
 
 func (i *Inventory) validateGroups() error {

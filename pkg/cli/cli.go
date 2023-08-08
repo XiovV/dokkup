@@ -59,11 +59,11 @@ func (a *App) Run() {
 }
 
 func (a *App) initClient(target string) (pb.DokkupClient, error) {
-  conn, err := grpc.Dial(target, grpc.WithTransportCredentials(insecure.NewCredentials()))
-  if err != nil {
-    return nil, err
-  }
-  
-  client := pb.NewDokkupClient(conn)
-  return client, nil
+	conn, err := grpc.Dial(target, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, err
+	}
+
+	client := pb.NewDokkupClient(conn)
+	return client, nil
 }
