@@ -2,13 +2,24 @@ package cli
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"log"
 	"os"
 	"text/tabwriter"
 
 	"github.com/XiovV/dokkup/pkg/config"
+	pb "github.com/XiovV/dokkup/pkg/grpc"
 	"github.com/urfave/cli/v2"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
+)
+
+const (
+  NODE_STATUS_ONLINE = "ONLINE"
+  NODE_STATUS_OFFLINE = "OFFLINE"
+  NODE_STATUS_UNAUTHENTICATED = "API KEY INVALID"
 )
 
 func (a *App) jobCmd(ctx *cli.Context) error {
@@ -29,7 +40,106 @@ func (a *App) jobCmd(ctx *cli.Context) error {
 		return err
 	}
 
-	fmt.Println("Deployment summary:\n")
+  a.showJobSummaryTable(job)
+
+  err = a.showNodeStatuses(inventory, job)
+  if err != nil {
+    log.Fatal("couldn't show node statuses: ", err)
+  }
+
+  shouldContinue, err := a.showConfirmationPrompt(ctx)	
+  if err != nil {
+    log.Fatal("confirmation prompt error: ", err)
+  }
+
+  if !shouldContinue {
+    return nil
+  }
+  
+	return nil
+}
+
+func (a *App) showNodeStatuses(inventory *config.Inventory, job *config.Job) error {
+  group, ok := inventory.GetGroup(job.Group)
+  if !ok {
+    return fmt.Errorf("couldn't find group '%s'", job.Group) 
+  }
+
+  var unavailableNodes int
+
+  fmt.Print("Node statuses:\n\n")
+  nodeStatusesTable := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
+  fmt.Fprintln(nodeStatusesTable, "NAME\tSTATUS")
+
+  for _, nodeName := range group.Nodes {
+    node, ok := inventory.GetNode(nodeName)
+    if !ok {
+      return fmt.Errorf("couldn't find node '%s", nodeName)
+    }
+        
+    nodeStatus, err := a.getNodeStatus(node)
+    if err != nil {
+      log.Fatal("couldn't get node status: ", err)
+    } 
+
+    if nodeStatus == NODE_STATUS_OFFLINE || nodeStatus == NODE_STATUS_UNAUTHENTICATED {
+      unavailableNodes++
+    }
+
+    out := fmt.Sprintf("%s\t%s", nodeName, nodeStatus)
+    fmt.Fprintln(nodeStatusesTable, out)
+  }
+
+  nodeStatusesTable.Flush()
+
+  if unavailableNodes == 1 {
+    fmt.Printf("\nWarning! It seems that there is %d unavailable node, it will be skipped.\n", unavailableNodes)
+  }
+
+  if unavailableNodes > 1 {
+    fmt.Printf("\nWarning! It seems that there are %d unavailable nodes, they will be skipped.\n", unavailableNodes)
+  }
+
+  return nil
+}
+
+func (a *App) getNodeStatus(node config.Node) (string, error) {
+  err := a.pingNode(node) 
+  if err != nil {
+    switch status.Code(err) {
+    case codes.Unauthenticated:
+      return NODE_STATUS_UNAUTHENTICATED, nil
+    case codes.Unavailable:
+      return NODE_STATUS_OFFLINE, nil
+    default:
+      return "", err
+    }
+  }
+
+  return NODE_STATUS_ONLINE, nil
+}
+
+func (a *App) pingNode(node config.Node) error {
+  client, err := a.initClient(node.Location)
+  if err != nil {
+    return fmt.Errorf("couldn't init connection: %w", err)
+  }
+
+  ctx, cancel := context.WithCancel(context.Background())
+  defer cancel()
+
+  ctx = metadata.AppendToOutgoingContext(ctx, "authorization", node.Key)
+
+  _, err = client.CheckAPIKey(ctx, &pb.CheckAPIKeyRequest{})
+  if err != nil {
+    return fmt.Errorf("couldn't check API key: %w", err)
+  }
+  
+  return nil
+}
+
+func (a *App) showJobSummaryTable(job *config.Job) {
+  fmt.Print("Deployment summary:\n\n")
 
 	jobSummaryTable := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
 	fmt.Fprintln(jobSummaryTable, "NAME\tIMAGE\tRESTART\tCOUNT\tGROUP\tNETWORKS")
@@ -38,19 +148,21 @@ func (a *App) jobCmd(ctx *cli.Context) error {
 	fmt.Fprintln(jobSummaryTable, out)
 
 	jobSummaryTable.Flush()
+}
 
-	if !ctx.Bool("yes") {
-		fmt.Print("Are you sure you want to proceed? (y/n) ")
+func (a *App) showConfirmationPrompt(ctx *cli.Context) (bool, error) {
+  if !ctx.Bool("yes") {
+		fmt.Print("\nAre you sure you want to proceed? (y/n) ")
 		reader := bufio.NewReader(os.Stdin)
 		input, err := reader.ReadString('\n')
 		if err != nil {
-			log.Fatal("couldn't read input: ", err)
+      return false, err 
 		}
 
 		if input == "n\n" {
-			return nil
+			return false, nil 
 		}
-	}
+	} 
 
-	return nil
+  return true, nil
 }
