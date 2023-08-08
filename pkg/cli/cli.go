@@ -12,7 +12,6 @@ import (
 
 type App struct {
 	Cli *cli.App
-  dokkupClient *pb.DokkupClient
 }
 
 func NewApp() *App {
@@ -59,12 +58,12 @@ func (a *App) Run() {
 	}
 }
 
-func (a *App) initClient(target string) (*pb.DokkupClient, error) {
+func (a *App) initClient(target string) (pb.DokkupClient, error) {
   conn, err := grpc.Dial(target, grpc.WithTransportCredentials(insecure.NewCredentials()))
   if err != nil {
     return nil, err
   }
   
   client := pb.NewDokkupClient(conn)
-  return &client, nil
+  return client, nil
 }
