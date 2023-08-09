@@ -1,28 +1,54 @@
 package server
 
 import (
-	"context"
 	"errors"
 	"fmt"
 
 	pb "github.com/XiovV/dokkup/pkg/grpc"
-	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/go-connections/nat"
+	"github.com/google/uuid"
 )
 
-func (s *Server) DeployContainer(ctx context.Context, in *pb.DeployContainerRequest) (*empty.Empty, error) {
-	fmt.Println(in)
-
-	err := s.Controller.ImagePull(in.ContainerImage)
+func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_DeployJobServer) error {
+	stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Attempting to pull image: %s", request.Container.Image)})
+	err := s.Controller.ImagePull(request.Container.Image)
 	if err != nil {
 		fmt.Println(err)
-		return nil, errors.New("failed to create container")
+		return errors.New("failed to pull image")
 	}
 
-	err = s.Controller.ContainerCreate(in.ContainerName, in.ContainerImage)
-	if err != nil {
-		fmt.Println(err)
-		return nil, errors.New("failed to create container")
+	internalPort := fmt.Sprintf("%s/tcp", request.Container.Ports[0].In)
+
+	for i := 0; i < int(request.Count); i++ {
+
+		containerConfig := &container.Config{
+			Image: request.Container.Image,
+			ExposedPorts: nat.PortSet{
+				nat.Port(internalPort): struct{}{},
+			},
+		}
+
+		fmt.Println(containerConfig.ExposedPorts[nat.Port(internalPort)])
+
+		hostConfig := &container.HostConfig{
+			PortBindings: nat.PortMap{
+				nat.Port(internalPort): []nat.PortBinding{{HostIP: "0.0.0.0"}},
+			},
+		}
+
+		uuidv4 := uuid.New()
+		containerName := fmt.Sprintf("%s-%s", request.Container.Name, uuidv4.String())
+
+		err = s.Controller.ContainerCreate(containerName, containerConfig, hostConfig)
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+
+		fmt.Println("successfully created container")
+
 	}
 
-	return new(empty.Empty), nil
+	return nil
 }

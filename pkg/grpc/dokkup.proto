@@ -30,8 +30,8 @@ message Container {
 }
 
 message Port {
-    int32 in = 1;
-    int32 out = 2;
+    string in = 1;
+    string out = 2;
 }
 
 message Network {

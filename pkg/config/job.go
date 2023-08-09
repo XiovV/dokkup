@@ -16,11 +16,17 @@ type Job struct {
 type Container struct {
 	Name        string   `yaml:"name"`
 	Image       string   `yaml:"image"`
+	Ports       []Port   `yaml:"ports"`
 	Networks    []string `yaml:"networks"`
 	Volumes     []string `yaml:"volumes"`
 	Environment []string `yaml:"environment"`
 	Restart     string   `yaml:"restart"`
 	Labels      []string `yaml:"labels"`
+}
+
+type Port struct {
+	In  string `yaml:"in"`
+	Out string `yaml:"out"`
 }
 
 func ReadJob(filename string) (*Job, error) {
