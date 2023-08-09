@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DokkupClient interface {
-	DeployContainer(ctx context.Context, in *DeployContainerRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	DeployJob(ctx context.Context, in *DeployJobRequest, opts ...grpc.CallOption) (Dokkup_DeployJobClient, error)
 	CheckAPIKey(ctx context.Context, in *CheckAPIKeyRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 }
 
@@ -35,13 +35,36 @@ func NewDokkupClient(cc grpc.ClientConnInterface) DokkupClient {
 	return &dokkupClient{cc}
 }
 
-func (c *dokkupClient) DeployContainer(ctx context.Context, in *DeployContainerRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
-	out := new(empty.Empty)
-	err := c.cc.Invoke(ctx, "/Dokkup/DeployContainer", in, out, opts...)
+func (c *dokkupClient) DeployJob(ctx context.Context, in *DeployJobRequest, opts ...grpc.CallOption) (Dokkup_DeployJobClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Dokkup_ServiceDesc.Streams[0], "/Dokkup/DeployJob", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &dokkupDeployJobClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Dokkup_DeployJobClient interface {
+	Recv() (*DeployJobResponse, error)
+	grpc.ClientStream
+}
+
+type dokkupDeployJobClient struct {
+	grpc.ClientStream
+}
+
+func (x *dokkupDeployJobClient) Recv() (*DeployJobResponse, error) {
+	m := new(DeployJobResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func (c *dokkupClient) CheckAPIKey(ctx context.Context, in *CheckAPIKeyRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
@@ -57,7 +80,7 @@ func (c *dokkupClient) CheckAPIKey(ctx context.Context, in *CheckAPIKeyRequest, 
 // All implementations must embed UnimplementedDokkupServer
 // for forward compatibility
 type DokkupServer interface {
-	DeployContainer(context.Context, *DeployContainerRequest) (*empty.Empty, error)
+	DeployJob(*DeployJobRequest, Dokkup_DeployJobServer) error
 	CheckAPIKey(context.Context, *CheckAPIKeyRequest) (*empty.Empty, error)
 	mustEmbedUnimplementedDokkupServer()
 }
@@ -66,8 +89,8 @@ type DokkupServer interface {
 type UnimplementedDokkupServer struct {
 }
 
-func (UnimplementedDokkupServer) DeployContainer(context.Context, *DeployContainerRequest) (*empty.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeployContainer not implemented")
+func (UnimplementedDokkupServer) DeployJob(*DeployJobRequest, Dokkup_DeployJobServer) error {
+	return status.Errorf(codes.Unimplemented, "method DeployJob not implemented")
 }
 func (UnimplementedDokkupServer) CheckAPIKey(context.Context, *CheckAPIKeyRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckAPIKey not implemented")
@@ -85,22 +108,25 @@ func RegisterDokkupServer(s grpc.ServiceRegistrar, srv DokkupServer) {
 	s.RegisterService(&Dokkup_ServiceDesc, srv)
 }
 
-func _Dokkup_DeployContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeployContainerRequest)
-	if err := dec(in); err != nil {
-		return nil, err
+func _Dokkup_DeployJob_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(DeployJobRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(DokkupServer).DeployContainer(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/Dokkup/DeployContainer",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DokkupServer).DeployContainer(ctx, req.(*DeployContainerRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(DokkupServer).DeployJob(m, &dokkupDeployJobServer{stream})
+}
+
+type Dokkup_DeployJobServer interface {
+	Send(*DeployJobResponse) error
+	grpc.ServerStream
+}
+
+type dokkupDeployJobServer struct {
+	grpc.ServerStream
+}
+
+func (x *dokkupDeployJobServer) Send(m *DeployJobResponse) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 func _Dokkup_CheckAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -129,14 +155,16 @@ var Dokkup_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*DokkupServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "DeployContainer",
-			Handler:    _Dokkup_DeployContainer_Handler,
-		},
-		{
 			MethodName: "CheckAPIKey",
 			Handler:    _Dokkup_CheckAPIKey_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "DeployJob",
+			Handler:       _Dokkup_DeployJob_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "pkg/grpc/dokkup.proto",
 }

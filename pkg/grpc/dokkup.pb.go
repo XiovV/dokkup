@@ -21,18 +21,17 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type DeployContainerRequest struct {
+type DeployJobRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Count          int32  `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
-	ContainerName  string `protobuf:"bytes,2,opt,name=containerName,proto3" json:"containerName,omitempty"`
-	ContainerImage string `protobuf:"bytes,3,opt,name=containerImage,proto3" json:"containerImage,omitempty"`
+	Count     int32      `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
+	Container *Container `protobuf:"bytes,2,opt,name=container,proto3" json:"container,omitempty"`
 }
 
-func (x *DeployContainerRequest) Reset() {
-	*x = DeployContainerRequest{}
+func (x *DeployJobRequest) Reset() {
+	*x = DeployJobRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_pkg_grpc_dokkup_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -40,13 +39,13 @@ func (x *DeployContainerRequest) Reset() {
 	}
 }
 
-func (x *DeployContainerRequest) String() string {
+func (x *DeployJobRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*DeployContainerRequest) ProtoMessage() {}
+func (*DeployJobRequest) ProtoMessage() {}
 
-func (x *DeployContainerRequest) ProtoReflect() protoreflect.Message {
+func (x *DeployJobRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_pkg_grpc_dokkup_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -58,28 +57,414 @@ func (x *DeployContainerRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeployContainerRequest.ProtoReflect.Descriptor instead.
-func (*DeployContainerRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use DeployJobRequest.ProtoReflect.Descriptor instead.
+func (*DeployJobRequest) Descriptor() ([]byte, []int) {
 	return file_pkg_grpc_dokkup_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *DeployContainerRequest) GetCount() int32 {
+func (x *DeployJobRequest) GetCount() int32 {
 	if x != nil {
 		return x.Count
 	}
 	return 0
 }
 
-func (x *DeployContainerRequest) GetContainerName() string {
+func (x *DeployJobRequest) GetContainer() *Container {
 	if x != nil {
-		return x.ContainerName
+		return x.Container
+	}
+	return nil
+}
+
+type DeployJobResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+}
+
+func (x *DeployJobResponse) Reset() {
+	*x = DeployJobResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_grpc_dokkup_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeployJobResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeployJobResponse) ProtoMessage() {}
+
+func (x *DeployJobResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_grpc_dokkup_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeployJobResponse.ProtoReflect.Descriptor instead.
+func (*DeployJobResponse) Descriptor() ([]byte, []int) {
+	return file_pkg_grpc_dokkup_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *DeployJobResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
 	}
 	return ""
 }
 
-func (x *DeployContainerRequest) GetContainerImage() string {
+type Container struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name        string         `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Image       string         `protobuf:"bytes,2,opt,name=image,proto3" json:"image,omitempty"`
+	Ports       []*Port        `protobuf:"bytes,3,rep,name=ports,proto3" json:"ports,omitempty"`
+	Networks    []*Network     `protobuf:"bytes,4,rep,name=networks,proto3" json:"networks,omitempty"`
+	Volumes     []*Volume      `protobuf:"bytes,5,rep,name=volumes,proto3" json:"volumes,omitempty"`
+	Environment []*Environment `protobuf:"bytes,6,rep,name=environment,proto3" json:"environment,omitempty"`
+	Restart     string         `protobuf:"bytes,7,opt,name=restart,proto3" json:"restart,omitempty"`
+	Labels      []*Label       `protobuf:"bytes,8,rep,name=labels,proto3" json:"labels,omitempty"`
+}
+
+func (x *Container) Reset() {
+	*x = Container{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_grpc_dokkup_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Container) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Container) ProtoMessage() {}
+
+func (x *Container) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_grpc_dokkup_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Container.ProtoReflect.Descriptor instead.
+func (*Container) Descriptor() ([]byte, []int) {
+	return file_pkg_grpc_dokkup_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *Container) GetName() string {
 	if x != nil {
-		return x.ContainerImage
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Container) GetImage() string {
+	if x != nil {
+		return x.Image
+	}
+	return ""
+}
+
+func (x *Container) GetPorts() []*Port {
+	if x != nil {
+		return x.Ports
+	}
+	return nil
+}
+
+func (x *Container) GetNetworks() []*Network {
+	if x != nil {
+		return x.Networks
+	}
+	return nil
+}
+
+func (x *Container) GetVolumes() []*Volume {
+	if x != nil {
+		return x.Volumes
+	}
+	return nil
+}
+
+func (x *Container) GetEnvironment() []*Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return nil
+}
+
+func (x *Container) GetRestart() string {
+	if x != nil {
+		return x.Restart
+	}
+	return ""
+}
+
+func (x *Container) GetLabels() []*Label {
+	if x != nil {
+		return x.Labels
+	}
+	return nil
+}
+
+type Port struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	In  int32 `protobuf:"varint,1,opt,name=in,proto3" json:"in,omitempty"`
+	Out int32 `protobuf:"varint,2,opt,name=out,proto3" json:"out,omitempty"`
+}
+
+func (x *Port) Reset() {
+	*x = Port{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_grpc_dokkup_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Port) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Port) ProtoMessage() {}
+
+func (x *Port) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_grpc_dokkup_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Port.ProtoReflect.Descriptor instead.
+func (*Port) Descriptor() ([]byte, []int) {
+	return file_pkg_grpc_dokkup_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *Port) GetIn() int32 {
+	if x != nil {
+		return x.In
+	}
+	return 0
+}
+
+func (x *Port) GetOut() int32 {
+	if x != nil {
+		return x.Out
+	}
+	return 0
+}
+
+type Network struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Network string `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
+}
+
+func (x *Network) Reset() {
+	*x = Network{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_grpc_dokkup_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Network) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Network) ProtoMessage() {}
+
+func (x *Network) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_grpc_dokkup_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Network.ProtoReflect.Descriptor instead.
+func (*Network) Descriptor() ([]byte, []int) {
+	return file_pkg_grpc_dokkup_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *Network) GetNetwork() string {
+	if x != nil {
+		return x.Network
+	}
+	return ""
+}
+
+type Volume struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Volume string `protobuf:"bytes,1,opt,name=volume,proto3" json:"volume,omitempty"`
+}
+
+func (x *Volume) Reset() {
+	*x = Volume{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_grpc_dokkup_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Volume) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Volume) ProtoMessage() {}
+
+func (x *Volume) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_grpc_dokkup_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Volume.ProtoReflect.Descriptor instead.
+func (*Volume) Descriptor() ([]byte, []int) {
+	return file_pkg_grpc_dokkup_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *Volume) GetVolume() string {
+	if x != nil {
+		return x.Volume
+	}
+	return ""
+}
+
+type Environment struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Environment string `protobuf:"bytes,1,opt,name=environment,proto3" json:"environment,omitempty"`
+}
+
+func (x *Environment) Reset() {
+	*x = Environment{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_grpc_dokkup_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Environment) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Environment) ProtoMessage() {}
+
+func (x *Environment) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_grpc_dokkup_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Environment.ProtoReflect.Descriptor instead.
+func (*Environment) Descriptor() ([]byte, []int) {
+	return file_pkg_grpc_dokkup_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *Environment) GetEnvironment() string {
+	if x != nil {
+		return x.Environment
+	}
+	return ""
+}
+
+type Label struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Label string `protobuf:"bytes,1,opt,name=label,proto3" json:"label,omitempty"`
+}
+
+func (x *Label) Reset() {
+	*x = Label{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_grpc_dokkup_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Label) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Label) ProtoMessage() {}
+
+func (x *Label) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_grpc_dokkup_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Label.ProtoReflect.Descriptor instead.
+func (*Label) Descriptor() ([]byte, []int) {
+	return file_pkg_grpc_dokkup_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *Label) GetLabel() string {
+	if x != nil {
+		return x.Label
 	}
 	return ""
 }
@@ -93,7 +478,7 @@ type CheckAPIKeyRequest struct {
 func (x *CheckAPIKeyRequest) Reset() {
 	*x = CheckAPIKeyRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pkg_grpc_dokkup_proto_msgTypes[1]
+		mi := &file_pkg_grpc_dokkup_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -106,7 +491,7 @@ func (x *CheckAPIKeyRequest) String() string {
 func (*CheckAPIKeyRequest) ProtoMessage() {}
 
 func (x *CheckAPIKeyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_grpc_dokkup_proto_msgTypes[1]
+	mi := &file_pkg_grpc_dokkup_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -119,7 +504,7 @@ func (x *CheckAPIKeyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckAPIKeyRequest.ProtoReflect.Descriptor instead.
 func (*CheckAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_grpc_dokkup_proto_rawDescGZIP(), []int{1}
+	return file_pkg_grpc_dokkup_proto_rawDescGZIP(), []int{8}
 }
 
 var File_pkg_grpc_dokkup_proto protoreflect.FileDescriptor
@@ -128,27 +513,55 @@ var file_pkg_grpc_dokkup_proto_rawDesc = []byte{
 	0x0a, 0x15, 0x70, 0x6b, 0x67, 0x2f, 0x67, 0x72, 0x70, 0x63, 0x2f, 0x64, 0x6f, 0x6b, 0x6b, 0x75,
 	0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1b, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x65, 0x6d, 0x70, 0x74, 0x79, 0x2e, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x22, 0x7c, 0x0a, 0x16, 0x44, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x43, 0x6f,
-	0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x14,
-	0x0a, 0x05, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x63,
-	0x6f, 0x75, 0x6e, 0x74, 0x12, 0x24, 0x0a, 0x0d, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65,
-	0x72, 0x4e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x63, 0x6f, 0x6e,
-	0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x26, 0x0a, 0x0e, 0x63, 0x6f,
-	0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x0e, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x49, 0x6d, 0x61,
-	0x67, 0x65, 0x22, 0x14, 0x0a, 0x12, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x41, 0x50, 0x49, 0x4b, 0x65,
-	0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x32, 0x8c, 0x01, 0x0a, 0x06, 0x44, 0x6f, 0x6b,
-	0x6b, 0x75, 0x70, 0x12, 0x44, 0x0a, 0x0f, 0x44, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x43, 0x6f, 0x6e,
-	0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x12, 0x17, 0x2e, 0x44, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x43,
-	0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
-	0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
-	0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12, 0x3c, 0x0a, 0x0b, 0x43, 0x68, 0x65,
-	0x63, 0x6b, 0x41, 0x50, 0x49, 0x4b, 0x65, 0x79, 0x12, 0x13, 0x2e, 0x43, 0x68, 0x65, 0x63, 0x6b,
-	0x41, 0x50, 0x49, 0x4b, 0x65, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e,
-	0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e,
-	0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x42, 0x19, 0x5a, 0x17, 0x67, 0x69, 0x74, 0x68, 0x75,
-	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x58, 0x69, 0x6f, 0x76, 0x56, 0x2f, 0x64, 0x6f, 0x6b, 0x6b,
-	0x75, 0x70, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x6f, 0x74, 0x6f, 0x22, 0x52, 0x0a, 0x10, 0x44, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x4a, 0x6f,
+	0x62, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x63, 0x6f, 0x75, 0x6e,
+	0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x28,
+	0x0a, 0x09, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x0a, 0x2e, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x52, 0x09, 0x63,
+	0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x22, 0x2d, 0x0a, 0x11, 0x44, 0x65, 0x70, 0x6c,
+	0x6f, 0x79, 0x4a, 0x6f, 0x62, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a,
+	0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07,
+	0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x85, 0x02, 0x0a, 0x09, 0x43, 0x6f, 0x6e, 0x74,
+	0x61, 0x69, 0x6e, 0x65, 0x72, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x69, 0x6d, 0x61,
+	0x67, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x12,
+	0x1b, 0x0a, 0x05, 0x70, 0x6f, 0x72, 0x74, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x05,
+	0x2e, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x05, 0x70, 0x6f, 0x72, 0x74, 0x73, 0x12, 0x24, 0x0a, 0x08,
+	0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x73, 0x18, 0x04, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x08,
+	0x2e, 0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x52, 0x08, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72,
+	0x6b, 0x73, 0x12, 0x21, 0x0a, 0x07, 0x76, 0x6f, 0x6c, 0x75, 0x6d, 0x65, 0x73, 0x18, 0x05, 0x20,
+	0x03, 0x28, 0x0b, 0x32, 0x07, 0x2e, 0x56, 0x6f, 0x6c, 0x75, 0x6d, 0x65, 0x52, 0x07, 0x76, 0x6f,
+	0x6c, 0x75, 0x6d, 0x65, 0x73, 0x12, 0x2e, 0x0a, 0x0b, 0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e,
+	0x6d, 0x65, 0x6e, 0x74, 0x18, 0x06, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0c, 0x2e, 0x45, 0x6e, 0x76,
+	0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x0b, 0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f,
+	0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x72, 0x65, 0x73, 0x74, 0x61, 0x72, 0x74,
+	0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x72, 0x65, 0x73, 0x74, 0x61, 0x72, 0x74, 0x12,
+	0x1e, 0x0a, 0x06, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x73, 0x18, 0x08, 0x20, 0x03, 0x28, 0x0b, 0x32,
+	0x06, 0x2e, 0x4c, 0x61, 0x62, 0x65, 0x6c, 0x52, 0x06, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x73, 0x22,
+	0x28, 0x0a, 0x04, 0x50, 0x6f, 0x72, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x6e, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x05, 0x52, 0x02, 0x69, 0x6e, 0x12, 0x10, 0x0a, 0x03, 0x6f, 0x75, 0x74, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x05, 0x52, 0x03, 0x6f, 0x75, 0x74, 0x22, 0x23, 0x0a, 0x07, 0x4e, 0x65, 0x74,
+	0x77, 0x6f, 0x72, 0x6b, 0x12, 0x18, 0x0a, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x22, 0x20,
+	0x0a, 0x06, 0x56, 0x6f, 0x6c, 0x75, 0x6d, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x76, 0x6f, 0x6c, 0x75,
+	0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x76, 0x6f, 0x6c, 0x75, 0x6d, 0x65,
+	0x22, 0x2f, 0x0a, 0x0b, 0x45, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x12,
+	0x20, 0x0a, 0x0b, 0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e,
+	0x74, 0x22, 0x1d, 0x0a, 0x05, 0x4c, 0x61, 0x62, 0x65, 0x6c, 0x12, 0x14, 0x0a, 0x05, 0x6c, 0x61,
+	0x62, 0x65, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c,
+	0x22, 0x14, 0x0a, 0x12, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x41, 0x50, 0x49, 0x4b, 0x65, 0x79, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x32, 0x7e, 0x0a, 0x06, 0x44, 0x6f, 0x6b, 0x6b, 0x75, 0x70,
+	0x12, 0x36, 0x0a, 0x09, 0x44, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x4a, 0x6f, 0x62, 0x12, 0x11, 0x2e,
+	0x44, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x4a, 0x6f, 0x62, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x12, 0x2e, 0x44, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x4a, 0x6f, 0x62, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x30, 0x01, 0x12, 0x3c, 0x0a, 0x0b, 0x43, 0x68, 0x65, 0x63,
+	0x6b, 0x41, 0x50, 0x49, 0x4b, 0x65, 0x79, 0x12, 0x13, 0x2e, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x41,
+	0x50, 0x49, 0x4b, 0x65, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x67,
+	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45,
+	0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x42, 0x19, 0x5a, 0x17, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
+	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x58, 0x69, 0x6f, 0x76, 0x56, 0x2f, 0x64, 0x6f, 0x6b, 0x6b, 0x75,
+	0x70, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -163,22 +576,35 @@ func file_pkg_grpc_dokkup_proto_rawDescGZIP() []byte {
 	return file_pkg_grpc_dokkup_proto_rawDescData
 }
 
-var file_pkg_grpc_dokkup_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_pkg_grpc_dokkup_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_pkg_grpc_dokkup_proto_goTypes = []interface{}{
-	(*DeployContainerRequest)(nil), // 0: DeployContainerRequest
-	(*CheckAPIKeyRequest)(nil),     // 1: CheckAPIKeyRequest
-	(*empty.Empty)(nil),            // 2: google.protobuf.Empty
+	(*DeployJobRequest)(nil),   // 0: DeployJobRequest
+	(*DeployJobResponse)(nil),  // 1: DeployJobResponse
+	(*Container)(nil),          // 2: Container
+	(*Port)(nil),               // 3: Port
+	(*Network)(nil),            // 4: Network
+	(*Volume)(nil),             // 5: Volume
+	(*Environment)(nil),        // 6: Environment
+	(*Label)(nil),              // 7: Label
+	(*CheckAPIKeyRequest)(nil), // 8: CheckAPIKeyRequest
+	(*empty.Empty)(nil),        // 9: google.protobuf.Empty
 }
 var file_pkg_grpc_dokkup_proto_depIdxs = []int32{
-	0, // 0: Dokkup.DeployContainer:input_type -> DeployContainerRequest
-	1, // 1: Dokkup.CheckAPIKey:input_type -> CheckAPIKeyRequest
-	2, // 2: Dokkup.DeployContainer:output_type -> google.protobuf.Empty
-	2, // 3: Dokkup.CheckAPIKey:output_type -> google.protobuf.Empty
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	2, // 0: DeployJobRequest.container:type_name -> Container
+	3, // 1: Container.ports:type_name -> Port
+	4, // 2: Container.networks:type_name -> Network
+	5, // 3: Container.volumes:type_name -> Volume
+	6, // 4: Container.environment:type_name -> Environment
+	7, // 5: Container.labels:type_name -> Label
+	0, // 6: Dokkup.DeployJob:input_type -> DeployJobRequest
+	8, // 7: Dokkup.CheckAPIKey:input_type -> CheckAPIKeyRequest
+	1, // 8: Dokkup.DeployJob:output_type -> DeployJobResponse
+	9, // 9: Dokkup.CheckAPIKey:output_type -> google.protobuf.Empty
+	8, // [8:10] is the sub-list for method output_type
+	6, // [6:8] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_pkg_grpc_dokkup_proto_init() }
@@ -188,7 +614,7 @@ func file_pkg_grpc_dokkup_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_pkg_grpc_dokkup_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeployContainerRequest); i {
+			switch v := v.(*DeployJobRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -200,6 +626,90 @@ func file_pkg_grpc_dokkup_proto_init() {
 			}
 		}
 		file_pkg_grpc_dokkup_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeployJobResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_grpc_dokkup_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Container); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_grpc_dokkup_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Port); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_grpc_dokkup_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Network); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_grpc_dokkup_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Volume); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_grpc_dokkup_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Environment); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_grpc_dokkup_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Label); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_grpc_dokkup_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CheckAPIKeyRequest); i {
 			case 0:
 				return &v.state
@@ -218,7 +728,7 @@ func file_pkg_grpc_dokkup_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_pkg_grpc_dokkup_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

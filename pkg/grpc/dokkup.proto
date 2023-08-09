@@ -5,14 +5,49 @@ option go_package = "github.com/XiovV/dokkup";
 import "google/protobuf/empty.proto";
 
 service Dokkup {
-  rpc DeployContainer(DeployContainerRequest) returns (google.protobuf.Empty) {}
+  rpc DeployJob(DeployJobRequest) returns (stream DeployJobResponse) {}
   rpc CheckAPIKey(CheckAPIKeyRequest) returns (google.protobuf.Empty) {}
 }
 
-message DeployContainerRequest {
+message DeployJobRequest {
   int32 count = 1;
-  string containerName = 2;
-  string containerImage = 3;
+  Container container = 2;
+}
+
+message DeployJobResponse {
+  string message = 1;
+}
+
+message Container {
+  string name = 1;
+  string image = 2;
+  repeated Port ports = 3;
+  repeated Network networks = 4;
+  repeated Volume volumes = 5;
+  repeated Environment environment = 6;
+  string restart = 7;
+  repeated Label labels = 8;
+}
+
+message Port {
+    int32 in = 1;
+    int32 out = 2;
+}
+
+message Network {
+    string network = 1;
+}
+
+message Volume {
+    string volume = 1;
+}
+
+message Environment {
+    string environment = 1;
+}
+
+message Label {
+    string label = 1;
 }
 
 message CheckAPIKeyRequest {
