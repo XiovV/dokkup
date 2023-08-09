@@ -52,3 +52,12 @@ func (s *Server) authenticateUnary(ctx context.Context, req interface{}, info *g
 
 	return handler(ctx, req)
 }
+
+func (s *Server) authenticateStream(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	err := s.validateAuthHeader(stream.Context())
+	if err != nil {
+		return err
+	}
+
+	return handler(srv, stream)
+}
