@@ -24,7 +24,7 @@ func (s *Server) Serve() error {
 		return err
 	}
 
-	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(s.authenticateUnary))
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(s.authenticateUnary), grpc.StreamInterceptor(s.authenticateStream))
 	pb.RegisterDokkupServer(grpcServer, s)
 
 	return grpcServer.Serve(lis)
