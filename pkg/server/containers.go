@@ -18,23 +18,22 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 		return errors.New("failed to pull image")
 	}
 
-	internalPort := fmt.Sprintf("%s/tcp", request.Container.Ports[0].In)
-
 	for i := 0; i < int(request.Count); i++ {
 
 		containerConfig := &container.Config{
-			Image: request.Container.Image,
-			ExposedPorts: nat.PortSet{
-				nat.Port(internalPort): struct{}{},
-			},
+			Image:        request.Container.Image,
+			ExposedPorts: nat.PortSet{},
 		}
 
-		fmt.Println(containerConfig.ExposedPorts[nat.Port(internalPort)])
-
 		hostConfig := &container.HostConfig{
-			PortBindings: nat.PortMap{
-				nat.Port(internalPort): []nat.PortBinding{{HostIP: "0.0.0.0"}},
-			},
+			PortBindings: nat.PortMap{},
+		}
+
+		for _, port := range request.Container.Ports {
+			internalPort := fmt.Sprintf("%s/tcp", port.In)
+			containerConfig.ExposedPorts[nat.Port(internalPort)] = struct{}{}
+
+			hostConfig.PortBindings[nat.Port(internalPort)] = []nat.PortBinding{{HostIP: "0.0.0.0"}}
 		}
 
 		uuidv4 := uuid.New()
