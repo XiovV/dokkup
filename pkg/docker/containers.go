@@ -1,23 +1,23 @@
 package docker
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 )
 
-func (c *Controller) ContainerCreate(containerName string, containerConfig *container.Config, hostConfig *container.HostConfig) error {
+func (c *Controller) ContainerCreate(containerName string, containerConfig *container.Config, hostConfig *container.HostConfig) (container.CreateResponse, error) {
 	resp, err := c.cli.ContainerCreate(c.ctx, containerConfig, hostConfig, nil, nil, containerName)
 	if err != nil {
-		return err
+		return container.CreateResponse{}, err
 	}
 
-	fmt.Println("container created successfully:", resp.ID)
+	return resp, nil
+}
 
-	c.cli.ContainerStart(c.ctx, resp.ID, types.ContainerStartOptions{})
-	return nil
+func (c *Controller) ContainerStart(containerId string) error {
+	return c.cli.ContainerStart(c.ctx, containerId, types.ContainerStartOptions{})
 }
 
 func (c *Controller) ContainerInspect(containerId string) types.ContainerJSON {
