@@ -18,9 +18,15 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 		return errors.New("failed to pull image")
 	}
 
-	for i := 0; i < int(request.Count); i++ {
 
-		containerConfig := &container.Config{
+  createdContainers := []string{}
+	for i := 0; i < int(request.Count); i++ {
+		uuid := uuid.New()
+		containerName := fmt.Sprintf("%s-%s", request.Container.Name, uuid.String())
+    
+    stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Setting up container: %s", containerName)})
+
+	  containerConfig := &container.Config{
 			Image:        request.Container.Image,
 			ExposedPorts: nat.PortSet{},
 		}
@@ -36,18 +42,28 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 			hostConfig.PortBindings[nat.Port(internalPort)] = []nat.PortBinding{{HostIP: "0.0.0.0"}}
 		}
 
-		uuidv4 := uuid.New()
-		containerName := fmt.Sprintf("%s-%s", request.Container.Name, uuidv4.String())
-
-		err = s.Controller.ContainerCreate(containerName, containerConfig, hostConfig)
+    resp, err := s.Controller.ContainerCreate(containerName, containerConfig, hostConfig)
 		if err != nil {
 			fmt.Println(err)
 			return err
 		}
 
-		fmt.Println("successfully created container")
-
+    createdContainers = append(createdContainers, resp.ID)
+    
+    stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Container %s configured successfully", containerName)})
 	}
 
+  for _, container := range createdContainers {
+    stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Attempting to start container: %s", container)})
+
+    if err := s.Controller.ContainerStart(container); err != nil {
+      return err
+    }
+
+    stream.Send(&pb.DeployJobResponse{Message: "Container started successfully"})
+  }
+
+
+  stream.Send(&pb.DeployJobResponse{Message: "Deployment successfull"})
 	return nil
 }
