@@ -16,13 +16,13 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 		return errors.New("failed to pull image")
 	}
 
-	createdContainers, err := s.Controller.CreateContainersFromRequest(request)
+	createdContainers, err := s.Controller.CreateContainersFromRequest(request, stream)
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
 
-	err = s.Controller.StartContainers(createdContainers)
+	err = s.Controller.StartContainers(createdContainers, stream)
 	if err != nil {
 		fmt.Println(err)
 		return err

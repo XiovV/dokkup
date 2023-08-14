@@ -61,9 +61,11 @@ func (c *Controller) ContainerSetupConfig(config *pb.Container) *ContainerConfig
 	}
 }
 
-func (c *Controller) CreateContainersFromRequest(request *pb.DeployJobRequest) ([]string, error) {
+func (c *Controller) CreateContainersFromRequest(request *pb.DeployJobRequest, stream pb.Dokkup_DeployJobServer) ([]string, error) {
 	createdContainers := []string{}
 	for i := 0; i < int(request.Count); i++ {
+		stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Configuring container (%d/%d)", i+1, request.Count)})
+
 		containerConfig := c.ContainerSetupConfig(request.Container)
 
 		resp, err := c.ContainerCreate(containerConfig.ContainerName, containerConfig.Config, containerConfig.HostConfig)
@@ -78,8 +80,9 @@ func (c *Controller) CreateContainersFromRequest(request *pb.DeployJobRequest) (
 	return createdContainers, nil
 }
 
-func (c *Controller) StartContainers(containerIDs []string) error {
-	for _, container := range containerIDs {
+func (c *Controller) StartContainers(containerIDs []string, stream pb.Dokkup_DeployJobServer) error {
+	for i, container := range containerIDs {
+		stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Starting container (%d/%d)", i+1, len(containerIDs))})
 		if err := c.ContainerStart(container); err != nil {
 			return err
 		}
