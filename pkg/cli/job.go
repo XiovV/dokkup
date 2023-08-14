@@ -114,7 +114,7 @@ func (a *App) deployJob(node config.Node, job *config.Job) error {
 			return err
 		}
 
-		fmt.Println(resp)
+		fmt.Printf("%s: %s\n", node.Name, resp.GetMessage())
 	}
 
 	return nil
