@@ -7,6 +7,7 @@ require (
 	github.com/docker/go-connections v0.4.0
 	github.com/golang/protobuf v1.5.3
 	github.com/google/uuid v1.3.0
+	github.com/gosuri/uilive v0.0.4
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/urfave/cli/v2 v2.25.7
 	golang.org/x/crypto v0.11.0
@@ -23,6 +24,7 @@ require (
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
+	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/moby/term v0.5.0 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
