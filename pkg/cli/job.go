@@ -57,7 +57,8 @@ func (a *App) jobCmd(ctx *cli.Context) error {
 		return nil
 	}
 
-	if err := a.deployJobs(inventory, job); err != nil {
+	err = a.deployJobs(inventory, job)
+	if err != nil {
 		log.Fatal(err)
 	}
 
