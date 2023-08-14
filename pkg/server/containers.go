@@ -28,6 +28,6 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 		return err
 	}
 
-	stream.Send(&pb.DeployJobResponse{Message: "Deployment successfull"})
+	stream.Send(&pb.DeployJobResponse{Message: "Deployment successful"})
 	return nil
 }
