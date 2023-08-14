@@ -11,6 +11,7 @@ import (
 
 	"github.com/XiovV/dokkup/pkg/config"
 	pb "github.com/XiovV/dokkup/pkg/grpc"
+	"github.com/gosuri/uilive"
 	"github.com/urfave/cli/v2"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -56,6 +57,8 @@ func (a *App) jobCmd(ctx *cli.Context) error {
 	if !shouldContinue {
 		return nil
 	}
+
+	fmt.Print("\n")
 
 	err = a.deployJobs(inventory, job)
 	if err != nil {
@@ -104,9 +107,13 @@ func (a *App) deployJob(node config.Node, job *config.Job) error {
 		return err
 	}
 
+	writer := uilive.New()
+	writer.Start()
+
 	for {
 		resp, err := stream.Recv()
 		if err == io.EOF {
+			writer.Stop()
 			break
 		}
 
@@ -114,7 +121,7 @@ func (a *App) deployJob(node config.Node, job *config.Job) error {
 			return err
 		}
 
-		fmt.Printf("%s: %s\n", node.Name, resp.GetMessage())
+		fmt.Fprintf(writer, "%s: %s\n", node.Name, resp.GetMessage())
 	}
 
 	return nil
