@@ -3,6 +3,7 @@ package docker
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -38,13 +39,26 @@ func (c *Controller) ContainerSetupConfig(config *pb.Container) *ContainerConfig
 	uuid := uuid.New()
 	containerName := fmt.Sprintf("%s-%s", config.Name, uuid.String())
 
+	labels := make(map[string]string)
+
+	for _, l := range config.Labels {
+		labelSplit := strings.Split(l, "=")
+		labels[labelSplit[0]] = labelSplit[1]
+	}
+
 	containerConfig := &container.Config{
 		Image:        config.Image,
 		ExposedPorts: nat.PortSet{},
+		Env:          config.Environment,
+		Labels:       labels,
 	}
 
 	hostConfig := &container.HostConfig{
 		PortBindings: nat.PortMap{},
+		Binds:        config.Volumes,
+		RestartPolicy: container.RestartPolicy{
+			Name: config.Restart,
+		},
 	}
 
 	for _, port := range config.Ports {
