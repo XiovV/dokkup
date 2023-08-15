@@ -22,32 +22,16 @@ message Container {
   string name = 1;
   string image = 2;
   repeated Port ports = 3;
-  repeated Network networks = 4;
-  repeated Volume volumes = 5;
-  repeated Environment environment = 6;
+  repeated string networks = 4;
+  repeated string volumes = 5;
+  repeated string environment = 6;
   string restart = 7;
-  repeated Label labels = 8;
+  repeated string labels = 8;
 }
 
 message Port {
     string in = 1;
     string out = 2;
-}
-
-message Network {
-    string network = 1;
-}
-
-message Volume {
-    string volume = 1;
-}
-
-message Environment {
-    string environment = 1;
-}
-
-message Label {
-    string label = 1;
 }
 
 message CheckAPIKeyRequest {
