@@ -2,8 +2,8 @@ package server
 
 import (
 	"context"
-	"fmt"
 
+	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -17,19 +17,19 @@ func (s *Server) validateAuthHeader(ctx context.Context) error {
 	apiKeyHeader := header["authorization"]
 
 	if len(apiKeyHeader) < 1 {
-		fmt.Println("api key not provided")
+		s.Logger.Warn("api key not provided")
 		return status.Error(codes.Unauthenticated, "api key not provided")
 	}
 
 	apiKey := apiKeyHeader[0]
 
 	if len(apiKey) > API_KEY_LENGHT {
-		fmt.Println("api key too long")
+		s.Logger.Warn("api key is too long", zap.Int("expectedLength", API_KEY_LENGHT), zap.Int("got", len(apiKey)))
 		return status.Error(codes.Unauthenticated, "api key is invalid")
 	}
 
 	if len(apiKey) < API_KEY_LENGHT {
-		fmt.Println("api key too short")
+		s.Logger.Warn("api key is too short", zap.Int("expectedLength", API_KEY_LENGHT), zap.Int("got", len(apiKey)))
 		return status.Error(codes.Unauthenticated, "api key is invalid")
 	}
 
@@ -37,7 +37,7 @@ func (s *Server) validateAuthHeader(ctx context.Context) error {
 
 	err := bcrypt.CompareHashAndPassword([]byte(key), []byte(apiKey))
 	if err != nil {
-		fmt.Println("api key incorrect")
+		s.Logger.Warn("api key is incorrect")
 		return status.Error(codes.Unauthenticated, "api key is invalid")
 	}
 

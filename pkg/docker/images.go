@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/docker/docker/api/types"
+	"go.uber.org/zap"
 )
 
 func (c *Controller) ImagePull(containerImage string) error {
@@ -13,6 +14,7 @@ func (c *Controller) ImagePull(containerImage string) error {
 	}
 
 	if exists {
+		c.Logger.Info("image already exists, exiting")
 		return nil
 	}
 
@@ -20,6 +22,8 @@ func (c *Controller) ImagePull(containerImage string) error {
 	if err != nil {
 		return err
 	}
+
+	c.Logger.Info("image pulled successfully", zap.String("image", containerImage))
 
 	return nil
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/go-connections/nat"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 
 	pb "github.com/XiovV/dokkup/pkg/grpc"
 )
@@ -82,11 +83,13 @@ func (c *Controller) CreateContainersFromRequest(request *pb.DeployJobRequest, s
 
 		containerConfig := c.ContainerSetupConfig(request.Container)
 
+		c.Logger.Info("attempting to create a container", zap.String("containerName", containerConfig.ContainerName))
 		resp, err := c.ContainerCreate(containerConfig.ContainerName, containerConfig.Config, containerConfig.HostConfig)
 		if err != nil {
-			fmt.Println(err)
 			return nil, err
 		}
+
+		c.Logger.Info("container created successfully", zap.String("containerName", containerConfig.ContainerName))
 
 		createdContainers = append(createdContainers, resp.ID)
 	}
@@ -96,10 +99,14 @@ func (c *Controller) CreateContainersFromRequest(request *pb.DeployJobRequest, s
 
 func (c *Controller) StartContainers(containerIDs []string, stream pb.Dokkup_DeployJobServer) error {
 	for i, container := range containerIDs {
+		c.Logger.Info("attempting to start a container", zap.String("containerId", container))
+
 		stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Starting container (%d/%d)", i+1, len(containerIDs))})
 		if err := c.ContainerStart(container); err != nil {
 			return err
 		}
+
+		c.Logger.Info("container started successfully", zap.String("containerId", container))
 	}
 
 	return nil
