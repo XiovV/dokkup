@@ -9,6 +9,7 @@ import (
 	"github.com/XiovV/dokkup/pkg/docker"
 	pb "github.com/XiovV/dokkup/pkg/grpc"
 	"github.com/golang/protobuf/ptypes/empty"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
 
@@ -16,6 +17,7 @@ type Server struct {
 	pb.UnimplementedDokkupServer
 	Config     *config.AgentConfig
 	Controller *docker.Controller
+	Logger     *zap.Logger
 }
 
 func (s *Server) Serve() error {
