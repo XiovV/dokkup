@@ -1,36 +1,37 @@
 package main
 
 import (
-	"fmt"
-	"log"
-
 	"github.com/XiovV/dokkup/pkg/config"
 	"github.com/XiovV/dokkup/pkg/docker"
 	"github.com/XiovV/dokkup/pkg/server"
+	"go.uber.org/zap"
 )
 
 func main() {
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+
 	key, err := config.CheckAPIKey()
 	if err != nil {
-		log.Fatal("could not check API key: ", err)
+		logger.Fatal("could not check API key", zap.Error(err))
 	}
 
 	config, err := config.ReadAgentConfig()
 	if err != nil {
-		log.Fatal("could not read config: ", err)
+		logger.Fatal("could not read config", zap.Error(err))
 	}
 
 	config.APIKey = key
 
-	controller, err := docker.NewController()
+	controller, err := docker.NewController(logger)
 	if err != nil {
-		log.Fatal("could not instantiate controller: ", err)
+		logger.Fatal("could not instantiate controller", zap.Error(err))
 	}
 
-	srv := server.Server{Config: config, Controller: controller}
+	srv := server.Server{Config: config, Controller: controller, Logger: logger}
 
-	fmt.Println("server listening on port", config.Port)
+	logger.Info("server is listening...", zap.String("port", config.Port))
 	if err := srv.Serve(); err != nil {
-		log.Fatal(err)
+		logger.Fatal("could not start server", zap.Error(err))
 	}
 }
