@@ -139,8 +139,8 @@ func (a *App) jobToDeployJobRequest(job *config.Job) *pb.DeployJobRequest {
 
 	return &pb.DeployJobRequest{
 		Count: count,
+		Name:  job.Name,
 		Container: &pb.Container{
-			Name:  container.Name,
 			Image: container.Image,
 			Ports: ports,
 		},
@@ -232,7 +232,7 @@ func (a *App) showJobSummaryTable(job *config.Job) {
 	jobSummaryTable := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
 	fmt.Fprintln(jobSummaryTable, "NAME\tIMAGE\tRESTART\tCOUNT\tGROUP\tNETWORKS")
 
-	out := fmt.Sprintf("%s\t%s\t%s\t%d\t%s\t%s\n", job.Container[0].Name, job.Container[0].Image, job.Container[0].Restart, job.Count, job.Group, job.Container[0].Networks)
+	out := fmt.Sprintf("%s\t%s\t%s\t%d\t%s\t%s\n", job.Name, job.Container[0].Image, job.Container[0].Restart, job.Count, job.Group, job.Container[0].Networks)
 	fmt.Fprintln(jobSummaryTable, out)
 
 	jobSummaryTable.Flush()
