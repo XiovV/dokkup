@@ -1,20 +1,20 @@
 package config
 
 import (
-	"io/ioutil"
+	"os"
 
 	"gopkg.in/yaml.v3"
 )
 
 type Job struct {
-	Group     string      `yaml:"group,omitempty"`
-	Node      string      `yaml:"node,omitempty"`
-	Count     int         `yaml:"count"`
+	Group     string `yaml:"group,omitempty"`
+	Node      string `yaml:"node,omitempty"`
+	Count     int    `yaml:"count"`
+	Name      string
 	Container []Container `yaml:"container"`
 }
 
 type Container struct {
-	Name        string   `yaml:"name"`
 	Image       string   `yaml:"image"`
 	Ports       []Port   `yaml:"ports"`
 	Networks    []string `yaml:"networks"`
@@ -30,7 +30,7 @@ type Port struct {
 }
 
 func ReadJob(filename string) (*Job, error) {
-	content, err := ioutil.ReadFile(filename)
+	content, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
