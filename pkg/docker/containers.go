@@ -111,3 +111,18 @@ func (c *Controller) StartContainers(containerIDs []string, stream pb.Dokkup_Dep
 
 	return nil
 }
+
+func (c *Controller) ContainerDoesExist(containerName string) (bool, error) {
+	containers, err := c.cli.ContainerList(c.ctx, types.ContainerListOptions{All: true})
+	if err != nil {
+		return false, err
+	}
+
+	for _, container := range containers {
+		if strings.Contains(container.Names[0], containerName) {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
