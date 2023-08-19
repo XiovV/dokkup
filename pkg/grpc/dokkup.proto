@@ -11,7 +11,8 @@ service Dokkup {
 
 message DeployJobRequest {
   int32 count = 1;
-  Container container = 2;
+  string name = 2;
+  Container container = 3;
 }
 
 message DeployJobResponse {
@@ -19,7 +20,6 @@ message DeployJobResponse {
 }
 
 message Container {
-  string name = 1;
   string image = 2;
   repeated Port ports = 3;
   repeated string networks = 4;
