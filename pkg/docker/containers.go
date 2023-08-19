@@ -36,9 +36,9 @@ func (c *Controller) ContainerInspect(containerId string) types.ContainerJSON {
 	return resp
 }
 
-func (c *Controller) ContainerSetupConfig(config *pb.Container) *ContainerConfig {
+func (c *Controller) ContainerSetupConfig(jobName string, config *pb.Container) *ContainerConfig {
 	uuid := uuid.New()
-	containerName := fmt.Sprintf("%s-%s", config.Name, uuid.String())
+	containerName := fmt.Sprintf("%s-%s", jobName, uuid.String())
 
 	labels := make(map[string]string)
 
@@ -81,7 +81,7 @@ func (c *Controller) CreateContainersFromRequest(request *pb.DeployJobRequest, s
 	for i := 0; i < int(request.Count); i++ {
 		stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Configuring container (%d/%d)", i+1, request.Count)})
 
-		containerConfig := c.ContainerSetupConfig(request.Container)
+		containerConfig := c.ContainerSetupConfig(request.Name, request.Container)
 
 		c.Logger.Info("attempting to create a container", zap.String("containerName", containerConfig.ContainerName))
 		resp, err := c.ContainerCreate(containerConfig.ContainerName, containerConfig.Config, containerConfig.HostConfig)

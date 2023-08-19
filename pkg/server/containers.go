@@ -8,7 +8,7 @@ import (
 )
 
 func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_DeployJobServer) error {
-	s.Logger.Info("job received", zap.String("jobName", request.Container.Name), zap.Int("containerCount", int(request.Count)), zap.String("containerImage", request.Container.Image))
+	s.Logger.Info("job received", zap.String("jobName", request.Name), zap.Int("containerCount", int(request.Count)), zap.String("containerImage", request.Container.Image))
 
 	stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Attempting to pull image: %s", request.Container.Image)})
 
