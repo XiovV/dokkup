@@ -1,5 +1,3 @@
-<p align="center"><img src="https://raw.githubusercontent.com/XiovV/dokkup/master/logo/dokkupBlue2.png" width=700></p>
-
 # Note
 This project is currently undergoing a complete rewrite. The documentation below is for the old version.
 
