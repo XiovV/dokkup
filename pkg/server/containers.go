@@ -34,3 +34,12 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 	stream.Send(&pb.DeployJobResponse{Message: "Deployment successful"})
 	return nil
 }
+
+func (s *Server) StopJob(request *pb.StopJobRequest, stream pb.Dokkup_StopJobServer) error {
+	err := s.Controller.StopContainers(request.Name)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
