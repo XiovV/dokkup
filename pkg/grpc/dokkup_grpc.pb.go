@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DokkupClient interface {
 	DeployJob(ctx context.Context, in *DeployJobRequest, opts ...grpc.CallOption) (Dokkup_DeployJobClient, error)
+	StopJob(ctx context.Context, in *StopJobRequest, opts ...grpc.CallOption) (Dokkup_StopJobClient, error)
 	CheckAPIKey(ctx context.Context, in *CheckAPIKeyRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 }
 
@@ -67,6 +68,38 @@ func (x *dokkupDeployJobClient) Recv() (*DeployJobResponse, error) {
 	return m, nil
 }
 
+func (c *dokkupClient) StopJob(ctx context.Context, in *StopJobRequest, opts ...grpc.CallOption) (Dokkup_StopJobClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Dokkup_ServiceDesc.Streams[1], "/Dokkup/StopJob", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &dokkupStopJobClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Dokkup_StopJobClient interface {
+	Recv() (*StopJobResponse, error)
+	grpc.ClientStream
+}
+
+type dokkupStopJobClient struct {
+	grpc.ClientStream
+}
+
+func (x *dokkupStopJobClient) Recv() (*StopJobResponse, error) {
+	m := new(StopJobResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (c *dokkupClient) CheckAPIKey(ctx context.Context, in *CheckAPIKeyRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/Dokkup/CheckAPIKey", in, out, opts...)
@@ -81,6 +114,7 @@ func (c *dokkupClient) CheckAPIKey(ctx context.Context, in *CheckAPIKeyRequest, 
 // for forward compatibility
 type DokkupServer interface {
 	DeployJob(*DeployJobRequest, Dokkup_DeployJobServer) error
+	StopJob(*StopJobRequest, Dokkup_StopJobServer) error
 	CheckAPIKey(context.Context, *CheckAPIKeyRequest) (*empty.Empty, error)
 	mustEmbedUnimplementedDokkupServer()
 }
@@ -91,6 +125,9 @@ type UnimplementedDokkupServer struct {
 
 func (UnimplementedDokkupServer) DeployJob(*DeployJobRequest, Dokkup_DeployJobServer) error {
 	return status.Errorf(codes.Unimplemented, "method DeployJob not implemented")
+}
+func (UnimplementedDokkupServer) StopJob(*StopJobRequest, Dokkup_StopJobServer) error {
+	return status.Errorf(codes.Unimplemented, "method StopJob not implemented")
 }
 func (UnimplementedDokkupServer) CheckAPIKey(context.Context, *CheckAPIKeyRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckAPIKey not implemented")
@@ -129,6 +166,27 @@ func (x *dokkupDeployJobServer) Send(m *DeployJobResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _Dokkup_StopJob_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(StopJobRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(DokkupServer).StopJob(m, &dokkupStopJobServer{stream})
+}
+
+type Dokkup_StopJobServer interface {
+	Send(*StopJobResponse) error
+	grpc.ServerStream
+}
+
+type dokkupStopJobServer struct {
+	grpc.ServerStream
+}
+
+func (x *dokkupStopJobServer) Send(m *StopJobResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 func _Dokkup_CheckAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CheckAPIKeyRequest)
 	if err := dec(in); err != nil {
@@ -163,6 +221,11 @@ var Dokkup_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "DeployJob",
 			Handler:       _Dokkup_DeployJob_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "StopJob",
+			Handler:       _Dokkup_StopJob_Handler,
 			ServerStreams: true,
 		},
 	},

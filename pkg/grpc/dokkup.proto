@@ -6,6 +6,7 @@ import "google/protobuf/empty.proto";
 
 service Dokkup {
   rpc DeployJob(DeployJobRequest) returns (stream DeployJobResponse) {}
+  rpc StopJob(StopJobRequest) returns (stream StopJobResponse) {}
   rpc CheckAPIKey(CheckAPIKeyRequest) returns (google.protobuf.Empty) {}
 }
 
@@ -17,6 +18,14 @@ message DeployJobRequest {
 
 message DeployJobResponse {
   string message = 1;
+}
+
+message StopJobRequest {
+    string name = 1;
+}
+
+message StopJobResponse {
+    string message = 1;
 }
 
 message Container {
