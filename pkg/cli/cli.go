@@ -46,6 +46,17 @@ func NewApp() *App {
 					},
 				},
 			},
+			{
+				Name:    "stop",
+				Aliases: []string{"s"},
+				Subcommands: []*cli.Command{
+					{
+						Name:   "job",
+						Usage:  "stop a job",
+						Action: app.stopJobCmd,
+					},
+				},
+			},
 		},
 	}
 
