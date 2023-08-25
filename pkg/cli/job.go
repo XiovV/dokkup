@@ -68,6 +68,10 @@ func (a *App) jobCmd(ctx *cli.Context) error {
 	return nil
 }
 
+func (a *App) stopJobCmd(ctx *cli.Context) error {
+	return nil
+}
+
 func (a *App) deployJobs(inventory *config.Inventory, job *config.Job) error {
 	group, ok := inventory.GetGroup(job.Group)
 	if !ok {
