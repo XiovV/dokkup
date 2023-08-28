@@ -127,31 +127,29 @@ func (c *Controller) ContainerDoesExist(containerName string) (bool, error) {
 	return false, nil
 }
 
+func (c *Controller) StopContainers(containers []types.Container) error {
+	for _, cont := range containers {
+		err := c.cli.ContainerStop(c.ctx, cont.ID, container.StopOptions{})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (c *Controller) GetContainersByJobName(jobName string) ([]types.Container, error) {
-	containers, err := c.cli.ContainerList(c.ctx, types.ContainerListOptions{All: true})
+	allContainers, err := c.cli.ContainerList(c.ctx, types.ContainerListOptions{All: true})
 	if err != nil {
 		return nil, err
 	}
 
-	var foundContainers []types.Container
-	for _, container := range containers {
+	foundContainers := []types.Container{}
+	for _, container := range allContainers {
 		if strings.Contains(container.Names[0], jobName) {
 			foundContainers = append(foundContainers, container)
 		}
 	}
 
 	return foundContainers, nil
-}
-
-func (c *Controller) StopContainers(jobName string) error {
-	containers, err := c.GetContainersByJobName(jobName)
-	if err != nil {
-		return err
-	}
-
-	for _, cont := range containers {
-		c.cli.ContainerStop(c.ctx, cont.ID, container.StopOptions{})
-	}
-
-	return nil
 }
