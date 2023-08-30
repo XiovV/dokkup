@@ -58,7 +58,9 @@ func (a *App) stopJobCmd(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("This will stop a job called %s in the group %s", job.Name, job.Group)
+	a.showStopJobSummaryTable(job)
+
+	a.showNodeStatuses(inventory, job)
 
 	shouldContinue, err := a.showConfirmationPrompt(ctx)
 	if err != nil {
