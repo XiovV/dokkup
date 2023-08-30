@@ -76,7 +76,7 @@ func (a *App) stopJobCmd(ctx *cli.Context) error {
 
 	fmt.Print("\n")
 
-	err = a.stopJob(job, inventory)
+	err = a.stopJobs(job, inventory)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -84,7 +84,7 @@ func (a *App) stopJobCmd(ctx *cli.Context) error {
 	return nil
 }
 
-func (a *App) stopJob(job *config.Job, inventory *config.Inventory) error {
+func (a *App) stopJobs(job *config.Job, inventory *config.Inventory) error {
 	group, ok := inventory.GetGroup(job.Group)
 	if !ok {
 		return fmt.Errorf("couldn't find group: %s", group.Name)
@@ -96,36 +96,44 @@ func (a *App) stopJob(job *config.Job, inventory *config.Inventory) error {
 			return fmt.Errorf("couldn't find node: %s", nodeName)
 		}
 
-		client, err := a.initClient(node.Location)
+		err := a.stopJob(node, job)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (a *App) stopJob(node config.Node, job *config.Job) error {
+	client, err := a.initClient(node.Location)
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := a.newAuthorizationContext(node.Key)
+	defer cancel()
+
+	request := &pb.StopJobRequest{
+		Name: job.Name,
+	}
+
+	stream, err := client.StopJob(ctx, request)
+	if err != nil {
+		return err
+	}
+
+	for {
+		resp, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+
 		if err != nil {
 			return err
 		}
 
-		ctx, cancel := a.newAuthorizationContext(node.Key)
-		defer cancel()
-
-		request := &pb.StopJobRequest{
-			Name: job.Name,
-		}
-
-		stream, err := client.StopJob(ctx, request)
-		if err != nil {
-			return err
-		}
-
-		for {
-			resp, err := stream.Recv()
-			if err == io.EOF {
-				break
-			}
-
-			if err != nil {
-				return err
-			}
-
-			fmt.Println(resp)
-		}
-
+		fmt.Println(resp)
 	}
 
 	return nil
