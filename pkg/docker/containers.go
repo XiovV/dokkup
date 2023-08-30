@@ -138,6 +138,17 @@ func (c *Controller) StopContainers(containers []types.Container) error {
 	return nil
 }
 
+func (c *Controller) DeleteContainers(containers []types.Container) error {
+	for _, cont := range containers {
+		err := c.cli.ContainerRemove(c.ctx, cont.ID, types.ContainerRemoveOptions{})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (c *Controller) GetContainersByJobName(jobName string) ([]types.Container, error) {
 	allContainers, err := c.cli.ContainerList(c.ctx, types.ContainerListOptions{All: true})
 	if err != nil {
