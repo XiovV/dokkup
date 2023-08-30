@@ -120,9 +120,13 @@ func (a *App) stopJob(node config.Node, job *config.Job) error {
 		return err
 	}
 
+	writer := uilive.New()
+	writer.Start()
+
 	for {
 		resp, err := stream.Recv()
 		if err == io.EOF {
+			writer.Stop()
 			break
 		}
 
@@ -130,7 +134,43 @@ func (a *App) stopJob(node config.Node, job *config.Job) error {
 			return err
 		}
 
-		fmt.Println(resp)
+		fmt.Fprintf(writer, "%s: %s\n", node.Name, resp.GetMessage())
+	}
+
+	return nil
+}
+
+func (a *App) deployJob(node config.Node, job *config.Job) error {
+	client, err := a.initClient(node.Location)
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := a.newAuthorizationContext(node.Key)
+	defer cancel()
+
+	request := a.jobToDeployJobRequest(job)
+
+	stream, err := client.DeployJob(ctx, request)
+	if err != nil {
+		return err
+	}
+
+	writer := uilive.New()
+	writer.Start()
+
+	for {
+		resp, err := stream.Recv()
+		if err == io.EOF {
+			writer.Stop()
+			break
+		}
+
+		if err != nil {
+			return err
+		}
+
+		fmt.Fprintf(writer, "%s: %s\n", node.Name, resp.GetMessage())
 	}
 
 	return nil
@@ -173,42 +213,6 @@ func (a *App) deployJobs(job *config.Job, inventory *config.Inventory) error {
 		if err != nil {
 			return err
 		}
-	}
-
-	return nil
-}
-
-func (a *App) deployJob(node config.Node, job *config.Job) error {
-	client, err := a.initClient(node.Location)
-	if err != nil {
-		return err
-	}
-
-	ctx, cancel := a.newAuthorizationContext(node.Key)
-	defer cancel()
-
-	request := a.jobToDeployJobRequest(job)
-
-	stream, err := client.DeployJob(ctx, request)
-	if err != nil {
-		return err
-	}
-
-	writer := uilive.New()
-	writer.Start()
-
-	for {
-		resp, err := stream.Recv()
-		if err == io.EOF {
-			writer.Stop()
-			break
-		}
-
-		if err != nil {
-			return err
-		}
-
-		fmt.Fprintf(writer, "%s: %s\n", node.Name, resp.GetMessage())
 	}
 
 	return nil
