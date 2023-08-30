@@ -3,6 +3,7 @@ package cli
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -25,21 +26,9 @@ const (
 )
 
 func (a *App) jobCmd(ctx *cli.Context) error {
-	inventoryFlag := ctx.String("inventory")
-	inventory, err := config.ReadInventory(inventoryFlag)
+	job, inventory, err := a.readJobAndInventory(ctx)
 	if err != nil {
-		log.Fatal("couldn't read inventory:", err)
-	}
-
-	jobArg := ctx.Args().First()
-
-	if len(jobArg) == 0 {
-		log.Fatal("please provide a job file")
-	}
-
-	job, err := config.ReadJob(jobArg)
-	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 
 	a.showJobSummaryTable(job)
@@ -69,7 +58,35 @@ func (a *App) jobCmd(ctx *cli.Context) error {
 }
 
 func (a *App) stopJobCmd(ctx *cli.Context) error {
+	job, inventory, err := a.readJobAndInventory(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(job, inventory)
+
+	fmt.Println("stopping job")
 	return nil
+}
+
+func (a *App) readJobAndInventory(ctx *cli.Context) (*config.Job, *config.Inventory, error) {
+	inventoryFlag := ctx.String("inventory")
+	inventory, err := config.ReadInventory(inventoryFlag)
+	if err != nil {
+		return nil, nil, fmt.Errorf("couldn't read inventory: %w", err)
+	}
+
+	jobArg := ctx.Args().First()
+
+	if len(jobArg) == 0 {
+		return nil, nil, errors.New("please provide a job file")
+	}
+
+	job, err := config.ReadJob(jobArg)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return job, inventory, nil
 }
 
 func (a *App) deployJobs(inventory *config.Inventory, job *config.Job) error {
