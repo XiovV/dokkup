@@ -37,8 +37,8 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 
 func (s *Server) StopJob(request *pb.StopJobRequest, stream pb.Dokkup_StopJobServer) error {
 	s.Logger.Info("attempting to stop a job", zap.String("jobName", request.Name))
-	s.Logger.Info("getting running containers")
 
+	s.Logger.Info("getting running containers")
 	jobContainers, err := s.Controller.GetContainersByJobName(request.Name)
 	if err != nil {
 		s.Logger.Error("failed to get containers by job name", zap.Error(err))
