@@ -4,10 +4,7 @@ import (
 	"log"
 	"os"
 
-	pb "github.com/XiovV/dokkup/pkg/grpc"
 	"github.com/urfave/cli/v2"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 type App struct {
@@ -80,14 +77,4 @@ func (a *App) Run() {
 	if err := a.Cli.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
-}
-
-func (a *App) initClient(target string) (pb.DokkupClient, error) {
-	conn, err := grpc.Dial(target, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		return nil, err
-	}
-
-	client := pb.NewDokkupClient(conn)
-	return client, nil
 }
