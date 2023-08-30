@@ -93,6 +93,18 @@ func (a *App) pingNode(node config.Node) error {
 	return nil
 }
 
+func (a *App) showStopJobSummaryTable(job *config.Job) {
+	fmt.Print("Stop job summary:\n\n")
+
+	jobSummaryTable := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
+	fmt.Fprintln(jobSummaryTable, "NAME\tIMAGE\tGROUP")
+
+	out := fmt.Sprintf("%s\t%s\t%s\n", job.Name, job.Container[0].Image, job.Group)
+	fmt.Fprintln(jobSummaryTable, out)
+
+	jobSummaryTable.Flush()
+}
+
 func (a *App) showJobSummaryTable(job *config.Job) {
 	fmt.Print("Deployment summary:\n\n")
 
