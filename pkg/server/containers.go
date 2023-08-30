@@ -46,18 +46,20 @@ func (s *Server) StopJob(request *pb.StopJobRequest, stream pb.Dokkup_StopJobSer
 	}
 
 	s.Logger.Info("stopping containers")
-	err = s.Controller.StopContainers(jobContainers)
+	err = s.Controller.StopContainers(jobContainers, stream)
 	if err != nil {
 		s.Logger.Error("failed to stop containers", zap.Error(err))
 		return err
 	}
 
 	s.Logger.Info("deleting containers")
-	err = s.Controller.DeleteContainers(jobContainers)
+	err = s.Controller.DeleteContainers(jobContainers, stream)
 	if err != nil {
 		s.Logger.Error("failed to delete containers", zap.Error(err))
 		return err
 	}
 
+	s.Logger.Info("job stopped successfully")
+	stream.Send(&pb.StopJobResponse{Message: "Job stopped successfully"})
 	return nil
 }

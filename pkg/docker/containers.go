@@ -127,8 +127,9 @@ func (c *Controller) ContainerDoesExist(containerName string) (bool, error) {
 	return false, nil
 }
 
-func (c *Controller) StopContainers(containers []types.Container) error {
-	for _, cont := range containers {
+func (c *Controller) StopContainers(containers []types.Container, stream pb.Dokkup_StopJobServer) error {
+	for i, cont := range containers {
+		stream.Send(&pb.StopJobResponse{Message: fmt.Sprintf("Stopping container (%d/%d)", i+1, len(containers))})
 		err := c.cli.ContainerStop(c.ctx, cont.ID, container.StopOptions{})
 		if err != nil {
 			return err
@@ -138,8 +139,9 @@ func (c *Controller) StopContainers(containers []types.Container) error {
 	return nil
 }
 
-func (c *Controller) DeleteContainers(containers []types.Container) error {
-	for _, cont := range containers {
+func (c *Controller) DeleteContainers(containers []types.Container, stream pb.Dokkup_StopJobServer) error {
+	for i, cont := range containers {
+		stream.Send(&pb.StopJobResponse{Message: fmt.Sprintf("Deleting container (%d/%d)", i+1, len(containers))})
 		err := c.cli.ContainerRemove(c.ctx, cont.ID, types.ContainerRemoveOptions{})
 		if err != nil {
 			return err
