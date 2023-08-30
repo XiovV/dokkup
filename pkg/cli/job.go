@@ -49,7 +49,7 @@ func (a *App) jobCmd(ctx *cli.Context) error {
 
 	fmt.Print("\n")
 
-	err = a.deployJobs(inventory, job)
+	err = a.deployJobs(job, inventory)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -62,9 +62,72 @@ func (a *App) stopJobCmd(ctx *cli.Context) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(job, inventory)
 
-	fmt.Println("stopping job")
+	fmt.Printf("This will stop a job called %s in the group %s", job.Name, job.Group)
+
+	shouldContinue, err := a.showConfirmationPrompt(ctx)
+	if err != nil {
+		log.Fatal("confirmation prompt error: ", err)
+	}
+
+	if !shouldContinue {
+		return nil
+	}
+
+	fmt.Print("\n")
+
+	err = a.stopJob(job, inventory)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return nil
+}
+
+func (a *App) stopJob(job *config.Job, inventory *config.Inventory) error {
+	group, ok := inventory.GetGroup(job.Group)
+	if !ok {
+		return fmt.Errorf("couldn't find group: %s", group.Name)
+	}
+
+	for _, nodeName := range group.Nodes {
+		node, ok := inventory.GetNode(nodeName)
+		if !ok {
+			return fmt.Errorf("couldn't find node: %s", nodeName)
+		}
+
+		client, err := a.initClient(node.Location)
+		if err != nil {
+			return err
+		}
+
+		ctx, cancel := a.newAuthorizationContext(node.Key)
+		defer cancel()
+
+		request := &pb.StopJobRequest{
+			Name: job.Name,
+		}
+
+		stream, err := client.StopJob(ctx, request)
+		if err != nil {
+			return err
+		}
+
+		for {
+			resp, err := stream.Recv()
+			if err == io.EOF {
+				break
+			}
+
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(resp)
+		}
+
+	}
+
 	return nil
 }
 
@@ -89,7 +152,7 @@ func (a *App) readJobAndInventory(ctx *cli.Context) (*config.Job, *config.Invent
 	return job, inventory, nil
 }
 
-func (a *App) deployJobs(inventory *config.Inventory, job *config.Job) error {
+func (a *App) deployJobs(job *config.Job, inventory *config.Inventory) error {
 	group, ok := inventory.GetGroup(job.Group)
 	if !ok {
 		return fmt.Errorf("couldn't find group: %s", group.Name)
@@ -116,10 +179,8 @@ func (a *App) deployJob(node config.Node, job *config.Job) error {
 		return err
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := a.newAuthorizationContext(node.Key)
 	defer cancel()
-
-	ctx = metadata.AppendToOutgoingContext(ctx, "authorization", node.Key)
 
 	request := a.jobToDeployJobRequest(job)
 
