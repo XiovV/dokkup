@@ -3,10 +3,8 @@ package config
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"os"
-	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -26,6 +24,10 @@ func CheckAPIKey() (string, error) {
 	}
 
 	key, err = createNewAPIKey()
+	if err != nil {
+		return "", err
+	}
+
 	fmt.Println("Your new API key is:", key)
 	return key, nil
 }
@@ -46,8 +48,7 @@ func storeAPIKey(key []byte) error {
 }
 
 func generateHashedAPIKey() ([]byte, string) {
-	rand.Seed(time.Now().UnixNano())
-	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
 	s := make([]rune, API_KEY_LENGHT)
 	for i := range s {
@@ -67,7 +68,7 @@ func readAPIKey() (string, error) {
 		return "", err
 	}
 
-	content, err := ioutil.ReadFile("data")
+	content, err := os.ReadFile("data")
 	if err != nil {
 		return "", err
 	}
