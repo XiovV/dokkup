@@ -42,7 +42,7 @@ func (c *Controller) ContainerSetupConfig(jobName string, config *pb.Container) 
 
 	labels := make(map[string]string)
 
-	labels["dokkup.job.name"] = jobName
+	labels[LABEL_DOKKUP_JOB_NAME] = jobName
 
 	for _, label := range config.Labels {
 		labelSplit := strings.Split(label, "=")
@@ -162,7 +162,7 @@ func (c *Controller) GetContainersByJobName(jobName string) ([]types.Container, 
 
 	foundContainers := []types.Container{}
 	for _, container := range allContainers {
-		if container.Labels["dokkup.job.name"] == jobName {
+		if container.Labels[LABEL_DOKKUP_JOB_NAME] == jobName {
 			foundContainers = append(foundContainers, container)
 		}
 	}
