@@ -60,6 +60,7 @@ func (c *Controller) ContainerSetupConfig(jobName string, config *pb.Container) 
 		RestartPolicy: container.RestartPolicy{
 			Name: config.Restart,
 		},
+		NetworkMode: container.NetworkMode(config.Network),
 	}
 
 	for _, port := range config.Ports {
