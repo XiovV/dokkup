@@ -31,7 +31,7 @@ message StopJobResponse {
 message Container {
   string image = 2;
   repeated Port ports = 3;
-  repeated string networks = 4;
+  string network = 4;
   repeated string volumes = 5;
   repeated string environment = 6;
   string restart = 7;
