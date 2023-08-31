@@ -42,8 +42,10 @@ func (c *Controller) ContainerSetupConfig(jobName string, config *pb.Container) 
 
 	labels := make(map[string]string)
 
-	for _, l := range config.Labels {
-		labelSplit := strings.Split(l, "=")
+	labels["dokkup.job.name"] = jobName
+
+	for _, label := range config.Labels {
+		labelSplit := strings.Split(label, "=")
 		labels[labelSplit[0]] = labelSplit[1]
 	}
 
