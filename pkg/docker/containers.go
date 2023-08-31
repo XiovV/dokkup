@@ -162,7 +162,7 @@ func (c *Controller) GetContainersByJobName(jobName string) ([]types.Container, 
 
 	foundContainers := []types.Container{}
 	for _, container := range allContainers {
-		if strings.Contains(container.Names[0], jobName) {
+		if container.Labels["dokkup.job.name"] == jobName {
 			foundContainers = append(foundContainers, container)
 		}
 	}
