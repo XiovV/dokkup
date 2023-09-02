@@ -62,7 +62,7 @@ func (c *Controller) ShouldUpdateContainers(request *pb.DeployJobRequest) (bool,
 func (c *Controller) IsConfigDifferent(containerConfig types.ContainerJSON, request *pb.DeployJobRequest) bool {
 	requestContainer := request.GetContainer()
 
-	if requestContainer.Image != containerConfig.Image {
+	if requestContainer.Image != containerConfig.Config.Image {
 		return true
 	}
 
@@ -74,17 +74,17 @@ func (c *Controller) IsConfigDifferent(containerConfig types.ContainerJSON, requ
 		return true
 	}
 
-	if len(requestContainer.Labels) != len(containerConfig.Config.Labels) {
-		return true
-	}
+	// if len(requestContainer.Labels) != len(containerConfig.Config.Labels) {
+	// 	return true
+	// }
 
 	if len(requestContainer.Volumes) != len(containerConfig.HostConfig.Binds) {
 		return true
 	}
 
-	if len(requestContainer.Environment) != len(containerConfig.Config.Env) {
-		return true
-	}
+	// if len(requestContainer.Environment) != len(containerConfig.Config.Env) {
+	// 	return true
+	// }
 
 	return false
 }
@@ -181,6 +181,15 @@ func (c *Controller) ContainerDoesExist(containerName string) (bool, error) {
 	}
 
 	return false, nil
+}
+
+func (c *Controller) DoesJobExist(jobName string) bool {
+	containers, err := c.GetContainersByJobName(jobName)
+	if err != nil {
+		return false
+	}
+
+	return len(containers) != 0
 }
 
 func (c *Controller) StopContainers(containers []types.Container) error {
