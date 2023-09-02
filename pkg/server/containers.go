@@ -24,6 +24,28 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 		return err
 	}
 
+	shouldUpdate, err := s.Controller.ShouldUpdateContainers(request)
+	if err != nil {
+		s.Logger.Error("failed to check if an update should be run", zap.Error(err))
+		return err
+	}
+
+	if shouldUpdate {
+		s.Logger.Info("updating the job...")
+		jobContainers, err := s.Controller.GetContainersByJobName(request.Name)
+		if err != nil {
+			s.Logger.Error("failed to get containers by job name", zap.Error(err))
+			return err
+		}
+
+		s.Logger.Info("stopping containers")
+		err = s.Controller.StopContainers(jobContainers)
+		if err != nil {
+			s.Logger.Error("failed to stop containers", zap.Error(err))
+			return err
+		}
+	}
+
 	err = s.Controller.StartContainers(createdContainers, stream)
 	if err != nil {
 		s.Logger.Error("failed to start containers", zap.Error(err))
@@ -46,7 +68,7 @@ func (s *Server) StopJob(request *pb.StopJobRequest, stream pb.Dokkup_StopJobSer
 	}
 
 	s.Logger.Info("stopping containers")
-	err = s.Controller.StopContainers(jobContainers, stream)
+	err = s.Controller.StopContainers(jobContainers)
 	if err != nil {
 		s.Logger.Error("failed to stop containers", zap.Error(err))
 		return err
