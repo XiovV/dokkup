@@ -18,15 +18,21 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 		return fmt.Errorf("failed to pull image: %w", err)
 	}
 
-	createdContainers, err := s.Controller.CreateContainersFromRequest(request, stream)
-	if err != nil {
-		s.Logger.Error("failed to create containers", zap.Error(err))
-		return err
-	}
-
 	shouldUpdate, err := s.Controller.ShouldUpdateContainers(request)
 	if err != nil {
 		s.Logger.Error("failed to check if an update should be run", zap.Error(err))
+		return err
+	}
+
+	doesJobExist := s.Controller.DoesJobExist(request.Name)
+	if doesJobExist && !shouldUpdate {
+		s.Logger.Info("nothing to do, exiting...")
+		return nil
+	}
+
+	createdContainers, err := s.Controller.CreateContainersFromRequest(request, stream)
+	if err != nil {
+		s.Logger.Error("failed to create containers", zap.Error(err))
 		return err
 	}
 
