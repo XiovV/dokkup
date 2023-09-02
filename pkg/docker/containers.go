@@ -2,7 +2,6 @@ package docker
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -27,13 +26,67 @@ func (c *Controller) ContainerStart(containerId string) error {
 	return c.cli.ContainerStart(c.ctx, containerId, types.ContainerStartOptions{})
 }
 
-func (c *Controller) ContainerInspect(containerId string) types.ContainerJSON {
+func (c *Controller) ContainerInspect(containerId string) (types.ContainerJSON, error) {
 	resp, err := c.cli.ContainerInspect(c.ctx, containerId)
 	if err != nil {
-		log.Fatal(err)
+		return types.ContainerJSON{}, err
 	}
 
-	return resp
+	return resp, nil
+}
+
+func (c *Controller) ShouldUpdateContainers(request *pb.DeployJobRequest) (bool, error) {
+	runningContainers, err := c.GetContainersByJobName(request.Name)
+	if err != nil {
+		return false, err
+	}
+
+	if len(runningContainers) == 0 {
+		return false, nil
+	}
+
+	containerConfig, err := c.ContainerInspect(runningContainers[0].ID)
+	if err != nil {
+		return false, err
+	}
+
+	isDifferent := c.IsConfigDifferent(containerConfig, request)
+	if !isDifferent {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+// TODO: expand this method to check ports, labels, volumes and environment variables more thorougly
+func (c *Controller) IsConfigDifferent(containerConfig types.ContainerJSON, request *pb.DeployJobRequest) bool {
+	requestContainer := request.GetContainer()
+
+	if requestContainer.Image != containerConfig.Image {
+		return true
+	}
+
+	if requestContainer.Network != string(containerConfig.HostConfig.NetworkMode) {
+		return true
+	}
+
+	if requestContainer.Restart != containerConfig.HostConfig.RestartPolicy.Name {
+		return true
+	}
+
+	if len(requestContainer.Labels) != len(containerConfig.Config.Labels) {
+		return true
+	}
+
+	if len(requestContainer.Volumes) != len(containerConfig.HostConfig.Binds) {
+		return true
+	}
+
+	if len(requestContainer.Environment) != len(containerConfig.Config.Env) {
+		return true
+	}
+
+	return false
 }
 
 func (c *Controller) ContainerSetupConfig(jobName string, config *pb.Container) *ContainerConfig {
@@ -130,9 +183,8 @@ func (c *Controller) ContainerDoesExist(containerName string) (bool, error) {
 	return false, nil
 }
 
-func (c *Controller) StopContainers(containers []types.Container, stream pb.Dokkup_StopJobServer) error {
-	for i, cont := range containers {
-		stream.Send(&pb.StopJobResponse{Message: fmt.Sprintf("Stopping container (%d/%d)", i+1, len(containers))})
+func (c *Controller) StopContainers(containers []types.Container) error {
+	for _, cont := range containers {
 		err := c.cli.ContainerStop(c.ctx, cont.ID, container.StopOptions{})
 		if err != nil {
 			return err
