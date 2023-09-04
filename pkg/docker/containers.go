@@ -102,6 +102,8 @@ func (c *Controller) ContainerSetupConfig(jobName string, config *pb.Container) 
 		labels[labelSplit[0]] = labelSplit[1]
 	}
 
+	fmt.Println("CONTAINER REQUEST:", config)
+
 	containerConfig := &container.Config{
 		Image:        config.Image,
 		ExposedPorts: nat.PortSet{},
@@ -195,6 +197,17 @@ func (c *Controller) DoesJobExist(jobName string) bool {
 func (c *Controller) StopContainers(containers []types.Container) error {
 	for _, cont := range containers {
 		err := c.cli.ContainerStop(c.ctx, cont.ID, container.StopOptions{})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (c *Controller) AppendRollbackToContainers(containers []types.Container) error {
+	for _, cont := range containers {
+		err := c.cli.ContainerRename(c.ctx, cont.ID, cont.Names[0]+"-rollback")
 		if err != nil {
 			return err
 		}
