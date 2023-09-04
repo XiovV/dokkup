@@ -232,9 +232,13 @@ func (a *App) jobToDeployJobRequest(job *config.Job) *pb.DeployJobRequest {
 		Count: count,
 		Name:  job.Name,
 		Container: &pb.Container{
-			Image:   container.Image,
-			Ports:   ports,
-			Network: container.Network,
+			Image:       container.Image,
+			Ports:       ports,
+			Network:     container.Network,
+			Volumes:     container.Volumes,
+			Environment: container.Environment,
+			Restart:     container.Restart,
+			Labels:      container.Labels,
 		},
 	}
 }
