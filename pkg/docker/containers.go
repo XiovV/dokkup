@@ -79,8 +79,6 @@ func (c *Controller) ContainerSetupConfig(jobName string, config *pb.Container) 
 		labels[labelSplit[0]] = labelSplit[1]
 	}
 
-	fmt.Println("CONTAINER REQUEST:", config)
-
 	containerConfig := &container.Config{
 		Image:        config.Image,
 		ExposedPorts: nat.PortSet{},
