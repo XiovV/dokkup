@@ -11,85 +11,30 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 	s.Logger.Info("job received", zap.String("jobName", request.Name), zap.Int("containerCount", int(request.Count)), zap.String("containerImage", request.Container.Image))
 	stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Attempting to pull image: %s", request.Container.Image)})
 
-	s.Logger.Info("attempting to pull image", zap.String("image", request.Container.Image))
-	err := s.Controller.ImagePull(request.Container.Image)
-	if err != nil {
-		s.Logger.Error("failed to pull image", zap.Error(err), zap.String("image", request.Container.Image))
-		return fmt.Errorf("failed to pull image: %w", err)
-	}
-
-	shouldUpdate, err := s.Controller.ShouldUpdateContainers(request)
+	shouldUpdate, err := s.JobRunner.ShouldUpdateJob(request)
 	if err != nil {
 		s.Logger.Error("failed to check if an update should be run", zap.Error(err))
 		return err
 	}
 
-	doesJobExist := s.Controller.DoesJobExist(request.Name)
+	if shouldUpdate {
+		return s.JobRunner.RunUpdate(stream, request)
+	}
 
-	if doesJobExist && !shouldUpdate {
+	doesJobExist := s.JobRunner.DoesJobExist(request.Name)
+
+	if doesJobExist {
 		s.Logger.Info("nothing to do, exiting...")
 		return nil
 	}
 
-	if shouldUpdate {
-		err = s.runUpdate(stream, request)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
-
-	createdContainers, err := s.Controller.CreateContainersFromRequest(request, stream)
+	err = s.JobRunner.RunDeployment(stream, request)
 	if err != nil {
-		s.Logger.Error("failed to create containers", zap.Error(err))
-		return err
-	}
-
-	err = s.Controller.StartContainers(createdContainers, stream)
-	if err != nil {
-		s.Logger.Error("failed to start containers", zap.Error(err))
 		return err
 	}
 
 	s.Logger.Info("job completed successfully")
 	stream.Send(&pb.DeployJobResponse{Message: "Deployment successful"})
-	return nil
-}
-
-func (s *Server) runUpdate(stream pb.Dokkup_DeployJobServer, request *pb.DeployJobRequest) error {
-	s.Logger.Info("updating the job...")
-	oldContainers, err := s.Controller.GetContainersByJobName(request.Name)
-	if err != nil {
-		s.Logger.Error("failed to get containers by job name", zap.Error(err))
-		return err
-	}
-
-	err = s.Controller.AppendRollbackToContainers(oldContainers)
-	if err != nil {
-		s.Logger.Error("failed to rename containers", zap.Error(err))
-		return err
-	}
-
-	updatedContainers, err := s.Controller.CreateContainersFromRequest(request, stream)
-	if err != nil {
-		s.Logger.Error("failed to create containers", zap.Error(err))
-		return err
-	}
-
-	s.Logger.Info("stopping containers")
-	err = s.Controller.StopContainers(oldContainers)
-	if err != nil {
-		s.Logger.Error("failed to stop containers", zap.Error(err))
-		return err
-	}
-
-	err = s.Controller.StartContainers(updatedContainers, stream)
-	if err != nil {
-		s.Logger.Error("failed to start containers", zap.Error(err))
-		return err
-	}
-
 	return nil
 }
 
