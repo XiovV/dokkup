@@ -35,29 +35,6 @@ func (c *Controller) ContainerInspect(containerId string) (types.ContainerJSON, 
 	return resp, nil
 }
 
-func (c *Controller) ShouldUpdateContainers(request *pb.DeployJobRequest) (bool, error) {
-	runningContainers, err := c.GetContainersByJobName(request.Name)
-	if err != nil {
-		return false, err
-	}
-
-	if len(runningContainers) == 0 {
-		return false, nil
-	}
-
-	containerConfig, err := c.ContainerInspect(runningContainers[0].ID)
-	if err != nil {
-		return false, err
-	}
-
-	isDifferent := c.IsConfigDifferent(containerConfig, request)
-	if !isDifferent {
-		return false, nil
-	}
-
-	return true, nil
-}
-
 // TODO: expand this method to check ports, labels, volumes and environment variables more thorougly
 func (c *Controller) IsConfigDifferent(containerConfig types.ContainerJSON, request *pb.DeployJobRequest) bool {
 	requestContainer := request.GetContainer()
@@ -183,15 +160,6 @@ func (c *Controller) ContainerDoesExist(containerName string) (bool, error) {
 	}
 
 	return false, nil
-}
-
-func (c *Controller) DoesJobExist(jobName string) bool {
-	containers, err := c.GetContainersByJobName(jobName)
-	if err != nil {
-		return false
-	}
-
-	return len(containers) != 0
 }
 
 func (c *Controller) StopContainers(containers []types.Container) error {
