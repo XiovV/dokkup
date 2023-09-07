@@ -8,6 +8,7 @@ import (
 	"github.com/XiovV/dokkup/pkg/config"
 	"github.com/XiovV/dokkup/pkg/docker"
 	pb "github.com/XiovV/dokkup/pkg/grpc"
+	"github.com/XiovV/dokkup/pkg/runner"
 	"github.com/golang/protobuf/ptypes/empty"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -17,6 +18,7 @@ type Server struct {
 	pb.UnimplementedDokkupServer
 	Config     *config.AgentConfig
 	Controller *docker.Controller
+	JobRunner  *runner.JobRunner
 	Logger     *zap.Logger
 }
 
