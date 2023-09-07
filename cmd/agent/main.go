@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/XiovV/dokkup/pkg/config"
 	"github.com/XiovV/dokkup/pkg/docker"
+	"github.com/XiovV/dokkup/pkg/runner"
 	"github.com/XiovV/dokkup/pkg/server"
 	"go.uber.org/zap"
 )
@@ -28,7 +29,9 @@ func main() {
 		logger.Fatal("could not instantiate controller", zap.Error(err))
 	}
 
-	srv := server.Server{Config: config, Controller: controller, Logger: logger}
+	jobRunner := runner.NewJobRunner(controller)
+
+	srv := server.Server{Config: config, Controller: controller, JobRunner: jobRunner, Logger: logger}
 
 	logger.Info("server is listening...", zap.String("port", config.Port))
 	if err := srv.Serve(); err != nil {
