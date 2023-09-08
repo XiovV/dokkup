@@ -36,18 +36,16 @@ func (c *Controller) ContainerInspect(containerId string) (types.ContainerJSON, 
 }
 
 // TODO: expand this method to check ports, labels, volumes and environment variables more thorougly
-func (c *Controller) IsConfigDifferent(containerConfig types.ContainerJSON, request *pb.DeployJobRequest) bool {
-	requestContainer := request.GetContainer()
-
-	if requestContainer.Image != containerConfig.Config.Image {
+func (c *Controller) IsConfigDifferent(containerConfig, comparisonContainer types.ContainerJSON) bool {
+	if comparisonContainer.Image != containerConfig.Config.Image {
 		return true
 	}
 
-	if requestContainer.Network != string(containerConfig.HostConfig.NetworkMode) {
+	if comparisonContainer.HostConfig.NetworkMode != containerConfig.HostConfig.NetworkMode {
 		return true
 	}
 
-	if requestContainer.Restart != containerConfig.HostConfig.RestartPolicy.Name {
+	if comparisonContainer.HostConfig.RestartPolicy.Name != containerConfig.HostConfig.RestartPolicy.Name {
 		return true
 	}
 
@@ -55,7 +53,7 @@ func (c *Controller) IsConfigDifferent(containerConfig types.ContainerJSON, requ
 	// 	return true
 	// }
 
-	if len(requestContainer.Volumes) != len(containerConfig.HostConfig.Binds) {
+	if len(comparisonContainer.HostConfig.Binds) != len(containerConfig.HostConfig.Binds) {
 		return true
 	}
 
