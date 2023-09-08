@@ -11,14 +11,29 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 	s.Logger.Info("job received", zap.String("jobName", request.Name), zap.Int("containerCount", int(request.Count)), zap.String("containerImage", request.Container.Image))
 	stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Attempting to pull image: %s", request.Container.Image)})
 
-	shouldUpdate, err := s.JobRunner.ShouldUpdateJob(request)
+	err := s.Controller.ImagePull(request.Container.Image)
+	if err != nil {
+		return fmt.Errorf("failed to pull image: %w", err)
+	}
+
+	newContainers, err := s.Controller.CreateContainersFromRequest(request, stream)
+	if err != nil {
+		return err
+	}
+
+	comparisonContainer, err := s.Controller.ContainerInspect(newContainers[0])
+	if err != nil {
+		return nil
+	}
+
+	shouldUpdate, err := s.JobRunner.ShouldUpdateJob(request.Name, comparisonContainer)
 	if err != nil {
 		s.Logger.Error("failed to check if an update should be run", zap.Error(err))
 		return err
 	}
 
 	if shouldUpdate {
-		return s.JobRunner.RunUpdate(stream, request)
+		return s.JobRunner.RunUpdate(request.Name, newContainers, stream)
 	}
 
 	doesJobExist := s.JobRunner.DoesJobExist(request.Name)
