@@ -56,7 +56,7 @@ func (j *JobRunner) RunDeployment(stream pb.Dokkup_DeployJobServer, request *pb.
 }
 
 func (j *JobRunner) RunUpdate(request *pb.DeployJobRequest, stream pb.Dokkup_DeployJobServer) error {
-	err := j.Controller.DeleteRollbackContainers()
+	err := j.Controller.DeleteRollbackContainers(request.Name)
 	if err != nil {
 		return err
 	}
@@ -81,8 +81,44 @@ func (j *JobRunner) RunUpdate(request *pb.DeployJobRequest, stream pb.Dokkup_Dep
 		return err
 	}
 
-	return j.Controller.StartContainers(newContainers, stream)
+	err = j.Controller.StartContainers(newContainers, stream)
+	if err != nil {
+		j.abortUpdate(request.Name)
+		return err
+	}
+
+	return nil
 }
 
-func (j *JobRunner) AbortUpdate() {
+func (j *JobRunner) abortUpdate(jobName string) error {
+	rollbackContainers, err := j.Controller.GetRollbackContainers(jobName)
+	if err != nil {
+		return err
+	}
+
+	for _, container := range rollbackContainers {
+		err := j.Controller.ContainerStart(container.ID)
+		if err != nil {
+			return err
+		}
+	}
+
+	oldContainers, err := j.Controller.GetContainersByJobName(jobName)
+	if err != nil {
+		return err
+	}
+
+	for _, container := range oldContainers {
+		err := j.Controller.ContainerRemove(container.ID)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = j.Controller.RemoveRollbackFromContainers(rollbackContainers)
+	if err != nil {
+		return nil
+	}
+
+	return nil
 }
