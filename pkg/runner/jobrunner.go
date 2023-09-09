@@ -1,8 +1,6 @@
 package runner
 
 import (
-	"fmt"
-
 	"github.com/XiovV/dokkup/pkg/docker"
 	pb "github.com/XiovV/dokkup/pkg/grpc"
 	"github.com/docker/docker/api/types"
@@ -49,11 +47,6 @@ func (j *JobRunner) DoesJobExist(jobName string) bool {
 }
 
 func (j *JobRunner) RunDeployment(stream pb.Dokkup_DeployJobServer, request *pb.DeployJobRequest) error {
-	err := j.Controller.ImagePull(request.Container.Image)
-	if err != nil {
-		return fmt.Errorf("failed to pull image: %w", err)
-	}
-
 	createdContainers, err := j.Controller.CreateContainersFromRequest(request, stream)
 	if err != nil {
 		return err
@@ -62,13 +55,18 @@ func (j *JobRunner) RunDeployment(stream pb.Dokkup_DeployJobServer, request *pb.
 	return j.Controller.StartContainers(createdContainers, stream)
 }
 
-func (j *JobRunner) RunUpdate(jobName string, newContainers []string, stream pb.Dokkup_DeployJobServer) error {
-	oldContainers, err := j.Controller.GetContainersByJobName(jobName)
+func (j *JobRunner) RunUpdate(request *pb.DeployJobRequest, stream pb.Dokkup_DeployJobServer) error {
+	oldContainers, err := j.Controller.GetContainersByJobName(request.Name)
 	if err != nil {
 		return err
 	}
 
 	err = j.Controller.AppendRollbackToContainers(oldContainers)
+	if err != nil {
+		return err
+	}
+
+	newContainers, err := j.Controller.CreateContainersFromRequest(request, stream)
 	if err != nil {
 		return err
 	}
