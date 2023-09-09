@@ -40,7 +40,6 @@ func (c *Controller) ContainerInspect(containerId string) (types.ContainerJSON, 
 	return resp, nil
 }
 
-// TODO: expand this method to check ports, labels, volumes and environment variables more thorougly
 func (c *Controller) IsConfigDifferent(containerConfig, comparisonContainer types.ContainerJSON) bool {
 	if comparisonContainer.Config.Image != containerConfig.Config.Image {
 		return true
@@ -150,7 +149,8 @@ func (c *Controller) StartContainers(containerIDs []string, stream pb.Dokkup_Dep
 		c.Logger.Info("attempting to start a container", zap.String("containerId", container))
 
 		stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Starting container (%d/%d)", i+1, len(containerIDs))})
-		if err := c.ContainerStart(container); err != nil {
+		err := c.ContainerStart(container)
+		if err != nil {
 			return err
 		}
 
@@ -197,6 +197,18 @@ func (c *Controller) AppendRollbackToContainers(containers []types.Container) er
 	return nil
 }
 
+func (c *Controller) RemoveRollbackFromContainers(containers []types.Container) error {
+	for _, cont := range containers {
+		newName := strings.ReplaceAll(cont.Names[0], "-rollback", "")
+		err := c.cli.ContainerRename(c.ctx, cont.ID, newName)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (c *Controller) DeleteContainers(containers []types.Container, stream pb.Dokkup_StopJobServer) error {
 	for i, cont := range containers {
 		stream.Send(&pb.StopJobResponse{Message: fmt.Sprintf("Deleting container (%d/%d)", i+1, len(containers))})
@@ -209,8 +221,8 @@ func (c *Controller) DeleteContainers(containers []types.Container, stream pb.Do
 	return nil
 }
 
-func (c *Controller) DeleteRollbackContainers() error {
-	rollbackContainers, err := c.GetRollbackContainers()
+func (c *Controller) DeleteRollbackContainers(jobName string) error {
+	rollbackContainers, err := c.GetRollbackContainers(jobName)
 	if err != nil {
 		return err
 	}
@@ -225,7 +237,7 @@ func (c *Controller) DeleteRollbackContainers() error {
 	return nil
 }
 
-func (c *Controller) GetRollbackContainers() ([]types.Container, error) {
+func (c *Controller) GetRollbackContainers(jobName string) ([]types.Container, error) {
 	allContainers, err := c.cli.ContainerList(c.ctx, types.ContainerListOptions{All: true})
 	if err != nil {
 		return nil, err
@@ -233,7 +245,7 @@ func (c *Controller) GetRollbackContainers() ([]types.Container, error) {
 
 	foundContainers := []types.Container{}
 	for _, container := range allContainers {
-		if strings.Contains(container.Names[0], "-rollback") {
+		if container.Labels[LABEL_DOKKUP_JOB_NAME] == jobName && strings.Contains(container.Names[0], "-rollback") {
 			foundContainers = append(foundContainers, container)
 		}
 	}
@@ -253,7 +265,7 @@ func (c *Controller) GetContainersByJobName(jobName string) ([]types.Container, 
 
 	foundContainers := []types.Container{}
 	for _, container := range allContainers {
-		if container.Labels[LABEL_DOKKUP_JOB_NAME] == jobName && !strings.Contains(container.Names[0], "-temporary") {
+		if container.Labels[LABEL_DOKKUP_JOB_NAME] == jobName && !strings.Contains(container.Names[0], "-temporary") && !strings.Contains(container.Names[0], "-rollback") {
 			foundContainers = append(foundContainers, container)
 		}
 	}
