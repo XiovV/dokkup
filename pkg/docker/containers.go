@@ -9,7 +9,6 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/go-connections/nat"
 	"github.com/google/uuid"
-	"github.com/gookit/goutil/dump"
 	"go.uber.org/zap"
 
 	pb "github.com/XiovV/dokkup/pkg/grpc"
@@ -43,36 +42,28 @@ func (c *Controller) ContainerInspect(containerId string) (types.ContainerJSON, 
 
 // TODO: expand this method to check ports, labels, volumes and environment variables more thorougly
 func (c *Controller) IsConfigDifferent(containerConfig, comparisonContainer types.ContainerJSON) bool {
-	dump.P(comparisonContainer)
-
 	if comparisonContainer.Config.Image != containerConfig.Config.Image {
-		fmt.Println("IMAGE IS DIFFERENT", comparisonContainer.Image, containerConfig.Config.Image)
 		return true
 	}
 
 	if comparisonContainer.HostConfig.NetworkMode != containerConfig.HostConfig.NetworkMode {
-		fmt.Println("NETWORK IS DIFFERENT", comparisonContainer.HostConfig.NetworkMode, containerConfig.HostConfig.NetworkMode)
 		return true
 	}
 
 	fmt.Println(comparisonContainer.HostConfig.RestartPolicy.Name, containerConfig.HostConfig.RestartPolicy.Name)
 	if comparisonContainer.HostConfig.RestartPolicy.Name != containerConfig.HostConfig.RestartPolicy.Name {
-		fmt.Println("RESTART IS DIFFERENT", comparisonContainer.HostConfig.RestartPolicy.Name, containerConfig.HostConfig.RestartPolicy.Name)
 		return true
 	}
 
 	if !reflect.DeepEqual(comparisonContainer.Config.Labels, containerConfig.Config.Labels) {
-		fmt.Println("LABELS ARE DIFFERENT", comparisonContainer.Config.Labels, containerConfig.Config.Labels)
 		return true
 	}
 
 	if !reflect.DeepEqual(comparisonContainer.HostConfig.Binds, containerConfig.HostConfig.Binds) {
-		fmt.Println("BINDS ARE DIFFERENT", comparisonContainer.HostConfig.Binds, containerConfig.HostConfig.Binds)
 		return true
 	}
 
 	if !reflect.DeepEqual(comparisonContainer.Config.Env, containerConfig.Config.Env) {
-		fmt.Println("ENV IS DIFFERENT", comparisonContainer.Config.Env, containerConfig.Config.Env)
 		return true
 	}
 
