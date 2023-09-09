@@ -16,24 +16,29 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 		return fmt.Errorf("failed to pull image: %w", err)
 	}
 
-	newContainers, err := s.Controller.CreateContainersFromRequest(request, stream)
+	temporaryContainer, err := s.Controller.CreateTemporaryContainer(request)
 	if err != nil {
 		return err
 	}
 
-	comparisonContainer, err := s.Controller.ContainerInspect(newContainers[0])
+	temporaryContainerConfig, err := s.Controller.ContainerInspect(temporaryContainer)
 	if err != nil {
-		return nil
+		return err
 	}
 
-	shouldUpdate, err := s.JobRunner.ShouldUpdateJob(request.Name, comparisonContainer)
+	shouldUpdate, err := s.JobRunner.ShouldUpdateJob(request.Name, temporaryContainerConfig)
 	if err != nil {
 		s.Logger.Error("failed to check if an update should be run", zap.Error(err))
 		return err
 	}
 
+	err = s.Controller.ContainerRemove(temporaryContainer)
+	if err != nil {
+		return err
+	}
+
 	if shouldUpdate {
-		return s.JobRunner.RunUpdate(request.Name, newContainers, stream)
+		return s.JobRunner.RunUpdate(request, stream)
 	}
 
 	doesJobExist := s.JobRunner.DoesJobExist(request.Name)
