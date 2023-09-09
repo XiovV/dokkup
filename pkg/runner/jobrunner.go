@@ -56,6 +56,11 @@ func (j *JobRunner) RunDeployment(stream pb.Dokkup_DeployJobServer, request *pb.
 }
 
 func (j *JobRunner) RunUpdate(request *pb.DeployJobRequest, stream pb.Dokkup_DeployJobServer) error {
+	err := j.Controller.DeleteRollbackContainers()
+	if err != nil {
+		return err
+	}
+
 	oldContainers, err := j.Controller.GetContainersByJobName(request.Name)
 	if err != nil {
 		return err
