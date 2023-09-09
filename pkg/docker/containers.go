@@ -26,6 +26,10 @@ func (c *Controller) ContainerStart(containerId string) error {
 	return c.cli.ContainerStart(c.ctx, containerId, types.ContainerStartOptions{})
 }
 
+func (c *Controller) ContainerStop(containerId string) error {
+	return c.cli.ContainerStop(c.ctx, containerId, container.StopOptions{})
+}
+
 func (c *Controller) ContainerInspect(containerId string) (types.ContainerJSON, error) {
 	resp, err := c.cli.ContainerInspect(c.ctx, containerId)
 	if err != nil {
@@ -105,6 +109,17 @@ func (c *Controller) ContainerSetupConfig(jobName string, config *pb.Container) 
 		Config:        containerConfig,
 		HostConfig:    hostConfig,
 	}
+}
+
+func (c *Controller) CreateTemporaryContainer(request *pb.DeployJobRequest) (string, error) {
+	containerConfig := c.ContainerSetupConfig(request.Name, request.Container)
+
+	container, err := c.ContainerCreate(request.Name+"-temporary", containerConfig.Config, containerConfig.HostConfig)
+	if err != nil {
+		return "", err
+	}
+
+	return container.ID, nil
 }
 
 func (c *Controller) CreateContainersFromRequest(request *pb.DeployJobRequest, stream pb.Dokkup_DeployJobServer) ([]string, error) {
@@ -190,6 +205,10 @@ func (c *Controller) DeleteContainers(containers []types.Container, stream pb.Do
 	}
 
 	return nil
+}
+
+func (c *Controller) ContainerRemove(containerId string) error {
+	return c.cli.ContainerRemove(c.ctx, containerId, types.ContainerRemoveOptions{})
 }
 
 func (c *Controller) GetContainersByJobName(jobName string) ([]types.Container, error) {
