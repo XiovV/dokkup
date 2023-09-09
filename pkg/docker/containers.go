@@ -209,6 +209,38 @@ func (c *Controller) DeleteContainers(containers []types.Container, stream pb.Do
 	return nil
 }
 
+func (c *Controller) DeleteRollbackContainers() error {
+	rollbackContainers, err := c.GetRollbackContainers()
+	if err != nil {
+		return err
+	}
+
+	for _, container := range rollbackContainers {
+		err = c.ContainerRemove(container.ID)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (c *Controller) GetRollbackContainers() ([]types.Container, error) {
+	allContainers, err := c.cli.ContainerList(c.ctx, types.ContainerListOptions{All: true})
+	if err != nil {
+		return nil, err
+	}
+
+	foundContainers := []types.Container{}
+	for _, container := range allContainers {
+		if strings.Contains(container.Names[0], "-rollback") {
+			foundContainers = append(foundContainers, container)
+		}
+	}
+
+	return foundContainers, nil
+}
+
 func (c *Controller) ContainerRemove(containerId string) error {
 	return c.cli.ContainerRemove(c.ctx, containerId, types.ContainerRemoveOptions{})
 }
