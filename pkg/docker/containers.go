@@ -9,7 +9,6 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/go-connections/nat"
 	"github.com/google/uuid"
-	"go.uber.org/zap"
 
 	pb "github.com/XiovV/dokkup/pkg/grpc"
 )
@@ -123,43 +122,6 @@ func (c *Controller) CreateTemporaryContainer(request *pb.DeployJobRequest) (str
 	return container.ID, nil
 }
 
-func (c *Controller) CreateContainersFromRequest(request *pb.DeployJobRequest, stream pb.Dokkup_DeployJobServer) ([]string, error) {
-	createdContainers := []string{}
-	for i := 0; i < int(request.Count); i++ {
-		stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Configuring container (%d/%d)", i+1, request.Count)})
-
-		containerConfig := c.ContainerSetupConfig(request.Name, request.Container)
-
-		c.Logger.Info("attempting to create a container", zap.String("containerName", containerConfig.ContainerName))
-		resp, err := c.ContainerCreate(containerConfig.ContainerName, containerConfig.Config, containerConfig.HostConfig)
-		if err != nil {
-			return nil, err
-		}
-
-		c.Logger.Info("container created successfully", zap.String("containerName", containerConfig.ContainerName))
-
-		createdContainers = append(createdContainers, resp.ID)
-	}
-
-	return createdContainers, nil
-}
-
-func (c *Controller) StartContainers(containerIDs []string, stream pb.Dokkup_DeployJobServer) error {
-	for i, container := range containerIDs {
-		c.Logger.Info("attempting to start a container", zap.String("containerId", container))
-
-		stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Starting container (%d/%d)", i+1, len(containerIDs))})
-		err := c.ContainerStart(container)
-		if err != nil {
-			return err
-		}
-
-		c.Logger.Info("container started successfully", zap.String("containerId", container))
-	}
-
-	return nil
-}
-
 func (c *Controller) ContainerDoesExist(containerName string) (bool, error) {
 	containers, err := c.cli.ContainerList(c.ctx, types.ContainerListOptions{All: true})
 	if err != nil {
@@ -173,17 +135,6 @@ func (c *Controller) ContainerDoesExist(containerName string) (bool, error) {
 	}
 
 	return false, nil
-}
-
-func (c *Controller) StopContainers(containers []types.Container) error {
-	for _, cont := range containers {
-		err := c.cli.ContainerStop(c.ctx, cont.ID, container.StopOptions{})
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 func (c *Controller) AppendRollbackToContainers(containers []types.Container) error {
