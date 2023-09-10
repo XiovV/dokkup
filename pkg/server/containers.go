@@ -12,13 +12,16 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 
 	stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Attempting to pull image: %s", request.Container.Image)})
 
+	s.Logger.Debug("attempint to pull image", zap.String("image", request.Container.Image))
 	err := s.Controller.ImagePull(request.Container.Image)
 	if err != nil {
 		return fmt.Errorf("failed to pull image: %w", err)
 	}
 
+	s.Logger.Debug("creating temporary container")
 	temporaryContainer, err := s.Controller.CreateTemporaryContainer(request)
 	if err != nil {
+		s.Logger.Error("failed to create temporary container", zap.Error(err))
 		return err
 	}
 
@@ -27,18 +30,22 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 		return err
 	}
 
+	s.Logger.Debug("checking if the job should be updated")
 	shouldUpdate, err := s.JobRunner.ShouldUpdateJob(request.Name, temporaryContainerConfig)
 	if err != nil {
 		s.Logger.Error("failed to check if an update should be run", zap.Error(err))
 		return err
 	}
 
+	s.Logger.Debug("removing the temporary container")
 	err = s.Controller.ContainerRemove(temporaryContainer)
 	if err != nil {
+		s.Logger.Error("failed to remove the temporary container", zap.Error(err))
 		return err
 	}
 
 	if shouldUpdate {
+		s.Logger.Info("updating job", zap.String("jobName", request.Name))
 		return s.JobRunner.RunUpdate(request, stream)
 	}
 
