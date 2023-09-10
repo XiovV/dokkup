@@ -6,14 +6,16 @@ import (
 	"github.com/XiovV/dokkup/pkg/docker"
 	pb "github.com/XiovV/dokkup/pkg/grpc"
 	"github.com/docker/docker/api/types"
+	"go.uber.org/zap"
 )
 
 type JobRunner struct {
 	Controller *docker.Controller
+	Logger     *zap.Logger
 }
 
-func NewJobRunner(controller *docker.Controller) *JobRunner {
-	return &JobRunner{Controller: controller}
+func NewJobRunner(controller *docker.Controller, logger *zap.Logger) *JobRunner {
+	return &JobRunner{Controller: controller, Logger: logger}
 }
 
 func (j *JobRunner) ShouldUpdateJob(jobName string, comparisonContainer types.ContainerJSON) (bool, error) {
@@ -75,8 +77,10 @@ func (j *JobRunner) createContainersFromRequest(request *pb.DeployJobRequest, st
 }
 
 func (j *JobRunner) RunUpdate(request *pb.DeployJobRequest, stream pb.Dokkup_DeployJobServer) error {
+	j.Logger.Debug("removing previous rollback containers")
 	err := j.Controller.DeleteRollbackContainers(request.Name)
 	if err != nil {
+		j.Logger.Error("could not remove previous rollback containers", zap.Error(err))
 		return err
 	}
 
@@ -85,13 +89,17 @@ func (j *JobRunner) RunUpdate(request *pb.DeployJobRequest, stream pb.Dokkup_Dep
 		return err
 	}
 
+	j.Logger.Debug("setting rollback containers")
 	err = j.Controller.AppendRollbackToContainers(oldContainers)
 	if err != nil {
+		j.Logger.Error("failed to set rollback containers", zap.Error(err))
 		return err
 	}
 
+	j.Logger.Debug("creating new containers")
 	newContainers, err := j.createContainersFromRequest(request, stream)
 	if err != nil {
+		j.Logger.Error("failed to create new containers", zap.Error(err))
 		return err
 	}
 
