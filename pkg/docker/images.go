@@ -14,7 +14,7 @@ func (c *Controller) ImagePull(containerImage string) error {
 	}
 
 	if exists {
-		c.Logger.Info("image already exists, exiting")
+		c.Logger.Debug("image already exists, exiting...")
 		return nil
 	}
 
@@ -23,7 +23,7 @@ func (c *Controller) ImagePull(containerImage string) error {
 		return err
 	}
 
-	c.Logger.Info("image pulled successfully", zap.String("image", containerImage))
+	c.Logger.Debug("image pulled successfully", zap.String("image", containerImage))
 
 	return nil
 }
