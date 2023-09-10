@@ -48,7 +48,6 @@ func (c *Controller) IsConfigDifferent(containerConfig, comparisonContainer type
 		return true
 	}
 
-	fmt.Println(comparisonContainer.HostConfig.RestartPolicy.Name, containerConfig.HostConfig.RestartPolicy.Name)
 	if comparisonContainer.HostConfig.RestartPolicy.Name != containerConfig.HostConfig.RestartPolicy.Name {
 		return true
 	}
