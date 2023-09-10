@@ -29,7 +29,7 @@ func main() {
 		logger.Fatal("could not instantiate controller", zap.Error(err))
 	}
 
-	jobRunner := runner.NewJobRunner(controller)
+	jobRunner := runner.NewJobRunner(controller, logger)
 
 	srv := server.Server{Config: config, Controller: controller, JobRunner: jobRunner, Logger: logger}
 
