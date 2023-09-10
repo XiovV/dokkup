@@ -1,6 +1,8 @@
 package runner
 
 import (
+	"fmt"
+
 	"github.com/XiovV/dokkup/pkg/docker"
 	pb "github.com/XiovV/dokkup/pkg/grpc"
 	"github.com/docker/docker/api/types"
@@ -47,12 +49,29 @@ func (j *JobRunner) DoesJobExist(jobName string) bool {
 }
 
 func (j *JobRunner) RunDeployment(stream pb.Dokkup_DeployJobServer, request *pb.DeployJobRequest) error {
-	createdContainers, err := j.Controller.CreateContainersFromRequest(request, stream)
+	createdContainers, err := j.createContainersFromRequest(request, stream)
 	if err != nil {
 		return err
 	}
 
-	return j.Controller.StartContainers(createdContainers, stream)
+	return j.startContainers(createdContainers, stream)
+}
+
+func (j *JobRunner) createContainersFromRequest(request *pb.DeployJobRequest, stream pb.Dokkup_DeployJobServer) ([]string, error) {
+	createdContainers := []string{}
+	for i := 0; i < int(request.Count); i++ {
+		stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Configuring container (%d/%d)", i+1, request.Count)})
+		containerConfig := j.Controller.ContainerSetupConfig(request.Name, request.Container)
+
+		resp, err := j.Controller.ContainerCreate(containerConfig.ContainerName, containerConfig.Config, containerConfig.HostConfig)
+		if err != nil {
+			return nil, err
+		}
+
+		createdContainers = append(createdContainers, resp.ID)
+	}
+
+	return createdContainers, nil
 }
 
 func (j *JobRunner) RunUpdate(request *pb.DeployJobRequest, stream pb.Dokkup_DeployJobServer) error {
@@ -71,20 +90,45 @@ func (j *JobRunner) RunUpdate(request *pb.DeployJobRequest, stream pb.Dokkup_Dep
 		return err
 	}
 
-	newContainers, err := j.Controller.CreateContainersFromRequest(request, stream)
+	newContainers, err := j.createContainersFromRequest(request, stream)
 	if err != nil {
 		return err
 	}
 
-	err = j.Controller.StopContainers(oldContainers)
+	err = j.stopContainers(oldContainers, stream)
 	if err != nil {
 		return err
 	}
 
-	err = j.Controller.StartContainers(newContainers, stream)
+	err = j.startContainers(newContainers, stream)
 	if err != nil {
 		j.abortUpdate(request.Name)
 		return err
+	}
+
+	stream.Send(&pb.DeployJobResponse{Message: "Update successful"})
+	return nil
+}
+
+func (j *JobRunner) startContainers(containerIDs []string, stream pb.Dokkup_DeployJobServer) error {
+	for i, container := range containerIDs {
+		stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Starting container (%d/%d)", i+1, len(containerIDs))})
+		err := j.Controller.ContainerStart(container)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (j *JobRunner) stopContainers(containers []types.Container, stream pb.Dokkup_DeployJobServer) error {
+	for i, container := range containers {
+		stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Stopping container (%d/%d)", i+1, len(containers))})
+		err := j.Controller.ContainerStop(container.ID)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
