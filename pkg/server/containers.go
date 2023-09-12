@@ -49,15 +49,18 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 		return s.JobRunner.RunUpdate(request, stream)
 	}
 
+	s.Logger.Debug("checking if job already exists")
 	doesJobExist := s.JobRunner.DoesJobExist(request.Name)
 
 	if doesJobExist {
-		s.Logger.Info("nothing to do, exiting...")
+		s.Logger.Debug("nothing to do, exiting...")
 		return nil
 	}
 
+	s.Logger.Info("deploying a new job")
 	err = s.JobRunner.RunDeployment(stream, request)
 	if err != nil {
+		s.Logger.Error("could not deploy job", zap.Error(err))
 		return err
 	}
 
