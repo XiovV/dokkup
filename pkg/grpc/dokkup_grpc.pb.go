@@ -25,6 +25,7 @@ const _ = grpc.SupportPackageIsVersion7
 type DokkupClient interface {
 	DeployJob(ctx context.Context, in *DeployJobRequest, opts ...grpc.CallOption) (Dokkup_DeployJobClient, error)
 	StopJob(ctx context.Context, in *StopJobRequest, opts ...grpc.CallOption) (Dokkup_StopJobClient, error)
+	RollbackJob(ctx context.Context, in *RollbackJobRequest, opts ...grpc.CallOption) (Dokkup_RollbackJobClient, error)
 	CheckAPIKey(ctx context.Context, in *CheckAPIKeyRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 }
 
@@ -100,6 +101,38 @@ func (x *dokkupStopJobClient) Recv() (*StopJobResponse, error) {
 	return m, nil
 }
 
+func (c *dokkupClient) RollbackJob(ctx context.Context, in *RollbackJobRequest, opts ...grpc.CallOption) (Dokkup_RollbackJobClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Dokkup_ServiceDesc.Streams[2], "/Dokkup/RollbackJob", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &dokkupRollbackJobClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Dokkup_RollbackJobClient interface {
+	Recv() (*RollbackJobResponse, error)
+	grpc.ClientStream
+}
+
+type dokkupRollbackJobClient struct {
+	grpc.ClientStream
+}
+
+func (x *dokkupRollbackJobClient) Recv() (*RollbackJobResponse, error) {
+	m := new(RollbackJobResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (c *dokkupClient) CheckAPIKey(ctx context.Context, in *CheckAPIKeyRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/Dokkup/CheckAPIKey", in, out, opts...)
@@ -115,6 +148,7 @@ func (c *dokkupClient) CheckAPIKey(ctx context.Context, in *CheckAPIKeyRequest, 
 type DokkupServer interface {
 	DeployJob(*DeployJobRequest, Dokkup_DeployJobServer) error
 	StopJob(*StopJobRequest, Dokkup_StopJobServer) error
+	RollbackJob(*RollbackJobRequest, Dokkup_RollbackJobServer) error
 	CheckAPIKey(context.Context, *CheckAPIKeyRequest) (*empty.Empty, error)
 	mustEmbedUnimplementedDokkupServer()
 }
@@ -128,6 +162,9 @@ func (UnimplementedDokkupServer) DeployJob(*DeployJobRequest, Dokkup_DeployJobSe
 }
 func (UnimplementedDokkupServer) StopJob(*StopJobRequest, Dokkup_StopJobServer) error {
 	return status.Errorf(codes.Unimplemented, "method StopJob not implemented")
+}
+func (UnimplementedDokkupServer) RollbackJob(*RollbackJobRequest, Dokkup_RollbackJobServer) error {
+	return status.Errorf(codes.Unimplemented, "method RollbackJob not implemented")
 }
 func (UnimplementedDokkupServer) CheckAPIKey(context.Context, *CheckAPIKeyRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckAPIKey not implemented")
@@ -187,6 +224,27 @@ func (x *dokkupStopJobServer) Send(m *StopJobResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _Dokkup_RollbackJob_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(RollbackJobRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(DokkupServer).RollbackJob(m, &dokkupRollbackJobServer{stream})
+}
+
+type Dokkup_RollbackJobServer interface {
+	Send(*RollbackJobResponse) error
+	grpc.ServerStream
+}
+
+type dokkupRollbackJobServer struct {
+	grpc.ServerStream
+}
+
+func (x *dokkupRollbackJobServer) Send(m *RollbackJobResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 func _Dokkup_CheckAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CheckAPIKeyRequest)
 	if err := dec(in); err != nil {
@@ -226,6 +284,11 @@ var Dokkup_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "StopJob",
 			Handler:       _Dokkup_StopJob_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "RollbackJob",
+			Handler:       _Dokkup_RollbackJob_Handler,
 			ServerStreams: true,
 		},
 	},
