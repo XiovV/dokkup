@@ -23,20 +23,7 @@ func NewApp() *App {
 				Aliases: []string{"j"},
 				Subcommands: []*cli.Command{
 					{
-						Flags: []cli.Flag{
-							&cli.StringFlag{
-								Name:    "inventory",
-								Aliases: []string{"i"},
-								Value:   "inventory.yaml",
-								Usage:   "name for the inventory file",
-							},
-							&cli.BoolFlag{
-								Name:    "yes",
-								Aliases: []string{"y"},
-								Value:   false,
-							},
-						},
-
+						Flags:  defaultFlags(),
 						Name:   "job",
 						Usage:  "run a job",
 						Action: app.jobCmd,
@@ -48,22 +35,22 @@ func NewApp() *App {
 				Aliases: []string{"s"},
 				Subcommands: []*cli.Command{
 					{
-						Flags: []cli.Flag{
-							&cli.StringFlag{
-								Name:    "inventory",
-								Aliases: []string{"i"},
-								Value:   "inventory.yaml",
-								Usage:   "name for the inventory file",
-							},
-							&cli.BoolFlag{
-								Name:    "yes",
-								Aliases: []string{"y"},
-								Value:   false,
-							},
-						},
+						Flags:  defaultFlags(),
 						Name:   "job",
 						Usage:  "stop a job",
 						Action: app.stopJobCmd,
+					},
+				},
+			},
+			{
+				Name:    "rollback",
+				Aliases: []string{"r"},
+				Subcommands: []*cli.Command{
+					{
+						Flags:  defaultFlags(),
+						Name:   "job",
+						Usage:  "rollback a job",
+						Action: app.rollbackCmd,
 					},
 				},
 			},
@@ -71,6 +58,22 @@ func NewApp() *App {
 	}
 
 	return app
+}
+
+func defaultFlags() []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:    "inventory",
+			Aliases: []string{"i"},
+			Value:   "inventory.yaml",
+			Usage:   "name for the inventory file",
+		},
+		&cli.BoolFlag{
+			Name:    "yes",
+			Aliases: []string{"y"},
+			Value:   false,
+		},
+	}
 }
 
 func (a *App) Run() {
