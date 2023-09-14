@@ -27,6 +27,7 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 
 	temporaryContainerConfig, err := s.Controller.ContainerInspect(temporaryContainer)
 	if err != nil {
+		s.Logger.Error("could not inspect temporary container", zap.Error(err))
 		return err
 	}
 
@@ -70,30 +71,33 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 }
 
 func (s *Server) StopJob(request *pb.StopJobRequest, stream pb.Dokkup_StopJobServer) error {
-	// s.Logger.Info("attempting to stop a job", zap.String("jobName", request.Name))
-	//
-	// s.Logger.Info("getting running containers")
-	// jobContainers, err := s.Controller.GetContainersByJobName(request.Name)
-	// if err != nil {
-	// 	s.Logger.Error("failed to get containers by job name", zap.Error(err))
-	// 	return err
-	// }
-	//
-	// s.Logger.Info("stopping containers")
-	// err = s.JobRunner.StopContainers(jobContainers)
-	// if err != nil {
-	// 	s.Logger.Error("failed to stop containers", zap.Error(err))
-	// 	return err
-	// }
-	//
-	// s.Logger.Info("deleting containers")
-	// err = s.Controller.DeleteContainers(jobContainers, stream)
-	// if err != nil {
-	// 	s.Logger.Error("failed to delete containers", zap.Error(err))
-	// 	return err
-	// }
-	//
-	// s.Logger.Info("job stopped successfully")
-	// stream.Send(&pb.StopJobResponse{Message: "Job stopped successfully"})
+	s.Logger.Info("stop job received", zap.String("jobName", request.Name))
+
+	s.Logger.Debug("getting containers")
+	containers, err := s.Controller.GetContainersByJobName(request.Name)
+	if err != nil {
+		s.Logger.Error("could not get containers", zap.Error(err))
+		return err
+	}
+
+	s.Logger.Info("stopping containers")
+	for _, container := range containers {
+		err := s.Controller.ContainerStop(container.ID)
+		if err != nil {
+			s.Logger.Error("could not stop container", zap.Error(err), zap.String("containerId", container.ID))
+			return err
+		}
+	}
+
+	s.Logger.Info("deleting containers")
+	for _, container := range containers {
+		err := s.Controller.ContainerRemove(container.ID)
+		if err != nil {
+			s.Logger.Error("could not remove delete container", zap.Error(err), zap.String("containerId", container.ID))
+			return err
+		}
+	}
+
+	stream.Send(&pb.StopJobResponse{Message: "Job stopped successfully"})
 	return nil
 }
