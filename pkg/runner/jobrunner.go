@@ -76,6 +76,37 @@ func (j *JobRunner) createContainersFromRequest(request *pb.DeployJobRequest, st
 	return createdContainers, nil
 }
 
+func (j *JobRunner) StopJob(request *pb.StopJobRequest, stream pb.Dokkup_StopJobServer) error {
+	j.Logger.Debug("getting containers")
+	containers, err := j.Controller.GetContainersByJobName(request.Name)
+	if err != nil {
+		j.Logger.Error("could not get containers", zap.Error(err))
+		return err
+	}
+
+	j.Logger.Info("stopping containers")
+	for i, container := range containers {
+		stream.Send(&pb.StopJobResponse{Message: fmt.Sprintf("Stopping container (%d/%d)", i+1, len(containers))})
+		err := j.Controller.ContainerStop(container.ID)
+		if err != nil {
+			j.Logger.Error("could not stop container", zap.Error(err), zap.String("containerId", container.ID))
+			return err
+		}
+	}
+
+	j.Logger.Info("deleting containers")
+	for i, container := range containers {
+		stream.Send(&pb.StopJobResponse{Message: fmt.Sprintf("Removing container (%d/%d)", i+1, len(containers))})
+		err := j.Controller.ContainerRemove(container.ID)
+		if err != nil {
+			j.Logger.Error("could not remove delete container", zap.Error(err), zap.String("containerId", container.ID))
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (j *JobRunner) RunUpdate(request *pb.DeployJobRequest, stream pb.Dokkup_DeployJobServer) error {
 	j.Logger.Debug("removing previous rollback containers")
 	err := j.Controller.DeleteRollbackContainers(request.Name)
