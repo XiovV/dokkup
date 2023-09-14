@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"bufio"
+	"fmt"
 	"log"
 	"os"
 
@@ -80,4 +82,21 @@ func (a *App) Run() {
 	if err := a.Cli.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func (a *App) showConfirmationPrompt(ctx *cli.Context) (bool, error) {
+	if !ctx.Bool("yes") {
+		fmt.Print("\nAre you sure you want to proceed? (y/n) ")
+		reader := bufio.NewReader(os.Stdin)
+		input, err := reader.ReadString('\n')
+		if err != nil {
+			return false, err
+		}
+
+		if input == "n\n" {
+			return false, nil
+		}
+	}
+
+	return true, nil
 }
