@@ -2,10 +2,12 @@ package cli
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"log"
 	"os"
 
+	"github.com/XiovV/dokkup/pkg/config"
 	"github.com/urfave/cli/v2"
 )
 
@@ -99,4 +101,25 @@ func (a *App) showConfirmationPrompt(ctx *cli.Context) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (a *App) readJobAndInventory(ctx *cli.Context) (*config.Job, *config.Inventory, error) {
+	inventoryFlag := ctx.String("inventory")
+	inventory, err := config.ReadInventory(inventoryFlag)
+	if err != nil {
+		return nil, nil, fmt.Errorf("couldn't read inventory: %w", err)
+	}
+
+	jobArg := ctx.Args().First()
+
+	if len(jobArg) == 0 {
+		return nil, nil, errors.New("please provide a job file")
+	}
+
+	job, err := config.ReadJob(jobArg)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return job, inventory, nil
 }
