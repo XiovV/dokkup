@@ -44,6 +44,27 @@ func (a *App) jobCmd(ctx *cli.Context) error {
 	return nil
 }
 
+func (a *App) deployJobs(job *config.Job, inventory *config.Inventory) error {
+	group, ok := inventory.GetGroup(job.Group)
+	if !ok {
+		return fmt.Errorf("couldn't find group: %s", group.Name)
+	}
+
+	for _, nodeName := range group.Nodes {
+		node, ok := inventory.GetNode(nodeName)
+		if !ok {
+			return fmt.Errorf("couldn't find node: %s", nodeName)
+		}
+
+		err := a.deployJob(node, job)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (a *App) deployJob(node config.Node, job *config.Job) error {
 	client, err := a.initClient(node.Location)
 	if err != nil {
@@ -99,27 +120,6 @@ func (a *App) readJobAndInventory(ctx *cli.Context) (*config.Job, *config.Invent
 	}
 
 	return job, inventory, nil
-}
-
-func (a *App) deployJobs(job *config.Job, inventory *config.Inventory) error {
-	group, ok := inventory.GetGroup(job.Group)
-	if !ok {
-		return fmt.Errorf("couldn't find group: %s", group.Name)
-	}
-
-	for _, nodeName := range group.Nodes {
-		node, ok := inventory.GetNode(nodeName)
-		if !ok {
-			return fmt.Errorf("couldn't find node: %s", nodeName)
-		}
-
-		err := a.deployJob(node, job)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 func (a *App) jobToDeployJobRequest(job *config.Job) *pb.DeployJobRequest {
