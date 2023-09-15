@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -99,27 +98,6 @@ func (a *App) deployJob(node config.Node, job *config.Job) error {
 	}
 
 	return nil
-}
-
-func (a *App) readJobAndInventory(ctx *cli.Context) (*config.Job, *config.Inventory, error) {
-	inventoryFlag := ctx.String("inventory")
-	inventory, err := config.ReadInventory(inventoryFlag)
-	if err != nil {
-		return nil, nil, fmt.Errorf("couldn't read inventory: %w", err)
-	}
-
-	jobArg := ctx.Args().First()
-
-	if len(jobArg) == 0 {
-		return nil, nil, errors.New("please provide a job file")
-	}
-
-	job, err := config.ReadJob(jobArg)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return job, inventory, nil
 }
 
 func (a *App) jobToDeployJobRequest(job *config.Job) *pb.DeployJobRequest {
