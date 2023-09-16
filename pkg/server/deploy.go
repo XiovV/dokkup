@@ -12,7 +12,7 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 
 	stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Attempting to pull image: %s", request.Container.Image)})
 
-	s.Logger.Debug("attempint to pull image", zap.String("image", request.Container.Image))
+	s.Logger.Debug("attempting to pull image", zap.String("image", request.Container.Image))
 	err := s.Controller.ImagePull(request.Container.Image)
 	if err != nil {
 		return fmt.Errorf("failed to pull image: %w", err)
@@ -38,6 +38,8 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 		return err
 	}
 
+	s.Logger.Debug("should update job", zap.Bool("shouldUpdate", shouldUpdate))
+
 	s.Logger.Debug("removing the temporary container")
 	err = s.Controller.ContainerRemove(temporaryContainer)
 	if err != nil {
@@ -52,6 +54,8 @@ func (s *Server) DeployJob(request *pb.DeployJobRequest, stream pb.Dokkup_Deploy
 
 	s.Logger.Debug("checking if job already exists")
 	doesJobExist := s.JobRunner.DoesJobExist(request.Name)
+
+	s.Logger.Debug("does job already exist", zap.Bool("doesJobExist", doesJobExist))
 
 	if doesJobExist {
 		s.Logger.Debug("nothing to do, exiting...")
