@@ -19,9 +19,13 @@ func NewJobRunner(controller *docker.Controller, logger *zap.Logger) *JobRunner 
 }
 
 func (j *JobRunner) ShouldUpdateJob(jobName string, comparisonContainer types.ContainerJSON) (bool, error) {
-	runningContainers, err := j.Controller.GetContainersByJobName(jobName)
+	runningContainers, err := j.Controller.GetContainers(jobName, docker.GetContainersOptions{Stopped: true})
 	if err != nil {
 		return false, err
+	}
+
+	for _, cont := range runningContainers {
+		fmt.Println("SHOULD UPDATE CONTAINER: ", cont.Names[0])
 	}
 
 	if len(runningContainers) == 0 {
@@ -42,7 +46,7 @@ func (j *JobRunner) ShouldUpdateJob(jobName string, comparisonContainer types.Co
 }
 
 func (j *JobRunner) DoesJobExist(jobName string) bool {
-	containers, err := j.Controller.GetContainersByJobName(jobName)
+	containers, err := j.Controller.GetContainers(jobName, docker.GetContainersOptions{Stopped: true})
 	if err != nil {
 		return false
 	}
@@ -78,7 +82,7 @@ func (j *JobRunner) createContainersFromRequest(request *pb.DeployJobRequest, st
 
 func (j *JobRunner) StopJob(request *pb.StopJobRequest, stream pb.Dokkup_StopJobServer) error {
 	j.Logger.Debug("getting containers")
-	containers, err := j.Controller.GetContainersByJobName(request.Name)
+	containers, err := j.Controller.GetContainers(request.Name, docker.GetContainersOptions{Stopped: true, Rollback: true})
 	if err != nil {
 		j.Logger.Error("could not get containers", zap.Error(err))
 		return err
@@ -104,26 +108,6 @@ func (j *JobRunner) StopJob(request *pb.StopJobRequest, stream pb.Dokkup_StopJob
 		}
 	}
 
-	rollbackContainers, err := j.Controller.GetRollbackContainers(request.Name)
-	if err != nil {
-		j.Logger.Error("could not get rollback containers", zap.Error(err))
-		return err
-	}
-
-	if len(rollbackContainers) == 0 {
-		return nil
-	}
-
-	j.Logger.Info("deleting rollback containers")
-	for i, container := range rollbackContainers {
-		stream.Send(&pb.StopJobResponse{Message: fmt.Sprintf("Removing rollback container (%d/%d)", i+1, len(containers))})
-		err := j.Controller.ContainerRemove(container.ID)
-		if err != nil {
-			j.Logger.Error("could not remove delete rollback container", zap.Error(err), zap.String("containerId", container.ID))
-			return err
-		}
-	}
-
 	return nil
 }
 
@@ -135,7 +119,7 @@ func (j *JobRunner) RunUpdate(request *pb.DeployJobRequest, stream pb.Dokkup_Dep
 		return err
 	}
 
-	oldContainers, err := j.Controller.GetContainersByJobName(request.Name)
+	oldContainers, err := j.Controller.GetContainers(request.Name, docker.GetContainersOptions{Stopped: true})
 	if err != nil {
 		return err
 	}
@@ -194,7 +178,7 @@ func (j *JobRunner) stopContainers(containers []types.Container, stream pb.Dokku
 }
 
 func (j *JobRunner) abortUpdate(jobName string) error {
-	rollbackContainers, err := j.Controller.GetRollbackContainers(jobName)
+	rollbackContainers, err := j.Controller.GetContainers(jobName, docker.GetContainersOptions{Rollback: true})
 	if err != nil {
 		return err
 	}
@@ -206,7 +190,7 @@ func (j *JobRunner) abortUpdate(jobName string) error {
 		}
 	}
 
-	oldContainers, err := j.Controller.GetContainersByJobName(jobName)
+	oldContainers, err := j.Controller.GetContainers(jobName, docker.GetContainersOptions{Stopped: true})
 	if err != nil {
 		return err
 	}
