@@ -104,6 +104,26 @@ func (j *JobRunner) StopJob(request *pb.StopJobRequest, stream pb.Dokkup_StopJob
 		}
 	}
 
+	rollbackContainers, err := j.Controller.GetRollbackContainers(request.Name)
+	if err != nil {
+		j.Logger.Error("could not get rollback containers", zap.Error(err))
+		return err
+	}
+
+	if len(rollbackContainers) == 0 {
+		return nil
+	}
+
+	j.Logger.Info("deleting rollback containers")
+	for i, container := range rollbackContainers {
+		stream.Send(&pb.StopJobResponse{Message: fmt.Sprintf("Removing rollback container (%d/%d)", i+1, len(containers))})
+		err := j.Controller.ContainerRemove(container.ID)
+		if err != nil {
+			j.Logger.Error("could not remove delete rollback container", zap.Error(err), zap.String("containerId", container.ID))
+			return err
+		}
+	}
+
 	return nil
 }
 
