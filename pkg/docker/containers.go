@@ -13,6 +13,12 @@ import (
 	pb "github.com/XiovV/dokkup/pkg/grpc"
 )
 
+type GetContainersOptions struct {
+	Stopped   bool
+	Rollback  bool
+	Temporary bool
+}
+
 func (c *Controller) ContainerCreate(containerName string, containerConfig *container.Config, hostConfig *container.HostConfig) (container.CreateResponse, error) {
 	resp, err := c.cli.ContainerCreate(c.ctx, containerConfig, hostConfig, nil, nil, containerName)
 	if err != nil {
@@ -172,7 +178,7 @@ func (c *Controller) DeleteContainers(containers []types.Container, stream pb.Do
 }
 
 func (c *Controller) DeleteRollbackContainers(jobName string) error {
-	rollbackContainers, err := c.GetRollbackContainers(jobName)
+	rollbackContainers, err := c.GetContainers(jobName, GetContainersOptions{Rollback: true})
 	if err != nil {
 		return err
 	}
@@ -187,37 +193,43 @@ func (c *Controller) DeleteRollbackContainers(jobName string) error {
 	return nil
 }
 
-func (c *Controller) GetRollbackContainers(jobName string) ([]types.Container, error) {
-	allContainers, err := c.cli.ContainerList(c.ctx, types.ContainerListOptions{All: true})
-	if err != nil {
-		return nil, err
-	}
-
-	foundContainers := []types.Container{}
-	for _, container := range allContainers {
-		if container.Labels[LABEL_DOKKUP_JOB_NAME] == jobName && strings.Contains(container.Names[0], "-rollback") {
-			foundContainers = append(foundContainers, container)
-		}
-	}
-
-	return foundContainers, nil
-}
-
 func (c *Controller) ContainerRemove(containerId string) error {
 	return c.cli.ContainerRemove(c.ctx, containerId, types.ContainerRemoveOptions{})
 }
 
-func (c *Controller) GetContainersByJobName(jobName string) ([]types.Container, error) {
-	allContainers, err := c.cli.ContainerList(c.ctx, types.ContainerListOptions{All: true})
+func (c *Controller) GetContainers(jobName string, options GetContainersOptions) ([]types.Container, error) {
+	if options.Rollback || options.Temporary {
+		options.Stopped = true
+	}
+
+	containers, err := c.cli.ContainerList(c.ctx, types.ContainerListOptions{All: options.Stopped})
 	if err != nil {
 		return nil, err
 	}
 
 	foundContainers := []types.Container{}
-	for _, container := range allContainers {
-		if container.Labels[LABEL_DOKKUP_JOB_NAME] == jobName && !strings.Contains(container.Names[0], "-temporary") && !strings.Contains(container.Names[0], "-rollback") {
+	for _, container := range containers {
+		if container.Labels[LABEL_DOKKUP_JOB_NAME] != jobName {
+			continue
+		}
+
+		isRollback := strings.Contains(container.Names[0], "-rollback")
+		isTemporary := strings.Contains(container.Names[0], "-temporary")
+
+		if (!options.Temporary && !isTemporary) && (!options.Rollback && !isRollback) {
+			foundContainers = append(foundContainers, container)
+			continue
+		}
+
+		if options.Temporary && isTemporary {
+			foundContainers = append(foundContainers, container)
+			continue
+		}
+
+		if options.Rollback && isRollback {
 			foundContainers = append(foundContainers, container)
 		}
+
 	}
 
 	return foundContainers, nil
