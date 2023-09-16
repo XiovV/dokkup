@@ -3,13 +3,14 @@ package server
 import (
 	"fmt"
 
+	"github.com/XiovV/dokkup/pkg/docker"
 	pb "github.com/XiovV/dokkup/pkg/grpc"
 	"go.uber.org/zap"
 )
 
 func (s *Server) RollbackJob(request *pb.RollbackJobRequest, stream pb.Dokkup_RollbackJobServer) error {
 	s.Logger.Info("received a rollback request", zap.String("jobName", request.Name))
-	currentContainers, err := s.Controller.GetContainersByJobName(request.Name)
+	currentContainers, err := s.Controller.GetContainers(request.Name, docker.GetContainersOptions{Stopped: true})
 	if err != nil {
 		s.Logger.Error("could not get containers", zap.Error(err))
 		return err
@@ -24,7 +25,7 @@ func (s *Server) RollbackJob(request *pb.RollbackJobRequest, stream pb.Dokkup_Ro
 		}
 	}
 
-	rollbackContainers, err := s.Controller.GetRollbackContainers(request.Name)
+	rollbackContainers, err := s.Controller.GetContainers(request.Name, docker.GetContainersOptions{Rollback: true})
 	if err != nil {
 		s.Logger.Error("could not get rollback containers", zap.Error(err))
 		return err
