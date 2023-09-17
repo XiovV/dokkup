@@ -2,8 +2,8 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"log"
 	"os"
 	"text/tabwriter"
 
@@ -20,28 +20,27 @@ func (a *App) showNodeStatuses(inventory *config.Inventory, job *config.Job) err
 		return fmt.Errorf("couldn't find group '%s'", job.Group)
 	}
 
-	var unavailableNodes int
-
 	fmt.Print("Node statuses:\n\n")
 	nodeStatusesTable := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
-	fmt.Fprintln(nodeStatusesTable, "NAME\tSTATUS")
+	fmt.Fprintln(nodeStatusesTable, "NAME\tSTATUS\tCONTAINERS\tUPDATE")
 
+	var unavailableNodes int
 	for _, nodeName := range group.Nodes {
 		node, ok := inventory.GetNode(nodeName)
 		if !ok {
 			return fmt.Errorf("couldn't find node '%s", nodeName)
 		}
 
-		nodeStatus, err := a.getNodeStatus(node)
+		jobStatus, err := a.getNodeStatus(job.Name, node)
 		if err != nil {
-			log.Fatal("couldn't get node status: ", err)
-		}
+			out := fmt.Sprintf("%s\t%s\t%d/%d\t%t", nodeName, err.Error(), 0, 0, false)
+			fmt.Fprintln(nodeStatusesTable, out)
 
-		if nodeStatus == NODE_STATUS_OFFLINE || nodeStatus == NODE_STATUS_UNAUTHENTICATED {
 			unavailableNodes++
+			continue
 		}
 
-		out := fmt.Sprintf("%s\t%s", nodeName, nodeStatus)
+		out := fmt.Sprintf("%s\t%s\t%d/%d\t%t", nodeName, NODE_STATUS_ONLINE, jobStatus.RunningContainers, jobStatus.TotalContainers, jobStatus.ShouldUpdate)
 		fmt.Fprintln(nodeStatusesTable, out)
 	}
 
@@ -58,26 +57,26 @@ func (a *App) showNodeStatuses(inventory *config.Inventory, job *config.Job) err
 	return nil
 }
 
-func (a *App) getNodeStatus(node config.Node) (string, error) {
-	err := a.pingNode(node)
+func (a *App) getNodeStatus(jobName string, node config.Node) (*pb.JobStatus, error) {
+	jobStatus, err := a.pingNode(jobName, node)
 	if err != nil {
 		switch status.Code(err) {
 		case codes.Unauthenticated:
-			return NODE_STATUS_UNAUTHENTICATED, nil
+			return nil, errors.New(NODE_STATUS_UNAUTHENTICATED)
 		case codes.Unavailable:
-			return NODE_STATUS_OFFLINE, nil
+			return nil, errors.New(NODE_STATUS_OFFLINE)
 		default:
-			return "", err
+			return nil, err
 		}
 	}
 
-	return NODE_STATUS_ONLINE, nil
+	return jobStatus, nil
 }
 
-func (a *App) pingNode(node config.Node) error {
+func (a *App) pingNode(jobName string, node config.Node) (*pb.JobStatus, error) {
 	client, err := a.initClient(node.Location)
 	if err != nil {
-		return fmt.Errorf("couldn't init connection: %w", err)
+		return nil, fmt.Errorf("couldn't init connection: %w", err)
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -85,12 +84,12 @@ func (a *App) pingNode(node config.Node) error {
 
 	ctx = metadata.AppendToOutgoingContext(ctx, "authorization", node.Key)
 
-	_, err = client.CheckAPIKey(ctx, &pb.CheckAPIKeyRequest{})
+	jobStatus, err := client.GetJobStatus(ctx, &pb.GetJobStatusRequest{Name: jobName})
 	if err != nil {
-		return fmt.Errorf("couldn't check API key: %w", err)
+		return nil, fmt.Errorf("couldn't get node status: %w", err)
 	}
 
-	return nil
+	return jobStatus, nil
 }
 
 func (a *App) showStopJobSummaryTable(job *config.Job) {
