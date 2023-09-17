@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/XiovV/dokkup/pkg/docker"
 	pb "github.com/XiovV/dokkup/pkg/grpc"
@@ -21,9 +20,6 @@ func (s *Server) GetJobStatus(ctx context.Context, in *pb.GetJobStatusRequest) (
 		s.Logger.Error("could not get all containers", zap.Error(err))
 		return nil, err
 	}
-
-	fmt.Println("RUNNING CONTAINERS LEN", len(runningContainers))
-	fmt.Println("TOTAL CONTAINERS LEN", len(totalContainers))
 
 	response := &pb.JobStatus{
 		TotalContainers:   int32(len(totalContainers)),
