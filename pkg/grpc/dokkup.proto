@@ -2,13 +2,12 @@ syntax = "proto3";
 
 option go_package = "github.com/XiovV/dokkup";
 
-import "google/protobuf/empty.proto";
-
 service Dokkup {
   rpc DeployJob(DeployJobRequest) returns (stream DeployJobResponse) {}
   rpc StopJob(StopJobRequest) returns (stream StopJobResponse) {}
   rpc RollbackJob(RollbackJobRequest) returns (stream RollbackJobResponse) {}
-  rpc CheckAPIKey(CheckAPIKeyRequest) returns (google.protobuf.Empty) {}
+  rpc GetNodeStatus(GetNodeStatusRequest) returns (NodeStatus) {}
+  rpc GetJobStatus(GetJobStatusRequest) returns (JobStatus) {}
 }
 
 message DeployJobRequest {
@@ -22,36 +21,52 @@ message DeployJobResponse {
 }
 
 message StopJobRequest {
-    string name = 1;
+  string name = 1;
 }
 
 message StopJobResponse {
-    string message = 1;
+  string message = 1;
 }
 
 message RollbackJobRequest {
-    string name = 1;
+  string name = 1;
 }
 
 message RollbackJobResponse {
-    string message = 1;
+  string message = 1;
 }
 
 message Container {
-  string image = 2;
-  repeated Port ports = 3;
-  string network = 4;
-  repeated string volumes = 5;
-  repeated string environment = 6;
-  string restart = 7;
-  repeated string labels = 8;
+  string image = 1;
+  repeated Port ports = 2;
+  string network = 3;
+  repeated string volumes = 4;
+  repeated string environment = 5;
+  string restart = 6;
+  repeated string labels = 7;
 }
 
 message Port {
-    string in = 1;
-    string out = 2;
+  string in = 1;
+  string out = 2;
 }
 
-message CheckAPIKeyRequest {
+message GetNodeStatusRequest {
 
+}
+
+message NodeStatus {
+  int32 runningContainers = 1;
+  int32 totalContainers = 2;
+  bool shouldUpdate = 3;
+}
+
+message GetJobStatusRequest {
+  string Name = 1;  
+}
+
+message JobStatus {
+  int32 runningContainers = 1;
+  int32 totalContainers = 2;
+  bool shouldUpdate = 3;
 }
