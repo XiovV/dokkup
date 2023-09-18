@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"text/tabwriter"
@@ -14,33 +13,30 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (a *App) showNodeStatuses(inventory *config.Inventory, job *config.Job) error {
-	group, ok := inventory.GetGroup(job.Group)
-	if !ok {
-		return fmt.Errorf("couldn't find group '%s'", job.Group)
-	}
+type JobStatus struct {
+	Node              config.Node
+	NodeStatus        string
+	RunningContainers int
+	TotalContainers   int
+	ShouldUpdate      bool
+}
 
+func (a *App) showJobStatuses(jobStatuses []JobStatus) error {
 	fmt.Print("Node statuses:\n\n")
 	nodeStatusesTable := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
 	fmt.Fprintln(nodeStatusesTable, "NAME\tSTATUS\tCONTAINERS\tUPDATE")
 
 	var unavailableNodes int
-	for _, nodeName := range group.Nodes {
-		node, ok := inventory.GetNode(nodeName)
-		if !ok {
-			return fmt.Errorf("couldn't find node '%s", nodeName)
-		}
-
-		jobStatus, err := a.getNodeStatus(job.Name, node)
-		if err != nil {
-			out := fmt.Sprintf("%s\t%s\t%d/%d\t%t", nodeName, err.Error(), 0, 0, false)
+	for _, jobStatus := range jobStatuses {
+		if jobStatus.NodeStatus == NODE_STATUS_OFFLINE || jobStatus.NodeStatus == NODE_STATUS_UNAUTHENTICATED {
+			out := fmt.Sprintf("%s\t%s\t%d/%d\t%t", jobStatus.Node.Name, jobStatus.NodeStatus, 0, 0, false)
 			fmt.Fprintln(nodeStatusesTable, out)
 
 			unavailableNodes++
 			continue
 		}
 
-		out := fmt.Sprintf("%s\t%s\t%d/%d\t%t", nodeName, NODE_STATUS_ONLINE, jobStatus.RunningContainers, jobStatus.TotalContainers, jobStatus.ShouldUpdate)
+		out := fmt.Sprintf("%s\t%s\t%d/%d\t%t", jobStatus.Node.Name, NODE_STATUS_ONLINE, jobStatus.RunningContainers, jobStatus.TotalContainers, jobStatus.ShouldUpdate)
 		fmt.Fprintln(nodeStatusesTable, out)
 	}
 
@@ -57,18 +53,33 @@ func (a *App) showNodeStatuses(inventory *config.Inventory, job *config.Job) err
 	return nil
 }
 
-func (a *App) getNodeStatus(jobName string, node config.Node) (*pb.JobStatus, error) {
-	jobStatus, err := a.pingNode(jobName, node)
+func (a *App) getJobStatus(jobName string, node config.Node) (JobStatus, error) {
+	jobStatusResponse, err := a.pingNode(jobName, node)
+
+	jobStatus := JobStatus{
+		Node:       node,
+		NodeStatus: NODE_STATUS_ONLINE,
+	}
+
 	if err != nil {
+		jobStatus.RunningContainers = 0
+		jobStatus.TotalContainers = 0
+		jobStatus.ShouldUpdate = false
+
 		switch status.Code(err) {
 		case codes.Unauthenticated:
-			return nil, errors.New(NODE_STATUS_UNAUTHENTICATED)
+			jobStatus.NodeStatus = NODE_STATUS_UNAUTHENTICATED
+			return jobStatus, nil
 		case codes.Unavailable:
-			return nil, errors.New(NODE_STATUS_OFFLINE)
+			jobStatus.NodeStatus = NODE_STATUS_OFFLINE
+			return jobStatus, nil
 		default:
-			return nil, err
+			return JobStatus{}, err
 		}
 	}
+
+	jobStatus.RunningContainers = int(jobStatusResponse.RunningContainers)
+	jobStatus.TotalContainers = int(jobStatusResponse.TotalContainers)
 
 	return jobStatus, nil
 }
