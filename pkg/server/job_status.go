@@ -35,10 +35,20 @@ func (s *Server) GetJobStatus(ctx context.Context, in *pb.Job) (*pb.JobStatus, e
 	s.Logger.Debug("does image exist", zap.Bool("doesExist", doesExist))
 	shouldUpdate := !doesExist
 
+	s.Logger.Debug("getting rollback containers")
+	rollbackContainers, err := s.Controller.GetContainers(in.Name, docker.GetContainersOptions{Rollback: true})
+	if err != nil {
+		s.Logger.Error("could not get rollback containers", zap.Error(err))
+		return nil, err
+	}
+
+	canRollback := len(rollbackContainers) > 0
+
 	response := &pb.JobStatus{
 		TotalContainers:   int32(len(totalContainers)),
 		RunningContainers: int32(len(runningContainers)),
 		ShouldUpdate:      shouldUpdate,
+		CanRollback:       canRollback,
 	}
 
 	s.Logger.Debug("should update job", zap.Bool("shouldUpdate", shouldUpdate))
