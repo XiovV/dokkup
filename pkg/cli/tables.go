@@ -36,7 +36,13 @@ func (a *App) showJobStatuses(jobStatuses []JobStatus) error {
 			continue
 		}
 
-		out := fmt.Sprintf("%s\t%s\t%d/%d\t%t", jobStatus.Node.Name, NODE_STATUS_ONLINE, jobStatus.RunningContainers, jobStatus.TotalContainers, jobStatus.ShouldUpdate)
+		nodeName := jobStatus.Node.Name
+
+		if jobStatus.TotalContainers == 0 {
+			nodeName += "*"
+		}
+
+		out := fmt.Sprintf("%s\t%s\t%d/%d\t%t", nodeName, NODE_STATUS_ONLINE, jobStatus.RunningContainers, jobStatus.TotalContainers, jobStatus.ShouldUpdate)
 		fmt.Fprintln(nodeStatusesTable, out)
 	}
 
