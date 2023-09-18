@@ -10,6 +10,18 @@ import (
 
 func (s *Server) RollbackJob(request *pb.Job, stream pb.Dokkup_RollbackJobServer) error {
 	s.Logger.Info("received a rollback request", zap.String("jobName", request.Name))
+	rollbackContainers, err := s.Controller.GetContainers(request.Name, docker.GetContainersOptions{Rollback: true})
+	if err != nil {
+		s.Logger.Error("could not get rollback containers", zap.Error(err))
+		return err
+	}
+
+	if len(rollbackContainers) == 0 {
+		s.Logger.Info("there are no rollback containers, exiting...")
+		stream.Send(&pb.RollbackJobResponse{Message: "No rollback containers available"})
+		return nil
+	}
+
 	currentContainers, err := s.Controller.GetContainers(request.Name, docker.GetContainersOptions{Stopped: true})
 	if err != nil {
 		s.Logger.Error("could not get containers", zap.Error(err))
@@ -23,12 +35,6 @@ func (s *Server) RollbackJob(request *pb.Job, stream pb.Dokkup_RollbackJobServer
 			s.Logger.Error("could not stop container", zap.Error(err), zap.String("containerId", container.ID))
 			return err
 		}
-	}
-
-	rollbackContainers, err := s.Controller.GetContainers(request.Name, docker.GetContainersOptions{Rollback: true})
-	if err != nil {
-		s.Logger.Error("could not get rollback containers", zap.Error(err))
-		return err
 	}
 
 	for i, container := range rollbackContainers {
