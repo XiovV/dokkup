@@ -33,18 +33,8 @@ func (a *App) newAuthorizationContext(nodeKey string) (context.Context, context.
 
 func (a *App) getJobStatus(job *config.Job, node config.Node) (JobStatus, error) {
 	jobStatusResponse, err := a.pingNode(job, node)
-
-	jobStatus := JobStatus{
-		Node:       node,
-		NodeStatus: NODE_STATUS_ONLINE,
-	}
-
 	if err != nil {
-		jobStatus.RunningContainers = 0
-		jobStatus.TotalContainers = 0
-		jobStatus.ShouldUpdate = false
-		jobStatus.CanRollback = false
-
+		jobStatus := JobStatus{Node: node}
 		switch status.Code(err) {
 		case codes.Unauthenticated:
 			jobStatus.NodeStatus = NODE_STATUS_UNAUTHENTICATED
@@ -57,10 +47,14 @@ func (a *App) getJobStatus(job *config.Job, node config.Node) (JobStatus, error)
 		}
 	}
 
-	jobStatus.RunningContainers = int(jobStatusResponse.RunningContainers)
-	jobStatus.TotalContainers = int(jobStatusResponse.TotalContainers)
-	jobStatus.ShouldUpdate = jobStatusResponse.ShouldUpdate
-	jobStatus.CanRollback = jobStatusResponse.CanRollback
+	jobStatus := JobStatus{
+		Node:              node,
+		NodeStatus:        NODE_STATUS_ONLINE,
+		RunningContainers: int(jobStatusResponse.RunningContainers),
+		TotalContainers:   int(jobStatusResponse.TotalContainers),
+		ShouldUpdate:      jobStatusResponse.ShouldUpdate,
+		CanRollback:       jobStatusResponse.CanRollback,
+	}
 
 	return jobStatus, nil
 }
