@@ -43,6 +43,7 @@ func (a *App) getJobStatus(job *config.Job, node config.Node) (JobStatus, error)
 		jobStatus.RunningContainers = 0
 		jobStatus.TotalContainers = 0
 		jobStatus.ShouldUpdate = false
+		jobStatus.CanRollback = false
 
 		switch status.Code(err) {
 		case codes.Unauthenticated:
@@ -59,6 +60,7 @@ func (a *App) getJobStatus(job *config.Job, node config.Node) (JobStatus, error)
 	jobStatus.RunningContainers = int(jobStatusResponse.RunningContainers)
 	jobStatus.TotalContainers = int(jobStatusResponse.TotalContainers)
 	jobStatus.ShouldUpdate = jobStatusResponse.ShouldUpdate
+	jobStatus.CanRollback = jobStatusResponse.CanRollback
 
 	return jobStatus, nil
 }
