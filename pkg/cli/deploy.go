@@ -19,7 +19,12 @@ func (a *App) jobCmd(ctx *cli.Context) error {
 
 	a.showJobSummaryTable(job)
 
-	err = a.showNodeStatuses(inventory, job)
+	jobStatuses, err := a.getJobStatuses(job, inventory)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = a.showJobStatuses(jobStatuses)
 	if err != nil {
 		log.Fatal("couldn't show node statuses: ", err)
 	}
@@ -35,7 +40,9 @@ func (a *App) jobCmd(ctx *cli.Context) error {
 
 	fmt.Print("\n")
 
-	err = a.deployJobs(job, inventory)
+	availableNodes := a.extractAvailableNodes(jobStatuses)
+
+	err = a.deployJobs(availableNodes, job)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,18 +50,45 @@ func (a *App) jobCmd(ctx *cli.Context) error {
 	return nil
 }
 
-func (a *App) deployJobs(job *config.Job, inventory *config.Inventory) error {
-	group, ok := inventory.GetGroup(job.Group)
-	if !ok {
-		return fmt.Errorf("couldn't find group: %s", group.Name)
+func (a *App) extractAvailableNodes(jobStatuses []JobStatus) []config.Node {
+	availableNodes := []config.Node{}
+	for _, status := range jobStatuses {
+		if status.NodeStatus == NODE_STATUS_OFFLINE || status.NodeStatus == NODE_STATUS_UNAUTHENTICATED {
+			continue
+		}
+
+		availableNodes = append(availableNodes, status.Node)
 	}
 
+	return availableNodes
+}
+
+func (a *App) getJobStatuses(job *config.Job, inventory *config.Inventory) ([]JobStatus, error) {
+	group, ok := inventory.GetGroup(job.Group)
+	if !ok {
+		return nil, fmt.Errorf("couldn't find group '%s'", job.Group)
+	}
+
+	jobStatuses := []JobStatus{}
 	for _, nodeName := range group.Nodes {
 		node, ok := inventory.GetNode(nodeName)
 		if !ok {
-			return fmt.Errorf("couldn't find node: %s", nodeName)
+			return nil, fmt.Errorf("couldn't find node '%s", nodeName)
 		}
 
+		jobStatus, err := a.getJobStatus(job.Name, node)
+		if err != nil {
+			return nil, err
+		}
+
+		jobStatuses = append(jobStatuses, jobStatus)
+	}
+
+	return jobStatuses, nil
+}
+
+func (a *App) deployJobs(nodes []config.Node, job *config.Job) error {
+	for _, node := range nodes {
 		err := a.deployJob(node, job)
 		if err != nil {
 			return err
