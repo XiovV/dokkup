@@ -76,7 +76,7 @@ func (a *App) getJobStatuses(job *config.Job, inventory *config.Inventory) ([]Jo
 			return nil, fmt.Errorf("couldn't find node '%s", nodeName)
 		}
 
-		jobStatus, err := a.getJobStatus(job.Name, node)
+		jobStatus, err := a.getJobStatus(job, node)
 		if err != nil {
 			return nil, err
 		}
