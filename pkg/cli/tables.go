@@ -53,8 +53,8 @@ func (a *App) showJobStatuses(jobStatuses []JobStatus) error {
 	return nil
 }
 
-func (a *App) getJobStatus(jobName string, node config.Node) (JobStatus, error) {
-	jobStatusResponse, err := a.pingNode(jobName, node)
+func (a *App) getJobStatus(job *config.Job, node config.Node) (JobStatus, error) {
+	jobStatusResponse, err := a.pingNode(job, node)
 
 	jobStatus := JobStatus{
 		Node:       node,
@@ -80,11 +80,12 @@ func (a *App) getJobStatus(jobName string, node config.Node) (JobStatus, error) 
 
 	jobStatus.RunningContainers = int(jobStatusResponse.RunningContainers)
 	jobStatus.TotalContainers = int(jobStatusResponse.TotalContainers)
+	jobStatus.ShouldUpdate = jobStatusResponse.ShouldUpdate
 
 	return jobStatus, nil
 }
 
-func (a *App) pingNode(jobName string, node config.Node) (*pb.JobStatus, error) {
+func (a *App) pingNode(job *config.Job, node config.Node) (*pb.JobStatus, error) {
 	client, err := a.initClient(node.Location)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't init connection: %w", err)
@@ -95,7 +96,9 @@ func (a *App) pingNode(jobName string, node config.Node) (*pb.JobStatus, error) 
 
 	ctx = metadata.AppendToOutgoingContext(ctx, "authorization", node.Key)
 
-	jobStatus, err := client.GetJobStatus(ctx, &pb.Job{Name: jobName})
+	request := a.jobToDeployJobRequest(job)
+
+	jobStatus, err := client.GetJobStatus(ctx, request)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get node status: %w", err)
 	}
