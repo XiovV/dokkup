@@ -19,8 +19,6 @@ func (a *App) stopJobCmd(ctx *cli.Context) error {
 
 	a.showStopJobSummaryTable(job)
 
-	a.showNodeStatuses(inventory, job)
-
 	shouldContinue, err := a.showConfirmationPrompt(ctx)
 	if err != nil {
 		log.Fatal("confirmation prompt error: ", err)
