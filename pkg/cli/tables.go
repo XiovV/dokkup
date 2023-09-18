@@ -14,6 +14,7 @@ type JobStatus struct {
 	RunningContainers int
 	TotalContainers   int
 	ShouldUpdate      bool
+	CanRollback       bool
 }
 
 func (a *App) showDeployJobStatuses(jobStatuses []JobStatus) error {
@@ -94,6 +95,44 @@ func (a *App) showStopJobStatuses(jobStatuses []JobStatus) error {
 		}
 
 		out := fmt.Sprintf("%s\t%s\t%d/%d", jobStatus.Node.Name, NODE_STATUS_ONLINE, jobStatus.RunningContainers, jobStatus.TotalContainers)
+		fmt.Fprintln(nodeStatusesTable, out)
+	}
+
+	nodeStatusesTable.Flush()
+
+	if unavailableNodes == 1 {
+		fmt.Printf("\nWarning! It seems that there is %d unavailable node, it will be skipped.\n", unavailableNodes)
+	}
+
+	if unavailableNodes > 1 {
+		fmt.Printf("\nWarning! It seems that there are %d unavailable nodes, they will be skipped.\n", unavailableNodes)
+	}
+
+	return nil
+}
+
+func (a *App) showRollbackJobStatuses(jobStatuses []JobStatus) error {
+	fmt.Print("Node statuses:\n\n")
+	nodeStatusesTable := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
+	fmt.Fprintln(nodeStatusesTable, "NAME\tSTATUS\tCONTAINERS\tROLLBACK")
+
+	var unavailableNodes int
+	for _, jobStatus := range jobStatuses {
+		if jobStatus.NodeStatus == NODE_STATUS_OFFLINE || jobStatus.NodeStatus == NODE_STATUS_UNAUTHENTICATED {
+			out := fmt.Sprintf("%s\t%s\t%d/%d\t%t", jobStatus.Node.Name, jobStatus.NodeStatus, 0, 0, false)
+			fmt.Fprintln(nodeStatusesTable, out)
+
+			unavailableNodes++
+			continue
+		}
+
+		nodeName := jobStatus.Node.Name
+
+		if jobStatus.TotalContainers == 0 {
+			nodeName += "*"
+		}
+
+		out := fmt.Sprintf("%s\t%s\t%d/%d\t%t", nodeName, NODE_STATUS_ONLINE, jobStatus.RunningContainers, jobStatus.TotalContainers, jobStatus.CanRollback)
 		fmt.Fprintln(nodeStatusesTable, out)
 	}
 
