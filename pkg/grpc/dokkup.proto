@@ -57,4 +57,5 @@ message JobStatus {
   int32 runningContainers = 1;
   int32 totalContainers = 2;
   bool shouldUpdate = 3;
+  bool canRollback = 4;
 }
