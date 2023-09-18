@@ -20,7 +20,12 @@ func (a *App) rollbackCmd(ctx *cli.Context) error {
 
 	a.showJobSummaryTable(job)
 
-	err = a.showNodeStatuses(inventory, job)
+	jobStatuses, err := a.getJobStatuses(job, inventory)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = a.showRollbackJobStatuses(jobStatuses)
 	if err != nil {
 		log.Fatal("couldn't show node statuses: ", err)
 	}
