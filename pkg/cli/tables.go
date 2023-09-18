@@ -16,7 +16,7 @@ type JobStatus struct {
 	ShouldUpdate      bool
 }
 
-func (a *App) showJobStatuses(jobStatuses []JobStatus) error {
+func (a *App) showDeployJobStatuses(jobStatuses []JobStatus) error {
 	fmt.Print("Node statuses:\n\n")
 	nodeStatusesTable := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
 	fmt.Fprintln(nodeStatusesTable, "NAME\tSTATUS\tCONTAINERS\tUPDATE")

@@ -24,7 +24,7 @@ func (a *App) jobCmd(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	err = a.showJobStatuses(jobStatuses)
+	err = a.showDeployJobStatuses(jobStatuses)
 	if err != nil {
 		log.Fatal("couldn't show node statuses: ", err)
 	}
