@@ -50,7 +50,7 @@ func (j *JobRunner) DoesJobExist(jobName string) bool {
 	return len(containers) != 0
 }
 
-func (j *JobRunner) RunDeployment(stream pb.Dokkup_DeployJobServer, request *pb.DeployJobRequest) error {
+func (j *JobRunner) RunDeployment(stream pb.Dokkup_DeployJobServer, request *pb.Job) error {
 	createdContainers, err := j.createContainersFromRequest(request, stream)
 	if err != nil {
 		return err
@@ -59,7 +59,7 @@ func (j *JobRunner) RunDeployment(stream pb.Dokkup_DeployJobServer, request *pb.
 	return j.startContainers(createdContainers, stream)
 }
 
-func (j *JobRunner) createContainersFromRequest(request *pb.DeployJobRequest, stream pb.Dokkup_DeployJobServer) ([]string, error) {
+func (j *JobRunner) createContainersFromRequest(request *pb.Job, stream pb.Dokkup_DeployJobServer) ([]string, error) {
 	createdContainers := []string{}
 	for i := 0; i < int(request.Count); i++ {
 		stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Configuring container (%d/%d)", i+1, request.Count)})
@@ -76,7 +76,7 @@ func (j *JobRunner) createContainersFromRequest(request *pb.DeployJobRequest, st
 	return createdContainers, nil
 }
 
-func (j *JobRunner) StopJob(request *pb.StopJobRequest, stream pb.Dokkup_StopJobServer) error {
+func (j *JobRunner) StopJob(request *pb.Job, stream pb.Dokkup_StopJobServer) error {
 	j.Logger.Debug("getting job containers")
 	containers, err := j.Controller.GetContainers(request.Name, docker.GetContainersOptions{Stopped: true})
 	if err != nil {
@@ -128,7 +128,7 @@ func (j *JobRunner) StopJob(request *pb.StopJobRequest, stream pb.Dokkup_StopJob
 	return nil
 }
 
-func (j *JobRunner) RunUpdate(request *pb.DeployJobRequest, stream pb.Dokkup_DeployJobServer) error {
+func (j *JobRunner) RunUpdate(request *pb.Job, stream pb.Dokkup_DeployJobServer) error {
 	j.Logger.Debug("removing previous rollback containers")
 	err := j.Controller.DeleteRollbackContainers(request.Name)
 	if err != nil {

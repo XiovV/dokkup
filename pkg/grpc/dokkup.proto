@@ -3,14 +3,14 @@ syntax = "proto3";
 option go_package = "github.com/XiovV/dokkup";
 
 service Dokkup {
-  rpc DeployJob(DeployJobRequest) returns (stream DeployJobResponse) {}
-  rpc StopJob(StopJobRequest) returns (stream StopJobResponse) {}
-  rpc RollbackJob(RollbackJobRequest) returns (stream RollbackJobResponse) {}
+  rpc DeployJob(Job) returns (stream DeployJobResponse) {}
+  rpc StopJob(Job) returns (stream StopJobResponse) {}
+  rpc RollbackJob(Job) returns (stream RollbackJobResponse) {}
   rpc GetNodeStatus(GetNodeStatusRequest) returns (NodeStatus) {}
-  rpc GetJobStatus(GetJobStatusRequest) returns (JobStatus) {}
+  rpc GetJobStatus(Job) returns (JobStatus) {}
 }
 
-message DeployJobRequest {
+message Job {
   int32 count = 1;
   string name = 2;
   Container container = 3;
@@ -20,16 +20,8 @@ message DeployJobResponse {
   string message = 1;
 }
 
-message StopJobRequest {
-  string name = 1;
-}
-
 message StopJobResponse {
   string message = 1;
-}
-
-message RollbackJobRequest {
-  string name = 1;
 }
 
 message RollbackJobResponse {
@@ -59,10 +51,6 @@ message NodeStatus {
   int32 runningContainers = 1;
   int32 totalContainers = 2;
   bool shouldUpdate = 3;
-}
-
-message GetJobStatusRequest {
-  string Name = 1;  
 }
 
 message JobStatus {

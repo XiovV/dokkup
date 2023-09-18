@@ -116,7 +116,7 @@ func (c *Controller) ContainerSetupConfig(jobName string, config *pb.Container) 
 	}
 }
 
-func (c *Controller) CreateTemporaryContainer(request *pb.DeployJobRequest) (string, error) {
+func (c *Controller) CreateTemporaryContainer(request *pb.Job) (string, error) {
 	containerConfig := c.ContainerSetupConfig(request.Name, request.Container)
 
 	container, err := c.ContainerCreate(request.Name+"-temporary", containerConfig.Config, containerConfig.HostConfig)

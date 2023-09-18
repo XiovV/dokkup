@@ -84,7 +84,7 @@ func (a *App) pingNode(jobName string, node config.Node) (*pb.JobStatus, error) 
 
 	ctx = metadata.AppendToOutgoingContext(ctx, "authorization", node.Key)
 
-	jobStatus, err := client.GetJobStatus(ctx, &pb.GetJobStatusRequest{Name: jobName})
+	jobStatus, err := client.GetJobStatus(ctx, &pb.Job{Name: jobName})
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get node status: %w", err)
 	}

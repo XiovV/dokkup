@@ -70,7 +70,7 @@ func (a *App) stopJob(node config.Node, job *config.Job) error {
 	ctx, cancel := a.newAuthorizationContext(node.Key)
 	defer cancel()
 
-	request := &pb.StopJobRequest{
+	request := &pb.Job{
 		Name: job.Name,
 	}
 

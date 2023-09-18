@@ -100,7 +100,7 @@ func (a *App) deployJob(node config.Node, job *config.Job) error {
 	return nil
 }
 
-func (a *App) jobToDeployJobRequest(job *config.Job) *pb.DeployJobRequest {
+func (a *App) jobToDeployJobRequest(job *config.Job) *pb.Job {
 	count := int32(job.Count)
 	container := job.Container[0]
 
@@ -110,7 +110,7 @@ func (a *App) jobToDeployJobRequest(job *config.Job) *pb.DeployJobRequest {
 		ports = append(ports, &pb.Port{In: port.In})
 	}
 
-	return &pb.DeployJobRequest{
+	return &pb.Job{
 		Count: count,
 		Name:  job.Name,
 		Container: &pb.Container{

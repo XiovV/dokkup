@@ -74,7 +74,7 @@ func (a *App) rollbackJob(node config.Node, job *config.Job) error {
 	ctx, cancel := a.newAuthorizationContext(node.Key)
 	defer cancel()
 
-	request := &pb.RollbackJobRequest{
+	request := &pb.Job{
 		Name: job.Name,
 	}
 

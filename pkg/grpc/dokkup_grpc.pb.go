@@ -22,11 +22,11 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DokkupClient interface {
-	DeployJob(ctx context.Context, in *DeployJobRequest, opts ...grpc.CallOption) (Dokkup_DeployJobClient, error)
-	StopJob(ctx context.Context, in *StopJobRequest, opts ...grpc.CallOption) (Dokkup_StopJobClient, error)
-	RollbackJob(ctx context.Context, in *RollbackJobRequest, opts ...grpc.CallOption) (Dokkup_RollbackJobClient, error)
+	DeployJob(ctx context.Context, in *Job, opts ...grpc.CallOption) (Dokkup_DeployJobClient, error)
+	StopJob(ctx context.Context, in *Job, opts ...grpc.CallOption) (Dokkup_StopJobClient, error)
+	RollbackJob(ctx context.Context, in *Job, opts ...grpc.CallOption) (Dokkup_RollbackJobClient, error)
 	GetNodeStatus(ctx context.Context, in *GetNodeStatusRequest, opts ...grpc.CallOption) (*NodeStatus, error)
-	GetJobStatus(ctx context.Context, in *GetJobStatusRequest, opts ...grpc.CallOption) (*JobStatus, error)
+	GetJobStatus(ctx context.Context, in *Job, opts ...grpc.CallOption) (*JobStatus, error)
 }
 
 type dokkupClient struct {
@@ -37,7 +37,7 @@ func NewDokkupClient(cc grpc.ClientConnInterface) DokkupClient {
 	return &dokkupClient{cc}
 }
 
-func (c *dokkupClient) DeployJob(ctx context.Context, in *DeployJobRequest, opts ...grpc.CallOption) (Dokkup_DeployJobClient, error) {
+func (c *dokkupClient) DeployJob(ctx context.Context, in *Job, opts ...grpc.CallOption) (Dokkup_DeployJobClient, error) {
 	stream, err := c.cc.NewStream(ctx, &Dokkup_ServiceDesc.Streams[0], "/Dokkup/DeployJob", opts...)
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func (x *dokkupDeployJobClient) Recv() (*DeployJobResponse, error) {
 	return m, nil
 }
 
-func (c *dokkupClient) StopJob(ctx context.Context, in *StopJobRequest, opts ...grpc.CallOption) (Dokkup_StopJobClient, error) {
+func (c *dokkupClient) StopJob(ctx context.Context, in *Job, opts ...grpc.CallOption) (Dokkup_StopJobClient, error) {
 	stream, err := c.cc.NewStream(ctx, &Dokkup_ServiceDesc.Streams[1], "/Dokkup/StopJob", opts...)
 	if err != nil {
 		return nil, err
@@ -101,7 +101,7 @@ func (x *dokkupStopJobClient) Recv() (*StopJobResponse, error) {
 	return m, nil
 }
 
-func (c *dokkupClient) RollbackJob(ctx context.Context, in *RollbackJobRequest, opts ...grpc.CallOption) (Dokkup_RollbackJobClient, error) {
+func (c *dokkupClient) RollbackJob(ctx context.Context, in *Job, opts ...grpc.CallOption) (Dokkup_RollbackJobClient, error) {
 	stream, err := c.cc.NewStream(ctx, &Dokkup_ServiceDesc.Streams[2], "/Dokkup/RollbackJob", opts...)
 	if err != nil {
 		return nil, err
@@ -142,7 +142,7 @@ func (c *dokkupClient) GetNodeStatus(ctx context.Context, in *GetNodeStatusReque
 	return out, nil
 }
 
-func (c *dokkupClient) GetJobStatus(ctx context.Context, in *GetJobStatusRequest, opts ...grpc.CallOption) (*JobStatus, error) {
+func (c *dokkupClient) GetJobStatus(ctx context.Context, in *Job, opts ...grpc.CallOption) (*JobStatus, error) {
 	out := new(JobStatus)
 	err := c.cc.Invoke(ctx, "/Dokkup/GetJobStatus", in, out, opts...)
 	if err != nil {
@@ -155,11 +155,11 @@ func (c *dokkupClient) GetJobStatus(ctx context.Context, in *GetJobStatusRequest
 // All implementations must embed UnimplementedDokkupServer
 // for forward compatibility
 type DokkupServer interface {
-	DeployJob(*DeployJobRequest, Dokkup_DeployJobServer) error
-	StopJob(*StopJobRequest, Dokkup_StopJobServer) error
-	RollbackJob(*RollbackJobRequest, Dokkup_RollbackJobServer) error
+	DeployJob(*Job, Dokkup_DeployJobServer) error
+	StopJob(*Job, Dokkup_StopJobServer) error
+	RollbackJob(*Job, Dokkup_RollbackJobServer) error
 	GetNodeStatus(context.Context, *GetNodeStatusRequest) (*NodeStatus, error)
-	GetJobStatus(context.Context, *GetJobStatusRequest) (*JobStatus, error)
+	GetJobStatus(context.Context, *Job) (*JobStatus, error)
 	mustEmbedUnimplementedDokkupServer()
 }
 
@@ -167,19 +167,19 @@ type DokkupServer interface {
 type UnimplementedDokkupServer struct {
 }
 
-func (UnimplementedDokkupServer) DeployJob(*DeployJobRequest, Dokkup_DeployJobServer) error {
+func (UnimplementedDokkupServer) DeployJob(*Job, Dokkup_DeployJobServer) error {
 	return status.Errorf(codes.Unimplemented, "method DeployJob not implemented")
 }
-func (UnimplementedDokkupServer) StopJob(*StopJobRequest, Dokkup_StopJobServer) error {
+func (UnimplementedDokkupServer) StopJob(*Job, Dokkup_StopJobServer) error {
 	return status.Errorf(codes.Unimplemented, "method StopJob not implemented")
 }
-func (UnimplementedDokkupServer) RollbackJob(*RollbackJobRequest, Dokkup_RollbackJobServer) error {
+func (UnimplementedDokkupServer) RollbackJob(*Job, Dokkup_RollbackJobServer) error {
 	return status.Errorf(codes.Unimplemented, "method RollbackJob not implemented")
 }
 func (UnimplementedDokkupServer) GetNodeStatus(context.Context, *GetNodeStatusRequest) (*NodeStatus, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNodeStatus not implemented")
 }
-func (UnimplementedDokkupServer) GetJobStatus(context.Context, *GetJobStatusRequest) (*JobStatus, error) {
+func (UnimplementedDokkupServer) GetJobStatus(context.Context, *Job) (*JobStatus, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetJobStatus not implemented")
 }
 func (UnimplementedDokkupServer) mustEmbedUnimplementedDokkupServer() {}
@@ -196,7 +196,7 @@ func RegisterDokkupServer(s grpc.ServiceRegistrar, srv DokkupServer) {
 }
 
 func _Dokkup_DeployJob_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(DeployJobRequest)
+	m := new(Job)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
@@ -217,7 +217,7 @@ func (x *dokkupDeployJobServer) Send(m *DeployJobResponse) error {
 }
 
 func _Dokkup_StopJob_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(StopJobRequest)
+	m := new(Job)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
@@ -238,7 +238,7 @@ func (x *dokkupStopJobServer) Send(m *StopJobResponse) error {
 }
 
 func _Dokkup_RollbackJob_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(RollbackJobRequest)
+	m := new(Job)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
@@ -277,7 +277,7 @@ func _Dokkup_GetNodeStatus_Handler(srv interface{}, ctx context.Context, dec fun
 }
 
 func _Dokkup_GetJobStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetJobStatusRequest)
+	in := new(Job)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -289,7 +289,7 @@ func _Dokkup_GetJobStatus_Handler(srv interface{}, ctx context.Context, dec func
 		FullMethod: "/Dokkup/GetJobStatus",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DokkupServer).GetJobStatus(ctx, req.(*GetJobStatusRequest))
+		return srv.(DokkupServer).GetJobStatus(ctx, req.(*Job))
 	}
 	return interceptor(ctx, in, info, handler)
 }

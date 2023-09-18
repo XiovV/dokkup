@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func (s *Server) GetJobStatus(ctx context.Context, in *pb.GetJobStatusRequest) (*pb.JobStatus, error) {
+func (s *Server) GetJobStatus(ctx context.Context, in *pb.Job) (*pb.JobStatus, error) {
 	runningContainers, err := s.Controller.GetContainers(in.Name, docker.GetContainersOptions{Stopped: false})
 	if err != nil {
 		s.Logger.Error("could not get running containers", zap.Error(err))

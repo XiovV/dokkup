@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func (s *Server) RollbackJob(request *pb.RollbackJobRequest, stream pb.Dokkup_RollbackJobServer) error {
+func (s *Server) RollbackJob(request *pb.Job, stream pb.Dokkup_RollbackJobServer) error {
 	s.Logger.Info("received a rollback request", zap.String("jobName", request.Name))
 	currentContainers, err := s.Controller.GetContainers(request.Name, docker.GetContainersOptions{Stopped: true})
 	if err != nil {
