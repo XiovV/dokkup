@@ -14,13 +14,13 @@ const (
 )
 
 func CheckAPIKey() ([]byte, error) {
-	key, err := readAPIKey()
+	hashedKey, err := readAPIKey()
 	if err != nil {
 		return nil, err
 	}
 
-	if len(key) != 0 {
-		return nil, nil
+	if len(hashedKey) != 0 {
+		return hashedKey, nil
 	}
 
 	hashedKey, key, err := createNewAPIKey()
@@ -62,18 +62,18 @@ func generateHashedAPIKey() ([]byte, string) {
 	return hashedKey, keyStr
 }
 
-func readAPIKey() (string, error) {
+func readAPIKey() ([]byte, error) {
 	err := createDataFile()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	content, err := os.ReadFile("data")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return string(content), nil
+	return content, nil
 }
 
 func createDataFile() error {
