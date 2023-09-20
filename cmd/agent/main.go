@@ -22,7 +22,7 @@ func main() {
 		logger.Fatal("could not read config", zap.Error(err))
 	}
 
-	config.APIKey = string(hashedKey)
+	config.APIKey = hashedKey
 
 	controller, err := docker.NewController(logger)
 	if err != nil {

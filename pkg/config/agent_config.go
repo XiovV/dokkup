@@ -6,7 +6,7 @@ import (
 
 type AgentConfig struct {
 	Port   string `env:"PORT" env-default:"8080"`
-	APIKey string
+	APIKey []byte
 }
 
 func ReadAgentConfig() (*AgentConfig, error) {
