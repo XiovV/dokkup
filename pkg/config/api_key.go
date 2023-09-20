@@ -13,34 +13,34 @@ const (
 	API_KEY_LENGHT = 32
 )
 
-func CheckAPIKey() (string, error) {
+func CheckAPIKey() ([]byte, error) {
 	key, err := readAPIKey()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if len(key) != 0 {
-		return key, nil
+		return nil, nil
 	}
 
-	key, err = createNewAPIKey()
+	hashedKey, key, err := createNewAPIKey()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	fmt.Println("Your new API key is:", key)
-	return key, nil
+	return hashedKey, nil
 }
 
-func createNewAPIKey() (string, error) {
-	newKey, keyStr := generateHashedAPIKey()
+func createNewAPIKey() ([]byte, string, error) {
+	hashedKey, keyStr := generateHashedAPIKey()
 
-	err := storeAPIKey(newKey)
+	err := storeAPIKey(hashedKey)
 	if err != nil {
-		return "", err
+		return nil, "", err
 	}
 
-	return keyStr, nil
+	return hashedKey, keyStr, nil
 }
 
 func storeAPIKey(key []byte) error {
