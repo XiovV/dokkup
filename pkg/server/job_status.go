@@ -11,13 +11,6 @@ import (
 func (s *Server) GetJobStatus(ctx context.Context, in *pb.Job) (*pb.JobStatus, error) {
 	s.Logger.Info("retreiving job status")
 
-	s.Logger.Debug("fetching running containers")
-	runningContainers, err := s.Controller.GetContainers(in.Name, docker.GetContainersOptions{Stopped: false})
-	if err != nil {
-		s.Logger.Error("could not get running containers", zap.Error(err))
-		return nil, err
-	}
-
 	s.Logger.Debug("fetching all containers")
 	totalContainers, err := s.Controller.GetContainers(in.Name, docker.GetContainersOptions{Stopped: true})
 	if err != nil {
@@ -25,36 +18,29 @@ func (s *Server) GetJobStatus(ctx context.Context, in *pb.Job) (*pb.JobStatus, e
 		return nil, err
 	}
 
-	s.Logger.Debug("checking if an image already exists", zap.String("image", in.Container.Image))
-	doesExist, err := s.Controller.ImageDoesExist(in.Container.Image)
-	if err != nil {
-		s.Logger.Error("failed to check if image exists", zap.Error(err), zap.String("image", in.Container.Image))
-		return nil, err
+	if len(totalContainers) == 0 {
+		response := &pb.JobStatus{
+			TotalContainers:   0,
+			RunningContainers: 0,
+			ShouldUpdate:      true,
+			CanRollback:       false,
+		}
+
+		return response, nil
 	}
 
-	s.Logger.Debug("does image exist", zap.Bool("doesExist", doesExist))
-	shouldUpdate := !doesExist
+	s.Logger.Debug("fetching running containers")
+	runningContainers, err := s.Controller.GetContainers(in.Name, docker.GetContainersOptions{Stopped: false})
+	if err != nil {
+		s.Logger.Error("could not get running containers", zap.Error(err))
+		return nil, err
+	}
 
 	s.Logger.Debug("getting rollback containers")
 	rollbackContainers, err := s.Controller.GetContainers(in.Name, docker.GetContainersOptions{Rollback: true})
 	if err != nil {
 		s.Logger.Error("could not get rollback containers", zap.Error(err))
 		return nil, err
-	}
-
-	canRollback := len(rollbackContainers) > 0
-
-	response := &pb.JobStatus{
-		TotalContainers:   int32(len(totalContainers)),
-		RunningContainers: int32(len(runningContainers)),
-		ShouldUpdate:      shouldUpdate,
-		CanRollback:       canRollback,
-	}
-
-	s.Logger.Debug("should update job", zap.Bool("shouldUpdate", shouldUpdate))
-
-	if len(totalContainers) == 0 {
-		return response, nil
 	}
 
 	containerConfig, err := s.Controller.ContainerInspect(totalContainers[0].ID)
@@ -87,8 +73,14 @@ func (s *Server) GetJobStatus(ctx context.Context, in *pb.Job) (*pb.JobStatus, e
 		return nil, err
 	}
 
-	response.ShouldUpdate = isDifferent
 	s.Logger.Debug("should update job", zap.Bool("shouldUpdate", isDifferent))
+
+	response := &pb.JobStatus{
+		TotalContainers:   int32(len(totalContainers)),
+		RunningContainers: int32(len(runningContainers)),
+		ShouldUpdate:      isDifferent,
+		CanRollback:       len(rollbackContainers) != 0,
+	}
 
 	return response, nil
 }
