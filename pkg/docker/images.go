@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"io"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -18,10 +19,12 @@ func (c *Controller) ImagePull(containerImage string) error {
 		return nil
 	}
 
-	_, err = c.cli.ImagePull(c.ctx, containerImage, types.ImagePullOptions{})
+	reader, err := c.cli.ImagePull(c.ctx, containerImage, types.ImagePullOptions{})
 	if err != nil {
 		return err
 	}
+	defer reader.Close()
+	io.Copy(io.Discard, reader)
 
 	c.Logger.Debug("image pulled successfully", zap.String("image", containerImage))
 
