@@ -33,9 +33,7 @@ func (s *Server) validateAuthHeader(ctx context.Context) error {
 		return status.Error(codes.Unauthenticated, "api key is invalid")
 	}
 
-	key := s.Config.APIKey
-
-	err := bcrypt.CompareHashAndPassword([]byte(key), []byte(apiKey))
+	err := bcrypt.CompareHashAndPassword(s.Config.APIKey, []byte(apiKey))
 	if err != nil {
 		s.Logger.Warn("api key is incorrect")
 		return status.Error(codes.Unauthenticated, "api key is invalid")
