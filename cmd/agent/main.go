@@ -12,7 +12,7 @@ func main() {
 	logger, _ := zap.NewDevelopment()
 	defer logger.Sync()
 
-	key, err := config.CheckAPIKey()
+	hashedKey, err := config.CheckAPIKey()
 	if err != nil {
 		logger.Fatal("could not check API key", zap.Error(err))
 	}
@@ -22,7 +22,7 @@ func main() {
 		logger.Fatal("could not read config", zap.Error(err))
 	}
 
-	config.APIKey = key
+	config.APIKey = string(hashedKey)
 
 	controller, err := docker.NewController(logger)
 	if err != nil {
