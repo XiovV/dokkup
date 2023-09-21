@@ -11,6 +11,7 @@ import (
 
 const (
 	API_KEY_LENGHT = 32
+	DATA_DIR       = "config/data"
 )
 
 func CheckAPIKey() ([]byte, error) {
@@ -44,7 +45,7 @@ func createNewAPIKey() ([]byte, string, error) {
 }
 
 func storeAPIKey(key []byte) error {
-	return os.WriteFile("data", key, 0644)
+	return os.WriteFile(DATA_DIR, key, 0644)
 }
 
 func generateHashedAPIKey() ([]byte, string) {
@@ -68,7 +69,7 @@ func readAPIKey() ([]byte, error) {
 		return nil, err
 	}
 
-	content, err := os.ReadFile("data")
+	content, err := os.ReadFile(DATA_DIR)
 	if err != nil {
 		return nil, err
 	}
@@ -77,11 +78,19 @@ func readAPIKey() ([]byte, error) {
 }
 
 func createDataFile() error {
-	if _, err := os.Stat("data"); errors.Is(err, os.ErrNotExist) {
-		_, err := os.Create("data")
-		if err != nil {
-			return err
-		}
+	_, err := os.Stat(DATA_DIR)
+	if !errors.Is(err, os.ErrNotExist) {
+		return nil
+	}
+
+	err = os.Mkdir("config", os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	_, err = os.Create(DATA_DIR)
+	if err != nil {
+		return err
 	}
 
 	return nil
