@@ -83,10 +83,7 @@ func createDataFile() error {
 		return nil
 	}
 
-	err = os.Mkdir("config", os.ModePerm)
-	if err != nil {
-		return err
-	}
+	_ = os.Mkdir("config", os.ModePerm)
 
 	_, err = os.Create(DATA_DIR)
 	if err != nil {
