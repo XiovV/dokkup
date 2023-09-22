@@ -68,5 +68,5 @@ groups:
    nodes: ["lab1", "lab2"]
 ```
 
-In this example we defined two nodes. We assigned them a name, the IP:PORT where the agent is running and their API key. We also created a 
-group called "labs" and assigned the two nodes to it so we can refer to them via the group name, instead of referring to them individually when we start managing our containers.
+- **nodes** is an array of nodes (or servers) where the `agents` are running.
+- **groups** is an array of groups, where you can group together multiple nodes to avoid referring to them individually.
