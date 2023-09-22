@@ -122,3 +122,23 @@ Are you sure you want to proceed? (y/n)
 The CLI will show a deployment summary, showing some basic information about the job and the container you are about to deploy. And it will display the nodes on which the job will be deployed. The asterisk next to the node name signifies that a job will be deployed from scratch.
 
 TODO: Show gif of the deployment process here.
+
+Now we can run `docker ps` on our nodes and see our containers (this is for demonstration purposes, you don't have to do this):
+```shell
+$ docker ps
+```
+lab1 output:
+```
+CONTAINER ID   IMAGE                  COMMAND                   CREATED          STATUS                             PORTS                                       NAMES
+adec3b3612ca   crccheck/hello-world   "/bin/sh -c 'echo \"h…"   14 seconds ago   Up 12 seconds (health: starting)   0.0.0.0:32805->8000/tcp                     demo-b905568e-942a-4ef4-b091-45f9fc2ddea9
+e3a4b99761b1   crccheck/hello-world   "/bin/sh -c 'echo \"h…"   14 seconds ago   Up 12 seconds (health: starting)   0.0.0.0:32804->8000/tcp                     demo-78d37fdd-cbfc-468c-88b3-b8a1df17855b
+23e0af35bdae   xiovv/dokkup:latest    "/agent"                  25 hours ago     Up 25 hours                        0.0.0.0:8080->8080/tcp, :::8080->8080/tcp   dokkup-agent
+```
+
+lab2 output:
+```
+CONTAINER ID   IMAGE                  COMMAND                   CREATED          STATUS                    PORTS                                       NAMES
+cf00cd390db3   crccheck/hello-world   "/bin/sh -c 'echo \"h…"   36 seconds ago   Up 34 seconds (healthy)   0.0.0.0:32793->8000/tcp                     demo-d71fc907-6b29-4287-aab8-d29a5fe4e821
+0e8e013adea2   crccheck/hello-world   "/bin/sh -c 'echo \"h…"   37 seconds ago   Up 35 seconds (healthy)   0.0.0.0:32792->8000/tcp                     demo-4d2c8f50-48e7-4817-b380-4b790196d34f
+2386f86f788b   xiovv/dokkup:latest    "/agent"                  25 hours ago     Up 25 hours               0.0.0.0:8080->8080/tcp, :::8080->8080/tcp   dokkup-agent
+```
