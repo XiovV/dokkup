@@ -70,3 +70,28 @@ groups:
 
 - **nodes** is an array of nodes (or servers, both terms are used interchangeably) where the `agents` are running.
 - **groups** is an array of groups, where you can group together multiple nodes to avoid referring to them individually.
+
+## Job
+The job specification holds information which tells the `agent` how to deploy a job. Let's define our `job.yaml`:
+```yaml
+group: "labs"
+count: 2
+name: "demo"
+
+container:
+ - image: "crccheck/hello-world"
+   ports:
+    - in: 8000
+   restart: always 
+   labels:
+     - "my.label.test=demo"
+   environment:
+     - MYENV=ENVEXAMPLE
+   volumes:
+     - myvolume:/home
+```
+
+- **group** specifies which group we want this job to be deployed on. Earlier on we created a "labs" group, so the job will be deployed on our lab1 and lab2 nodes.
+- **count** specifies how many containers we want to deploy on each node.
+- **name** gives the job a name.
+- **container** holds information about the container you want to deploy. It closely resembles a standard docker-compose file.
