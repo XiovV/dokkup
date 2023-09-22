@@ -94,4 +94,4 @@ container:
 - **group** specifies which group we want this job to be deployed on. Earlier on we created a "labs" group, so the job will be deployed on our lab1 and lab2 nodes.
 - **count** specifies how many containers we want to deploy on each node.
 - **name** gives the job a name.
-- **container** holds information about the container you want to deploy. It closely resembles a standard docker-compose file.
+- **container** holds information about the container you want to deploy. It closely resembles a standard [docker-compose](https://docs.docker.com/compose) file.
