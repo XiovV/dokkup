@@ -46,4 +46,4 @@ cd dokkup/cmd/dokkup
 go install
 ```
 
-Run `dokkup` in your terminal to verify it's installed
+Run `dokkup` in your terminal to verify it's installed.
