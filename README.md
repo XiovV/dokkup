@@ -13,7 +13,9 @@ The `agent` runs on your server and will do all of the container management once
 
 Running the `agent` is as simple as running a simple docker command:
 ```shell
-docker run -d --name dokkup-agent -p 8080:8080 --restart always -v /path/to/config:/config -v /var/run/docker.sock:/var/run/docker.sock xiovv/dokkup:latest
+docker run -d --name dokkup-agent -p 8080:8080 \ 
+--restart always -v /path/to/config:/config \ 
+-v /var/run/docker.sock:/var/run/docker.sock xiovv/dokkup:latest
 ```
 
 Next, retreive the API key through the logs:
