@@ -31,4 +31,19 @@ Your new API key is: jy9DbtDlfi5VJuAkbZYd4Kt0c2cQY8iQ
 
 Take note of that API key as it will not be printed out the next time the agent runs.
 
+## CLI
+The CLI is used to execute jobs and to tell the `agent` what to do.
 
+### Install from source
+Clone the repository:
+```shell
+git clone https://github.com/XiovV/dokkup.git
+```
+
+Install the binary:
+```shell
+cd dokkup/cmd/dokkup
+go install
+```
+
+Run `dokkup` in your terminal to verify it's installed
