@@ -96,7 +96,7 @@ container:
 - **name** gives the job a name.
 - **container** holds information about the container you want to deploy. It closely resembles a standard [docker-compose](https://docs.docker.com/compose) file.
 
-## Deploying the job
+## Deploying a job
 Now that we have our inventory and job specification, we can deploy our job:
 
 ```shell
@@ -146,3 +146,4 @@ cf00cd390db3   crccheck/hello-world   "/bin/sh -c 'echo \"h…"   36 seconds ago
 In case you run the `dokkup run job` command without making any changes, you don't have to worry about dokkup wiping your existing containers and re-deploying them again, it will detect that nothing has changed and it won't do anything:
 
 TODO: insert gif of "already up to date" clip
+
