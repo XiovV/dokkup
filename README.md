@@ -142,3 +142,7 @@ cf00cd390db3   crccheck/hello-world   "/bin/sh -c 'echo \"h…"   36 seconds ago
 0e8e013adea2   crccheck/hello-world   "/bin/sh -c 'echo \"h…"   37 seconds ago   Up 35 seconds (healthy)   0.0.0.0:32792->8000/tcp                     demo-4d2c8f50-48e7-4817-b380-4b790196d34f
 2386f86f788b   xiovv/dokkup:latest    "/agent"                  25 hours ago     Up 25 hours               0.0.0.0:8080->8080/tcp, :::8080->8080/tcp   dokkup-agent
 ```
+
+In case you run the `dokkup run job` command without making any changes, you don't have to worry about dokkup wiping your existing containers and re-deploying them again, it will detect that nothing has changed and it won't do anything:
+
+TODO: insert gif of "already up to date" clip
