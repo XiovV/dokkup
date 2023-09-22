@@ -13,17 +13,15 @@ The `agent` runs on your server and will do all of the container management once
 
 Running the `agent` is as simple as running a simple docker command:
 ```shell
-docker run -d --name dokkup-agent -p 8080:8080 \ 
+$ docker run -d --name dokkup-agent -p 8080:8080 \ 
 --restart always -v /path/to/config:/config \ 
 -v /var/run/docker.sock:/var/run/docker.sock xiovv/dokkup:latest
 ```
 
 Next, retreive the API key through the logs:
 ```shell
-docker logs dokkup-agent
+$ docker logs dokkup-agent
 ```
-
-Output:
 ```
 Your new API key is: jy9DbtDlfi5VJuAkbZYd4Kt0c2cQY8iQ
 2023-09-22T10:31:42.175+0200    INFO    agent/main.go:36        server is listening...  {"port": "8080"}
@@ -37,7 +35,7 @@ The CLI is used to execute jobs and to tell the `agent` what to do.
 ### Install from source
 Clone the repository:
 ```shell
-git clone https://github.com/XiovV/dokkup.git
+$ git clone https://github.com/XiovV/dokkup.git
 ```
 
 Install the binary:
