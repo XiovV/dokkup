@@ -72,7 +72,7 @@ groups:
 - **groups** is an array of groups, where you can group together multiple nodes to avoid referring to them individually.
 
 ## Job
-The job specification holds information which tells the `agent` how to deploy a job. Let's define our `job.yaml`:
+The job specification holds information which tells the `agent` how to deploy a job. Let's define our `demo.yaml`:
 ```yaml
 group: "labs"
 count: 2
@@ -89,9 +89,38 @@ container:
      - MYENV=ENVEXAMPLE
    volumes:
      - myvolume:/home
+   # networks:
+   # - mynetwork
 ```
 
 - **group** specifies which group we want this job to be deployed on. Earlier on we created a "labs" group, so the job will be deployed on our lab1 and lab2 nodes.
 - **count** specifies how many containers we want to deploy on each node.
 - **name** gives the job a name.
 - **container** holds information about the container you want to deploy. It closely resembles a standard [docker-compose](https://docs.docker.com/compose) file.
+
+## Deploying the job
+Now that we have our inventory and job specification, we can deploy our job:
+
+```shell
+$ dokkup run job -i inventory.yaml demo.yaml
+```
+```
+Deployment summary:
+
+NAME     IMAGE                    RESTART     COUNT     GROUP     NETWORK
+demo     crccheck/hello-world     always      2         labs      bridge
+
+Node statuses:
+
+NAME      STATUS     CONTAINERS     UPDATE
+lab1*     ONLINE     0/0            true
+lab2*     ONLINE     0/0            true
+
+Are you sure you want to proceed? (y/n) 
+```
+Tip #1: If there's an `inventory.yaml` in your current directory, you can omit the -i flag, dokkup loads `inventory.yaml` files by default. 
+Tip #2: You can provide a -y or --yes flag to skip the confirmation prompt.
+
+The CLI will show a deployment summary, showing some basic information about the job and the container you are about to deploy. And it will display the nodes on which the job will be deployed. The asterisk next to the node name signifies that a job will be deployed from scratch.
+
+TODO: Show gif of the deployment process here.
