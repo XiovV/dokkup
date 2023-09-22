@@ -144,6 +144,67 @@ cf00cd390db3   crccheck/hello-world   "/bin/sh -c 'echo \"h…"   36 seconds ago
 ```
 
 In case you run the `dokkup run job` command without making any changes, you don't have to worry about dokkup wiping your existing containers and re-deploying them again, it will detect that nothing has changed and it won't do anything:
+```
+Deployment summary:
+
+NAME     IMAGE                    RESTART     COUNT     GROUP     NETWORK
+demo     crccheck/hello-world     always      2         labs      bridge
+
+Node statuses:
+
+NAME     STATUS     CONTAINERS     UPDATE
+lab1     ONLINE     2/2            false
+lab2     ONLINE     2/2            false
+
+Are you sure you want to proceed? (y/n) 
+```
+The CLI will show how many containers are running and the update status which will signify if the job is going to be updated or not.
 
 TODO: insert gif of "already up to date" clip
 
+# Updating a job
+Updating a job is as simple as making a change in the job specification file and running the `dokkup run job` command again: \
+`demo.yaml`
+```yaml
+group: "labs"
+count: 2
+name: "demo"
+
+container:
+ - image: "crccheck/hello-world"
+   ports:
+    - in: 8000
+   restart: always 
+   labels:
+   # - "my.label.test=demo"
+     - "my.label.test=somechange"
+   environment:
+     - MYENV=ENVEXAMPLE
+   volumes:
+     - myvolume:/home
+   # networks:
+   # - mynetwork
+
+```
+```shell
+$ dokkup run job demo.yaml
+```
+```
+Deployment summary:
+
+NAME     IMAGE                    RESTART     COUNT     GROUP     NETWORK
+demo     crccheck/hello-world     always      2         labs      bridge
+
+Node statuses:
+
+NAME     STATUS     CONTAINERS     UPDATE
+lab1     ONLINE     2/2            true
+lab2     ONLINE     2/2            true
+
+Are you sure you want to proceed? (y/n) 
+```
+Note: we omitted the -i inventory.yaml flag because dokkup automatically loads files called `inventory.yaml`.
+
+The update status is now true, meaning that dokkup is going to take down the currently running containers and deploy new ones. If something goes wrong during the update, dokkup will abort and run the old containers, ensuring minimum downtime in case something goes wrong.
+
+TODO: insert gif of the update process
