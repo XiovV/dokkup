@@ -68,5 +68,5 @@ groups:
    nodes: ["lab1", "lab2"]
 ```
 
-- **nodes** is an array of nodes (or servers) where the `agents` are running.
+- **nodes** is an array of nodes (or servers, both terms are used interchangeably) where the `agents` are running.
 - **groups** is an array of groups, where you can group together multiple nodes to avoid referring to them individually.
