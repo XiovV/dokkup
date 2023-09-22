@@ -47,3 +47,26 @@ go install
 ```
 
 Run `dokkup` in your terminal to verify it's installed.
+
+# Deploying jobs
+In order to start deploying jobs, we need an inventory and a job file.
+
+## Inventory
+The inventory holds our agents, the concept is very similar to Ansible's [inventory](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html) file. Let's define our `inventory.yaml`:
+```yaml
+nodes:
+ - name: "lab1"
+   location: "192.168.0.99:8080"
+   key: "Z6wC4goD7V2EiL4XuecTuo8jVxfvwVxs"
+
+ - name: "lab2"
+   location: "192.168.0.100:8080"
+   key: "EcwxaMO3kyBaKETesxInx7ga3Ti93gvI"
+
+groups:
+ - name: "labs"
+   nodes: ["lab1", "lab2"]
+```
+
+In this example we defined two nodes. We assigned them a name, the IP:PORT where the agent is running and their API key. We also created a 
+group called "labs" and assigned the two nodes to it so we can refer to them via the group name, instead of referring to them individually when we start managing our containers.
