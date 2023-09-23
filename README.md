@@ -208,3 +208,6 @@ Note: we omitted the -i inventory.yaml flag because dokkup automatically loads f
 The update status is now true, meaning that dokkup is going to take down the currently running containers and deploy new ones. If something goes wrong during the update, dokkup will abort and run the old containers, ensuring minimum downtime in case something goes wrong.
 
 TODO: insert gif of the update process
+
+# Rollback a job
+In case you want to rollback an update, you can do so with the `dokkup rollback job" command.
