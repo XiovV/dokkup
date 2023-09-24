@@ -233,3 +233,48 @@ TODO: insert gif of the rollback process
 
 In case you've never done an update, the rollback field will be set to false, meaning that dokkup will not be able to do a rollback as there's no previous state to return to. 
 
+# Stop a job
+If you wish to stop a job, you can do so with the `dokkup stop job command`:
+```shell
+$ dokkup stop job demo.yaml
+```
+```
+Stop job summary:
+
+NAME     IMAGE                    GROUP
+demo     crccheck/hello-world     labs
+
+Node statuses:
+
+NAME     STATUS     CONTAINERS
+lab1     ONLINE     2/2
+lab2     ONLINE     2/2
+
+Are you sure you want to proceed? (y/n)
+```
+
+The CLI tool will show how many containers it's going to stop. Keep in mind that this will not remove the containers, it will only stop them. If you wish to remove the containers as well, take a look at the next chapter.
+
+# Remove/purge a job
+If you wish to completely remove a job from your cluster of servers, you can do so with the `dokkup stop job --purge demo.yaml`:
+```shell
+$ dokkup stop job --purge demo.yaml
+```
+```
+Stop job summary:
+
+NAME     IMAGE                    GROUP
+demo     crccheck/hello-world     labs
+
+Node statuses:
+
+NAME     STATUS     CONTAINERS
+lab1     ONLINE     2/2
+lab2     ONLINE     2/2
+
+Are you sure you want to proceed? (y/n)
+```
+
+The --purge flag will tell the `agent` to delete the containers after stopping them first.
+
+Warning: The rollback command will not undo a purge, so be careful when running this command. The only way to return the containers is by running a deployment from scratch.
