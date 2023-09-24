@@ -3,6 +3,12 @@ dokkup is a simple container orchestration tool, designed to make managing conta
 
 It's ideal for use cases where you want to orchestrate containers accross one or multiple servers. Think of it as Nomad, Swarm or Kubernetes, but easier to use. 
 
+# Features
+- **Easy to use** - You can go from having a bunch of bare servers to production ready infrastructure in a matter of minutes.
+- **Minimum downtime** - Dokkup will ensure minimum downtime when updating containers or in the event that something goes wrong.
+- **No Master node** - There is no need for setting up a server just for a master node, your personal machine is all you need.
+- **Sky is the limit** - Got only one server? No problem. Got 10000 servers? No problem.
+
 # Setup
 dokkup consists of two parts: the `agent` which runs on your servers, and the CLI tool which runs on your personal machine.
 
@@ -47,7 +53,7 @@ go install
 Run `dokkup` in your terminal to verify it's installed.
 
 # Deploying jobs
-In order to start deploying jobs, we need an inventory and a job file.
+Before we can start deploying jobs, we need an inventory and a job file.
 
 ## Inventory
 The inventory holds our agents, the concept is very similar to Ansible's [inventory](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html) file. Let's define our `inventory.yaml`:
@@ -91,7 +97,7 @@ container:
    # - mynetwork
 ```
 
-- **group** specifies which group we want this job to be deployed on. Earlier on we created a "labs" group, so the job will be deployed on our lab1 and lab2 nodes.
+- **group** specifies which group we want this job to be deployed on. Earlier on we created a "labs" group, so that's what we're using here.
 - **count** specifies how many containers we want to deploy on each node.
 - **name** gives the job a name.
 - **container** holds information about the container you want to deploy. It closely resembles a standard [docker-compose](https://docs.docker.com/compose) file.
@@ -210,7 +216,7 @@ The update status is now true, meaning that dokkup is going to take down the cur
 TODO: insert gif of the update process
 
 # Rollback a job
-In case you want to rollback an update, you can do so with the `dokkup rollback job` command:
+In case you want to rollback an update (for example: you notice a serious issue with your new containers and want to return to the previous state as soon as possible), you can do so with the `dokkup rollback job` command:
 ```shell
 $ dokkup rollback job demo.yaml
 ```
