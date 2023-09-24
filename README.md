@@ -96,7 +96,7 @@ container:
 - **name** gives the job a name.
 - **container** holds information about the container you want to deploy. It closely resembles a standard [docker-compose](https://docs.docker.com/compose) file.
 
-## Deploying a job
+## Deploy a job
 Now that we have our inventory and job specification, we can deploy our job:
 
 ```shell
@@ -162,7 +162,7 @@ The CLI will show how many containers are running and the update status which wi
 
 TODO: insert gif of "already up to date" clip
 
-# Updating a job
+# Update a job
 Updating a job is as simple as making a change in the job specification file and running the `dokkup run job` command again: \
 `demo.yaml`
 ```yaml
@@ -210,4 +210,26 @@ The update status is now true, meaning that dokkup is going to take down the cur
 TODO: insert gif of the update process
 
 # Rollback a job
-In case you want to rollback an update, you can do so with the `dokkup rollback job" command.
+In case you want to rollback an update, you can do so with the `dokkup rollback job` command:
+```shell
+$ dokkup rollback job demo.yaml
+```
+```
+Deployment summary:
+
+NAME     IMAGE                    RESTART     COUNT     GROUP     NETWORK
+demo     crccheck/hello-world     always      2         labs      bridge
+
+Node statuses:
+
+NAME     STATUS     CONTAINERS     ROLLBACK
+lab1     ONLINE     2/2            true
+lab2     ONLINE     2/2            true
+
+Are you sure you want to proceed? (y/n)
+```
+
+TODO: insert gif of the rollback process
+
+In case you've never done an update, the rollback field will be set to false, meaning that dokkup will not be able to do a rollback as there's no previous state to return to. 
+
