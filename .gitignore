@@ -1,7 +1,7 @@
 .idea/
-cmd/cli/cli
 cmd/agent/agent
 cmd/agent/data
 cmd/agent/config
 cmd/dokkup/inventory.yaml
 cmd/dokkup/job.yaml
+cmd/dokkup/dokkup
