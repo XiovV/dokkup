@@ -5,7 +5,7 @@ It's ideal for use cases where you want to orchestrate containers accross one or
 
 # Features
 - **Easy to use** - You can go from having a bunch of bare servers to production ready infrastructure in a matter of minutes.
-- **Minimum downtime** - Dokkup will ensure minimum downtime when updating containers or in the event that something goes wrong.
+- **Zero downtime** - Dokkup will ensure zero downtime while updating containers or in the event that something goes wrong.
 - **No Master node** - There is no need for setting up a server just for a master node, your personal machine is all you need.
 - **Sky is the limit** - Got only one server? No problem. Got 10,000 servers? No problem.
 
