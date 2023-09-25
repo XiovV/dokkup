@@ -40,7 +40,9 @@ func (a *App) stopJobCmd(ctx *cli.Context) error {
 
 	fmt.Print("\n")
 
-	err = a.stopJobs(job, inventory)
+	shouldPurge := ctx.Bool("purge")
+
+	err = a.stopJobs(job, inventory, shouldPurge)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -48,7 +50,7 @@ func (a *App) stopJobCmd(ctx *cli.Context) error {
 	return nil
 }
 
-func (a *App) stopJobs(job *config.Job, inventory *config.Inventory) error {
+func (a *App) stopJobs(job *config.Job, inventory *config.Inventory, shouldPurge bool) error {
 	group, ok := inventory.GetGroup(job.Group)
 	if !ok {
 		return fmt.Errorf("couldn't find group: %s", group.Name)
@@ -60,7 +62,7 @@ func (a *App) stopJobs(job *config.Job, inventory *config.Inventory) error {
 			return fmt.Errorf("couldn't find node: %s", nodeName)
 		}
 
-		err := a.stopJob(node, job)
+		err := a.stopJob(node, job, shouldPurge)
 		if err != nil {
 			return err
 		}
@@ -69,7 +71,7 @@ func (a *App) stopJobs(job *config.Job, inventory *config.Inventory) error {
 	return nil
 }
 
-func (a *App) stopJob(node config.Node, job *config.Job) error {
+func (a *App) stopJob(node config.Node, job *config.Job, shouldPurge bool) error {
 	client, err := a.initClient(node.Location)
 	if err != nil {
 		return err
@@ -78,8 +80,9 @@ func (a *App) stopJob(node config.Node, job *config.Job) error {
 	ctx, cancel := a.newAuthorizationContext(node.Key)
 	defer cancel()
 
-	request := &pb.Job{
-		Name: job.Name,
+	request := &pb.StopJobRequest{
+		Name:  job.Name,
+		Purge: shouldPurge,
 	}
 
 	stream, err := client.StopJob(ctx, request)

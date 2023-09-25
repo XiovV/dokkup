@@ -39,7 +39,24 @@ func NewApp() *App {
 				Aliases: []string{"s"},
 				Subcommands: []*cli.Command{
 					{
-						Flags:  defaultFlags(),
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:    "inventory",
+								Aliases: []string{"i"},
+								Value:   "inventory.yaml",
+								Usage:   "name for the inventory file",
+							},
+							&cli.BoolFlag{
+								Name:    "yes",
+								Aliases: []string{"y"},
+								Value:   false,
+							},
+							&cli.BoolFlag{
+								Name:    "purge",
+								Aliases: []string{"p"},
+								Value:   false,
+							},
+						},
 						Name:   "job",
 						Usage:  "stop a job",
 						Action: app.stopJobCmd,
