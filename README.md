@@ -253,7 +253,7 @@ test     crccheck/hello-world     local
 Node statuses:
 
 NAME          STATUS     CONTAINERS     PURGE
-localNode     ONLINE     0/0            false
+localNode     ONLINE     2/2            false
 
 Are you sure you want to proceed? (y/n)
 ```
@@ -274,7 +274,7 @@ test     crccheck/hello-world     local
 Node statuses:
 
 NAME          STATUS     CONTAINERS     PURGE
-localNode     ONLINE     0/0            true
+localNode     ONLINE     2/2            true
 
 Are you sure you want to proceed? (y/n)
 ```
