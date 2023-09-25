@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DokkupClient interface {
 	DeployJob(ctx context.Context, in *Job, opts ...grpc.CallOption) (Dokkup_DeployJobClient, error)
-	StopJob(ctx context.Context, in *Job, opts ...grpc.CallOption) (Dokkup_StopJobClient, error)
+	StopJob(ctx context.Context, in *StopJobRequest, opts ...grpc.CallOption) (Dokkup_StopJobClient, error)
 	RollbackJob(ctx context.Context, in *Job, opts ...grpc.CallOption) (Dokkup_RollbackJobClient, error)
 	GetNodeStatus(ctx context.Context, in *GetNodeStatusRequest, opts ...grpc.CallOption) (*NodeStatus, error)
 	GetJobStatus(ctx context.Context, in *Job, opts ...grpc.CallOption) (*JobStatus, error)
@@ -69,7 +69,7 @@ func (x *dokkupDeployJobClient) Recv() (*DeployJobResponse, error) {
 	return m, nil
 }
 
-func (c *dokkupClient) StopJob(ctx context.Context, in *Job, opts ...grpc.CallOption) (Dokkup_StopJobClient, error) {
+func (c *dokkupClient) StopJob(ctx context.Context, in *StopJobRequest, opts ...grpc.CallOption) (Dokkup_StopJobClient, error) {
 	stream, err := c.cc.NewStream(ctx, &Dokkup_ServiceDesc.Streams[1], "/Dokkup/StopJob", opts...)
 	if err != nil {
 		return nil, err
@@ -156,7 +156,7 @@ func (c *dokkupClient) GetJobStatus(ctx context.Context, in *Job, opts ...grpc.C
 // for forward compatibility
 type DokkupServer interface {
 	DeployJob(*Job, Dokkup_DeployJobServer) error
-	StopJob(*Job, Dokkup_StopJobServer) error
+	StopJob(*StopJobRequest, Dokkup_StopJobServer) error
 	RollbackJob(*Job, Dokkup_RollbackJobServer) error
 	GetNodeStatus(context.Context, *GetNodeStatusRequest) (*NodeStatus, error)
 	GetJobStatus(context.Context, *Job) (*JobStatus, error)
@@ -170,7 +170,7 @@ type UnimplementedDokkupServer struct {
 func (UnimplementedDokkupServer) DeployJob(*Job, Dokkup_DeployJobServer) error {
 	return status.Errorf(codes.Unimplemented, "method DeployJob not implemented")
 }
-func (UnimplementedDokkupServer) StopJob(*Job, Dokkup_StopJobServer) error {
+func (UnimplementedDokkupServer) StopJob(*StopJobRequest, Dokkup_StopJobServer) error {
 	return status.Errorf(codes.Unimplemented, "method StopJob not implemented")
 }
 func (UnimplementedDokkupServer) RollbackJob(*Job, Dokkup_RollbackJobServer) error {
@@ -217,7 +217,7 @@ func (x *dokkupDeployJobServer) Send(m *DeployJobResponse) error {
 }
 
 func _Dokkup_StopJob_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(Job)
+	m := new(StopJobRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}

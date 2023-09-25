@@ -4,7 +4,7 @@ option go_package = "github.com/XiovV/dokkup";
 
 service Dokkup {
   rpc DeployJob(Job) returns (stream DeployJobResponse) {}
-  rpc StopJob(Job) returns (stream StopJobResponse) {}
+  rpc StopJob(StopJobRequest) returns (stream StopJobResponse) {}
   rpc RollbackJob(Job) returns (stream RollbackJobResponse) {}
   rpc GetNodeStatus(GetNodeStatusRequest) returns (NodeStatus) {}
   rpc GetJobStatus(Job) returns (JobStatus) {}
@@ -18,6 +18,11 @@ message Job {
 
 message DeployJobResponse {
   string message = 1;
+}
+
+message StopJobRequest {
+  string name = 1;
+  bool purge = 2; 
 }
 
 message StopJobResponse {
