@@ -24,7 +24,9 @@ func (a *App) stopJobCmd(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	err = a.showStopJobStatuses(jobStatuses)
+	shouldPurge := ctx.Bool("purge")
+
+	err = a.showStopJobStatuses(jobStatuses, shouldPurge)
 	if err != nil {
 		log.Fatal("couldn't show node statuses: ", err)
 	}
@@ -39,8 +41,6 @@ func (a *App) stopJobCmd(ctx *cli.Context) error {
 	}
 
 	fmt.Print("\n")
-
-	shouldPurge := ctx.Bool("purge")
 
 	err = a.stopJobs(job, inventory, shouldPurge)
 	if err != nil {

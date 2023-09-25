@@ -79,22 +79,22 @@ func (a *App) showStopJobSummaryTable(job *config.Job) {
 	jobSummaryTable.Flush()
 }
 
-func (a *App) showStopJobStatuses(jobStatuses []JobStatus) error {
+func (a *App) showStopJobStatuses(jobStatuses []JobStatus, shouldPurge bool) error {
 	fmt.Print("Node statuses:\n\n")
 	nodeStatusesTable := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
-	fmt.Fprintln(nodeStatusesTable, "NAME\tSTATUS\tCONTAINERS")
+	fmt.Fprintln(nodeStatusesTable, "NAME\tSTATUS\tCONTAINERS\tPURGE")
 
 	var unavailableNodes int
 	for _, jobStatus := range jobStatuses {
 		if jobStatus.NodeStatus == NODE_STATUS_OFFLINE || jobStatus.NodeStatus == NODE_STATUS_UNAUTHENTICATED {
-			out := fmt.Sprintf("%s\t%s\t%d/%d", jobStatus.Node.Name, jobStatus.NodeStatus, 0, 0)
+			out := fmt.Sprintf("%s\t%s\t%d/%d\t%b", jobStatus.Node.Name, jobStatus.NodeStatus, 0, 0, false)
 			fmt.Fprintln(nodeStatusesTable, out)
 
 			unavailableNodes++
 			continue
 		}
 
-		out := fmt.Sprintf("%s\t%s\t%d/%d", jobStatus.Node.Name, NODE_STATUS_ONLINE, jobStatus.RunningContainers, jobStatus.TotalContainers)
+		out := fmt.Sprintf("%s\t%s\t%d/%d\t%t", jobStatus.Node.Name, NODE_STATUS_ONLINE, jobStatus.RunningContainers, jobStatus.TotalContainers, shouldPurge)
 		fmt.Fprintln(nodeStatusesTable, out)
 	}
 
