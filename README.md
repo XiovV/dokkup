@@ -9,6 +9,20 @@ It's ideal for use cases where you want to orchestrate containers accross one or
 - **No Master node** - There is no need for setting up a server just for a master node, your personal machine is all you need.
 - **Sky is the limit** - Got only one server? No problem. Got 10,000 servers? No problem.
 
+# Table of contents
+- [Setup](#setup)
+  - [Agent setup](#agent)
+  - [CLI Setup](#cli)
+- [Deploying jobs](#deploying-jobs)
+  - [Inventory file](#inventory)
+  - [Job specificaton](#job)
+  - [Deploy a job](#deploy-a-job)
+- [Managing jobs](#managing-jobs)
+  - [Update](#update-a-job)
+  - [Rollback](#rollback-a-job)
+  - [Stop](#stop-a-job)
+  - [Remove/purge](#removepurge-a-job)
+
 # Setup
 dokkup consists of two parts: the `agent` which runs on your servers, and the CLI tool which runs on your personal machine.
 
@@ -168,7 +182,9 @@ The CLI will show how many containers are running and the update status which wi
 
 TODO: insert gif of "already up to date" clip
 
-# Update a job
+# Managing jobs
+
+## Update a job
 Updating a job is as simple as making a change in the job specification file and running the `dokkup run job` command again: \
 `demo.yaml`
 ```yaml
@@ -215,7 +231,7 @@ The update status is now true, meaning that dokkup is going to take down the cur
 
 TODO: insert gif of the update process
 
-# Rollback a job
+## Rollback a job
 In case you want to rollback an update (for example: you notice a serious issue with your new containers and want to return to the previous state as soon as possible), you can do so with the `dokkup rollback job` command:
 ```shell
 $ dokkup rollback job demo.yaml
@@ -239,7 +255,7 @@ TODO: insert gif of the rollback process
 
 In case you've never done an update, the rollback field will be set to false, meaning that dokkup will not be able to do a rollback as there's no previous state to return to. 
 
-# Stop a job
+## Stop a job
 If you wish to stop a job, you can do so with the `dokkup stop job command`:
 ```shell
 $ dokkup stop job demo.yaml
@@ -260,7 +276,7 @@ Are you sure you want to proceed? (y/n)
 
 The CLI tool will show how many containers it's going to stop. Keep in mind that this will not remove the containers, it will only stop them. If you wish to remove the containers as well, take a look at the next chapter.
 
-# Remove/purge a job
+## Remove/purge a job
 If you wish to completely remove a job from your cluster of servers, you can do so with the `dokkup stop job --purge demo.yaml`:
 ```shell
 $ dokkup stop job --purge demo.yaml
