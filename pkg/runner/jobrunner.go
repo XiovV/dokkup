@@ -76,7 +76,7 @@ func (j *JobRunner) createContainersFromRequest(request *pb.Job, stream pb.Dokku
 	return createdContainers, nil
 }
 
-func (j *JobRunner) StopJob(request *pb.Job, stream pb.Dokkup_StopJobServer) error {
+func (j *JobRunner) StopJob(request *pb.StopJobRequest, stream pb.Dokkup_StopJobServer) error {
 	j.Logger.Debug("getting job containers")
 	containers, err := j.Controller.GetContainers(request.Name, docker.GetContainersOptions{Stopped: true})
 	if err != nil {
@@ -92,6 +92,11 @@ func (j *JobRunner) StopJob(request *pb.Job, stream pb.Dokkup_StopJobServer) err
 			j.Logger.Error("could not stop container", zap.Error(err), zap.String("containerId", container.ID))
 			return err
 		}
+	}
+
+	if !request.Purge {
+		stream.Send(&pb.StopJobResponse{Message: "Job stopped successfully"})
+		return nil
 	}
 
 	j.Logger.Info("deleting job containers")
