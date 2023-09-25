@@ -248,13 +248,12 @@ $ dokkup stop job demo.yaml
 Stop job summary:
 
 NAME     IMAGE                    GROUP
-demo     crccheck/hello-world     labs
+test     crccheck/hello-world     local
 
 Node statuses:
 
-NAME     STATUS     CONTAINERS
-lab1     ONLINE     2/2
-lab2     ONLINE     2/2
+NAME          STATUS     CONTAINERS     PURGE
+localNode     ONLINE     0/0            false
 
 Are you sure you want to proceed? (y/n)
 ```
@@ -270,13 +269,12 @@ $ dokkup stop job --purge demo.yaml
 Stop job summary:
 
 NAME     IMAGE                    GROUP
-demo     crccheck/hello-world     labs
+test     crccheck/hello-world     local
 
 Node statuses:
 
-NAME     STATUS     CONTAINERS
-lab1     ONLINE     2/2
-lab2     ONLINE     2/2
+NAME          STATUS     CONTAINERS     PURGE
+localNode     ONLINE     0/0            true
 
 Are you sure you want to proceed? (y/n)
 ```
