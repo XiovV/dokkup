@@ -20,23 +20,26 @@ func NewApp() *App {
 
 	app.Cli = &cli.App{
 		Name:  "dokkup",
-		Usage: "manage containers",
+		Usage: "manage your containers with ease",
 		Commands: []*cli.Command{
 			{
 				Name:    "run",
-				Aliases: []string{"j"},
+				Usage:   "Deploy, update or start containers",
+				Aliases: []string{"r"},
 				Subcommands: []*cli.Command{
 					{
-						Flags:  defaultFlags(),
-						Name:   "job",
-						Usage:  "run a job",
-						Action: app.jobCmd,
+						Flags:   defaultFlags(),
+						Aliases: []string{"j"},
+						Name:    "job",
+						Usage:   "dokkup run job [options] <path>",
+						Action:  app.jobCmd,
 					},
 				},
 			},
 			{
 				Name:    "stop",
 				Aliases: []string{"s"},
+				Usage:   "Stop or remove a job",
 				Subcommands: []*cli.Command{
 					{
 						Flags: []cli.Flag{
@@ -44,21 +47,23 @@ func NewApp() *App {
 								Name:    "inventory",
 								Aliases: []string{"i"},
 								Value:   "inventory.yaml",
-								Usage:   "name for the inventory file",
+								Usage:   "Name for the inventory file",
 							},
 							&cli.BoolFlag{
 								Name:    "yes",
 								Aliases: []string{"y"},
 								Value:   false,
+								Usage:   "Skip the confirmation prompt",
 							},
 							&cli.BoolFlag{
 								Name:    "purge",
 								Aliases: []string{"p"},
 								Value:   false,
+								Usage:   "Remove the job",
 							},
 						},
 						Name:   "job",
-						Usage:  "stop a job",
+						Usage:  "dokkup stop job [options] <path>",
 						Action: app.stopJobCmd,
 					},
 				},
@@ -66,11 +71,12 @@ func NewApp() *App {
 			{
 				Name:    "rollback",
 				Aliases: []string{"r"},
+				Usage:   "Rollback an update",
 				Subcommands: []*cli.Command{
 					{
 						Flags:  defaultFlags(),
 						Name:   "job",
-						Usage:  "rollback a job",
+						Usage:  "dokkup rollback job <path>",
 						Action: app.rollbackCmd,
 					},
 				},
@@ -87,12 +93,13 @@ func defaultFlags() []cli.Flag {
 			Name:    "inventory",
 			Aliases: []string{"i"},
 			Value:   "inventory.yaml",
-			Usage:   "name for the inventory file",
+			Usage:   "Name for the inventory file",
 		},
 		&cli.BoolFlag{
 			Name:    "yes",
 			Aliases: []string{"y"},
 			Value:   false,
+			Usage:   "Skip the confirmation prompt",
 		},
 	}
 }
