@@ -81,6 +81,19 @@ func NewApp() *App {
 					},
 				},
 			},
+			{
+				Name:    "show",
+				Aliases: []string{"s"},
+				Usage:   "Show the status of a running job",
+				Subcommands: []*cli.Command{
+					{
+						Flags:  defaultFlags(),
+						Name:   "job",
+						Usage:  "dokkup show job <path>",
+						Action: app.showJobCmd,
+					},
+				},
+			},
 		},
 	}
 
