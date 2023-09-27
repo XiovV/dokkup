@@ -6,8 +6,9 @@ It's ideal for use cases where you want to orchestrate containers accross one or
 # Features
 - **Easy to use** - You can go from having a bunch of bare servers to production ready infrastructure in a matter of minutes.
 - **Zero downtime** - Dokkup will ensure zero downtime while updating containers or in the event that something goes wrong.
-- **No Master node** - There is no need for setting up a server just for a master node, your personal machine is all you need.
+- **No master node** - There is no need for setting up a server just for a master node, your personal machine is all you need.
 - **Sky is the limit** - Got only one server? No problem. Got 10,000 servers? No problem.
+- **Easy reverse proxying and load balancing** - With built-in [Traefik](https://traefik.io/traefik) support, networking you containers is as easy as ever. (WIP)
 
 # Table of contents
 - [Setup](#setup)
