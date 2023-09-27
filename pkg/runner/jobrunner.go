@@ -18,22 +18,42 @@ func NewJobRunner(controller *docker.Controller, logger *zap.Logger) *JobRunner 
 	return &JobRunner{Controller: controller, Logger: logger}
 }
 
-func (j *JobRunner) ShouldUpdateJob(jobName string, comparisonContainer types.ContainerJSON) (bool, error) {
-	runningContainers, err := j.Controller.GetContainers(jobName, docker.GetContainersOptions{Stopped: true})
+func (j *JobRunner) ShouldUpdateJob(request *pb.Job) (bool, error) {
+	j.Logger.Debug("creating temporary container")
+	temporaryContainer, err := j.Controller.CreateTemporaryContainer(request)
+	if err != nil {
+		j.Logger.Error("failed to create temporary container", zap.Error(err))
+		return false, err
+	}
+
+	temporaryContainerConfig, err := j.Controller.ContainerInspect(temporaryContainer)
+	if err != nil {
+		j.Logger.Error("could not inspect temporary container", zap.Error(err))
+		return false, err
+	}
+
+	j.Logger.Debug("removing the temporary container")
+	err = j.Controller.ContainerRemove(temporaryContainer)
+	if err != nil {
+		j.Logger.Error("failed to remove the temporary container", zap.Error(err))
+		return false, err
+	}
+
+	currentContainers, err := j.Controller.GetContainers(request.Name, docker.GetContainersOptions{Stopped: true})
 	if err != nil {
 		return false, err
 	}
 
-	if len(runningContainers) == 0 {
+	if len(currentContainers) == 0 {
 		return false, nil
 	}
 
-	containerConfig, err := j.Controller.ContainerInspect(runningContainers[0].ID)
+	containerConfig, err := j.Controller.ContainerInspect(currentContainers[0].ID)
 	if err != nil {
 		return false, err
 	}
 
-	isDifferent := j.Controller.IsConfigDifferent(containerConfig, comparisonContainer)
+	isDifferent := j.Controller.IsConfigDifferent(containerConfig, temporaryContainerConfig)
 	if !isDifferent {
 		return false, nil
 	}
@@ -51,6 +71,14 @@ func (j *JobRunner) DoesJobExist(jobName string) bool {
 }
 
 func (j *JobRunner) RunDeployment(stream pb.Dokkup_DeployJobServer, request *pb.Job) error {
+	j.Logger.Debug("attempting to pull image", zap.String("image", request.Container.Image))
+
+	stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Attempting to pull image: %s", request.Container.Image)})
+	err := j.Controller.ImagePull(request.Container.Image)
+	if err != nil {
+		return fmt.Errorf("failed to pull image: %w", err)
+	}
+
 	createdContainers, err := j.createContainersFromRequest(request, stream)
 	if err != nil {
 		return err
@@ -134,8 +162,16 @@ func (j *JobRunner) StopJob(request *pb.StopJobRequest, stream pb.Dokkup_StopJob
 }
 
 func (j *JobRunner) RunUpdate(request *pb.Job, stream pb.Dokkup_DeployJobServer) error {
+	j.Logger.Debug("attempting to pull image", zap.String("image", request.Container.Image))
+
+	stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Attempting to pull image: %s", request.Container.Image)})
+	err := j.Controller.ImagePull(request.Container.Image)
+	if err != nil {
+		return fmt.Errorf("failed to pull image: %w", err)
+	}
+
 	j.Logger.Debug("removing previous rollback containers")
-	err := j.Controller.DeleteRollbackContainers(request.Name)
+	err = j.Controller.DeleteRollbackContainers(request.Name)
 	if err != nil {
 		j.Logger.Error("could not remove previous rollback containers", zap.Error(err))
 		return err
