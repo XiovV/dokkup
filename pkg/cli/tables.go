@@ -87,7 +87,7 @@ func (a *App) showStopJobStatuses(jobStatuses []JobStatus, shouldPurge bool) err
 	var unavailableNodes int
 	for _, jobStatus := range jobStatuses {
 		if jobStatus.NodeStatus == NODE_STATUS_OFFLINE || jobStatus.NodeStatus == NODE_STATUS_UNAUTHENTICATED {
-			out := fmt.Sprintf("%s\t%s\t%d/%d\t%b", jobStatus.Node.Name, jobStatus.NodeStatus, 0, 0, false)
+			out := fmt.Sprintf("%s\t%s\t%d/%d\t%t", jobStatus.Node.Name, jobStatus.NodeStatus, 0, 0, false)
 			fmt.Fprintln(nodeStatusesTable, out)
 
 			unavailableNodes++
