@@ -14,6 +14,7 @@ func (s *Server) DeployJob(request *pb.Job, stream pb.Dokkup_DeployJobServer) er
 	s.Logger.Debug("does job already exist", zap.Bool("doesJobExist", doesJobExist))
 
 	if doesJobExist {
+
 		s.Logger.Debug("checking if the job should be updated")
 		shouldUpdate, err := s.JobRunner.ShouldUpdateJob(request)
 		if err != nil {
@@ -24,8 +25,26 @@ func (s *Server) DeployJob(request *pb.Job, stream pb.Dokkup_DeployJobServer) er
 		s.Logger.Debug("should update job", zap.Bool("shouldUpdate", shouldUpdate))
 
 		if !shouldUpdate {
-			s.Logger.Debug("nothing to do, exiting...")
-			stream.Send(&pb.DeployJobResponse{Message: "Already up to date"})
+			stoppedContainers, err := s.Controller.GetStoppedContainers(request.Name)
+			if err != nil {
+				s.Logger.Error("could not get stopped containers", zap.Error(err))
+				return err
+			}
+
+			if len(stoppedContainers) == 0 {
+				s.Logger.Debug("nothing to do, exiting...")
+				stream.Send(&pb.DeployJobResponse{Message: "Already up to date"})
+				return nil
+			}
+
+			for _, container := range stoppedContainers {
+				err := s.Controller.ContainerStart(container.ID)
+				if err != nil {
+					s.Logger.Error("could not start container", zap.Error(err), zap.String("containerId", container.ID))
+					return err
+				}
+			}
+
 			return nil
 		}
 

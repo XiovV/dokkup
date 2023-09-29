@@ -197,6 +197,27 @@ func (c *Controller) ContainerRemove(containerId string) error {
 	return c.cli.ContainerRemove(c.ctx, containerId, types.ContainerRemoveOptions{})
 }
 
+func (c *Controller) GetStoppedContainers(jobName string) ([]types.Container, error) {
+	containers, err := c.cli.ContainerList(c.ctx, types.ContainerListOptions{All: true})
+	if err != nil {
+		return nil, err
+	}
+
+	stoppedContainers := []types.Container{}
+	for _, container := range containers {
+		isRollback := strings.Contains(container.Names[0], "-rollback")
+		isTemporary := strings.Contains(container.Names[0], "-temporary")
+
+		if container.State == "running" || isRollback || isTemporary {
+			continue
+		}
+
+		stoppedContainers = append(stoppedContainers, container)
+	}
+
+	return stoppedContainers, nil
+}
+
 func (c *Controller) GetContainers(jobName string, options GetContainersOptions) ([]types.Container, error) {
 	if options.Rollback || options.Temporary {
 		options.Stopped = true

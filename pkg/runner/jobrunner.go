@@ -18,6 +18,11 @@ func NewJobRunner(controller *docker.Controller, logger *zap.Logger) *JobRunner 
 	return &JobRunner{Controller: controller, Logger: logger}
 }
 
+func (j *JobRunner) StartStoppedContainers(request *pb.Job) error {
+	_, err := j.Controller.GetStoppedContainers(request.Name)
+	return err
+}
+
 func (j *JobRunner) ShouldUpdateJob(request *pb.Job) (bool, error) {
 	j.Logger.Debug("creating temporary container")
 	temporaryContainer, err := j.Controller.CreateTemporaryContainer(request)
