@@ -18,9 +18,17 @@ func NewJobRunner(controller *docker.Controller, logger *zap.Logger) *JobRunner 
 	return &JobRunner{Controller: controller, Logger: logger}
 }
 
-func (j *JobRunner) StartStoppedContainers(request *pb.Job) error {
-	_, err := j.Controller.GetStoppedContainers(request.Name)
-	return err
+func (j *JobRunner) StartContainers(containers []types.Container, stream pb.Dokkup_DeployJobServer) error {
+	for i, container := range containers {
+		stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Starting container (%d/%d)", i+1, len(containers))})
+		err := j.Controller.ContainerStart(container.ID)
+		if err != nil {
+			j.Logger.Error("could not start container", zap.Error(err), zap.String("containerId", container.ID))
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (j *JobRunner) ShouldUpdateJob(request *pb.Job) (bool, error) {
@@ -128,7 +136,6 @@ func (j *JobRunner) StopJob(request *pb.StopJobRequest, stream pb.Dokkup_StopJob
 	}
 
 	if !request.Purge {
-		stream.Send(&pb.StopJobResponse{Message: "Job stopped successfully"})
 		return nil
 	}
 
