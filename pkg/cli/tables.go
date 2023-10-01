@@ -94,7 +94,7 @@ func (a *App) showStopJobStatuses(jobStatuses []JobStatus, shouldPurge bool) err
 			continue
 		}
 
-		out := fmt.Sprintf("%s\t%s\t%d/%d\t%t", jobStatus.Node.Name, NODE_STATUS_ONLINE, jobStatus.RunningContainers, jobStatus.TotalContainers, shouldPurge)
+		out := fmt.Sprintf("%s\t%s\t%d -> %d\t%t", jobStatus.Node.Name, NODE_STATUS_ONLINE, jobStatus.RunningContainers, 0, shouldPurge)
 		fmt.Fprintln(nodeStatusesTable, out)
 	}
 
