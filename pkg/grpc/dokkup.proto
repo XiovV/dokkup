@@ -63,4 +63,6 @@ message JobStatus {
   int32 totalContainers = 2;
   bool shouldUpdate = 3;
   bool canRollback = 4;
+  string currentVersion = 5;
+  string newVersion = 6;
 }

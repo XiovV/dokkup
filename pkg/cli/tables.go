@@ -15,17 +15,19 @@ type JobStatus struct {
 	TotalContainers   int
 	ShouldUpdate      bool
 	CanRollback       bool
+	CurrentVersion    string
+	NewVersion        string
 }
 
-func (a *App) showDeployJobStatuses(jobStatuses []JobStatus) error {
+func (a *App) showDeployJobStatuses(jobStatuses []JobStatus, job *config.Job) error {
 	fmt.Print("Node statuses:\n\n")
 	nodeStatusesTable := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
-	fmt.Fprintln(nodeStatusesTable, "NAME\tSTATUS\tCONTAINERS\tUPDATE")
+	fmt.Fprintln(nodeStatusesTable, "NAME\tSTATUS\tCONTAINERS\tUPDATE\tVERSION")
 
 	var unavailableNodes int
 	for _, jobStatus := range jobStatuses {
 		if jobStatus.NodeStatus == NODE_STATUS_OFFLINE || jobStatus.NodeStatus == NODE_STATUS_UNAUTHENTICATED {
-			out := fmt.Sprintf("%s\t%s\t%d/%d\t%t", jobStatus.Node.Name, jobStatus.NodeStatus, 0, 0, false)
+			out := fmt.Sprintf("%s\t%s\t%d/%d\t%t\t%s", jobStatus.Node.Name, jobStatus.NodeStatus, 0, 0, false, "")
 			fmt.Fprintln(nodeStatusesTable, out)
 
 			unavailableNodes++
@@ -34,11 +36,22 @@ func (a *App) showDeployJobStatuses(jobStatuses []JobStatus) error {
 
 		nodeName := jobStatus.Node.Name
 
-		if jobStatus.TotalContainers == 0 {
+		if jobStatus.TotalContainers == 0 && jobStatus.ShouldUpdate {
 			nodeName += "*"
+
+			out := fmt.Sprintf("%s\t%s\t%d -> %d\t%t\t%s", nodeName, NODE_STATUS_ONLINE, 0, job.Count, jobStatus.ShouldUpdate, jobStatus.NewVersion[:7])
+			fmt.Fprintln(nodeStatusesTable, out)
+			continue
+
 		}
 
-		out := fmt.Sprintf("%s\t%s\t%d/%d\t%t", nodeName, NODE_STATUS_ONLINE, jobStatus.RunningContainers, jobStatus.TotalContainers, jobStatus.ShouldUpdate)
+		if jobStatus.ShouldUpdate {
+			out := fmt.Sprintf("%s\t%s\t%d -> %d\t%t\t%s -> %s", nodeName, NODE_STATUS_ONLINE, 0, job.Count, jobStatus.ShouldUpdate, jobStatus.CurrentVersion[:7], jobStatus.NewVersion[:7])
+			fmt.Fprintln(nodeStatusesTable, out)
+			continue
+		}
+
+		out := fmt.Sprintf("%s\t%s\t%d/%d\t%t\t%s", nodeName, NODE_STATUS_ONLINE, jobStatus.RunningContainers, jobStatus.TotalContainers, jobStatus.ShouldUpdate, jobStatus.CurrentVersion[:7])
 		fmt.Fprintln(nodeStatusesTable, out)
 	}
 

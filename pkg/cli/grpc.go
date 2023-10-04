@@ -54,6 +54,8 @@ func (a *App) getJobStatus(job *config.Job, node config.Node) (JobStatus, error)
 		TotalContainers:   int(jobStatusResponse.TotalContainers),
 		ShouldUpdate:      jobStatusResponse.ShouldUpdate,
 		CanRollback:       jobStatusResponse.CanRollback,
+		CurrentVersion:    jobStatusResponse.CurrentVersion,
+		NewVersion:        jobStatusResponse.NewVersion,
 	}
 
 	return jobStatus, nil

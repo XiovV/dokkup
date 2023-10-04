@@ -3,9 +3,9 @@ module github.com/XiovV/dokkup
 go 1.20
 
 require (
+	github.com/cnf/structhash v0.0.0-20201127153200-e1b16c1ebc08
 	github.com/docker/docker v24.0.5+incompatible
 	github.com/docker/go-connections v0.4.0
-	github.com/golang/protobuf v1.5.3
 	github.com/google/uuid v1.3.0
 	github.com/gosuri/uilive v0.0.4
 	github.com/ilyakaznacheev/cleanenv v1.5.0
@@ -24,6 +24,7 @@ require (
 	github.com/docker/distribution v2.8.2+incompatible // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/moby/term v0.5.0 // indirect
