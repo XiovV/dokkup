@@ -46,7 +46,7 @@ func (a *App) showDeployJobStatuses(jobStatuses []JobStatus, job *config.Job) er
 		}
 
 		if jobStatus.ShouldUpdate {
-			out := fmt.Sprintf("%s\t%s\t%d -> %d\t%t\t%s -> %s", nodeName, NODE_STATUS_ONLINE, 0, job.Count, jobStatus.ShouldUpdate, jobStatus.CurrentVersion[:7], jobStatus.NewVersion[:7])
+			out := fmt.Sprintf("%s\t%s\t%d/%d\t%t\t%s -> %s", nodeName, NODE_STATUS_ONLINE, jobStatus.RunningContainers, jobStatus.TotalContainers, jobStatus.ShouldUpdate, jobStatus.CurrentVersion[:7], jobStatus.NewVersion[:7])
 			fmt.Fprintln(nodeStatusesTable, out)
 			continue
 		}
