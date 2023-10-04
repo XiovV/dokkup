@@ -57,13 +57,7 @@ func (a *App) showDeployJobStatuses(jobStatuses []JobStatus, job *config.Job) er
 
 	nodeStatusesTable.Flush()
 
-	if unavailableNodes == 1 {
-		fmt.Printf("\nWarning! It seems that there is %d unavailable node, it will be skipped.\n", unavailableNodes)
-	}
-
-	if unavailableNodes > 1 {
-		fmt.Printf("\nWarning! It seems that there are %d unavailable nodes, they will be skipped.\n", unavailableNodes)
-	}
+	a.showWarningMessage(unavailableNodes)
 
 	return nil
 }
@@ -113,13 +107,7 @@ func (a *App) showStopJobStatuses(jobStatuses []JobStatus, shouldPurge bool) err
 
 	nodeStatusesTable.Flush()
 
-	if unavailableNodes == 1 {
-		fmt.Printf("\nWarning! It seems that there is %d unavailable node, it will be skipped.\n", unavailableNodes)
-	}
-
-	if unavailableNodes > 1 {
-		fmt.Printf("\nWarning! It seems that there are %d unavailable nodes, they will be skipped.\n", unavailableNodes)
-	}
+	a.showWarningMessage(unavailableNodes)
 
 	return nil
 }
@@ -161,6 +149,12 @@ func (a *App) showRollbackJobStatuses(jobStatuses []JobStatus) error {
 
 	nodeStatusesTable.Flush()
 
+	a.showWarningMessage(unavailableNodes)
+
+	return nil
+}
+
+func (a *App) showWarningMessage(unavailableNodes int) {
 	if unavailableNodes == 1 {
 		fmt.Printf("\nWarning! It seems that there is %d unavailable node, it will be skipped.\n", unavailableNodes)
 	}
@@ -168,6 +162,4 @@ func (a *App) showRollbackJobStatuses(jobStatuses []JobStatus) error {
 	if unavailableNodes > 1 {
 		fmt.Printf("\nWarning! It seems that there are %d unavailable nodes, they will be skipped.\n", unavailableNodes)
 	}
-
-	return nil
 }
