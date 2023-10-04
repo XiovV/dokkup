@@ -25,16 +25,10 @@ func (s *Server) GetJobStatus(ctx context.Context, in *pb.Job) (*pb.JobStatus, e
 		s.Logger.Error("failed to create temporary container", zap.Error(err))
 		return nil, err
 	}
-	defer s.Controller.ContainerRemove(temporaryContainer)
 
-	s.Logger.Debug("temporary container created successfully", zap.String("containerId", temporaryContainer))
-	temporaryContainerConfig, err := s.Controller.ContainerInspect(temporaryContainer)
-	if err != nil {
-		s.Logger.Error("could not inspect temporary container", zap.Error(err))
-		return nil, err
-	}
+	s.Logger.Debug("temporary container created successfully", zap.String("containerId", temporaryContainer.ID))
 
-	newVersionHash := version.Hash(temporaryContainerConfig)
+	newVersionHash := version.Hash(temporaryContainer)
 
 	if len(totalContainers) == 0 {
 		response := &pb.JobStatus{
@@ -69,7 +63,7 @@ func (s *Server) GetJobStatus(ctx context.Context, in *pb.Job) (*pb.JobStatus, e
 	}
 
 	s.Logger.Debug("checking if configs are different")
-	isDifferent := s.Controller.IsConfigDifferent(containerConfig, temporaryContainerConfig)
+	isDifferent := s.Controller.IsConfigDifferent(containerConfig, temporaryContainer)
 
 	s.Logger.Debug("is config different", zap.Bool("isDifferent", isDifferent))
 

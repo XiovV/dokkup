@@ -116,15 +116,21 @@ func (c *Controller) ContainerSetupConfig(jobName string, config *pb.Container) 
 	}
 }
 
-func (c *Controller) CreateTemporaryContainer(request *pb.Job) (string, error) {
+func (c *Controller) CreateTemporaryContainer(request *pb.Job) (types.ContainerJSON, error) {
 	containerConfig := c.ContainerSetupConfig(request.Name, request.Container)
 
 	container, err := c.ContainerCreate(request.Name+"-temporary", containerConfig.Config, containerConfig.HostConfig)
 	if err != nil {
-		return "", err
+		return types.ContainerJSON{}, err
+	}
+	defer c.ContainerRemove(container.ID)
+
+	temporaryContainerConfig, err := c.ContainerInspect(container.ID)
+	if err != nil {
+		return types.ContainerJSON{}, err
 	}
 
-	return container.ID, nil
+	return temporaryContainerConfig, nil
 }
 
 func (c *Controller) ContainerDoesExist(containerName string) (bool, error) {

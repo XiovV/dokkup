@@ -39,19 +39,6 @@ func (j *JobRunner) ShouldUpdateJob(request *pb.Job) (bool, error) {
 		return false, err
 	}
 
-	temporaryContainerConfig, err := j.Controller.ContainerInspect(temporaryContainer)
-	if err != nil {
-		j.Logger.Error("could not inspect temporary container", zap.Error(err))
-		return false, err
-	}
-
-	j.Logger.Debug("removing the temporary container")
-	err = j.Controller.ContainerRemove(temporaryContainer)
-	if err != nil {
-		j.Logger.Error("failed to remove the temporary container", zap.Error(err))
-		return false, err
-	}
-
 	currentContainers, err := j.Controller.GetContainers(request.Name, docker.GetContainersOptions{Stopped: true})
 	if err != nil {
 		return false, err
@@ -66,7 +53,7 @@ func (j *JobRunner) ShouldUpdateJob(request *pb.Job) (bool, error) {
 		return false, err
 	}
 
-	isDifferent := j.Controller.IsConfigDifferent(containerConfig, temporaryContainerConfig)
+	isDifferent := j.Controller.IsConfigDifferent(containerConfig, temporaryContainer)
 	if !isDifferent {
 		return false, nil
 	}
