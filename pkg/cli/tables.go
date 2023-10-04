@@ -17,6 +17,7 @@ type JobStatus struct {
 	CanRollback       bool
 	CurrentVersion    string
 	NewVersion        string
+	OldVersion        string
 }
 
 func (a *App) showDeployJobStatuses(jobStatuses []JobStatus, job *config.Job) error {
@@ -42,7 +43,6 @@ func (a *App) showDeployJobStatuses(jobStatuses []JobStatus, job *config.Job) er
 			out := fmt.Sprintf("%s\t%s\t%d -> %d\t%t\t%s", nodeName, NODE_STATUS_ONLINE, 0, job.Count, jobStatus.ShouldUpdate, jobStatus.NewVersion[:7])
 			fmt.Fprintln(nodeStatusesTable, out)
 			continue
-
 		}
 
 		if jobStatus.ShouldUpdate {
@@ -127,12 +127,12 @@ func (a *App) showStopJobStatuses(jobStatuses []JobStatus, shouldPurge bool) err
 func (a *App) showRollbackJobStatuses(jobStatuses []JobStatus) error {
 	fmt.Print("Node statuses:\n\n")
 	nodeStatusesTable := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
-	fmt.Fprintln(nodeStatusesTable, "NAME\tSTATUS\tCONTAINERS\tROLLBACK")
+	fmt.Fprintln(nodeStatusesTable, "NAME\tSTATUS\tCONTAINERS\tROLLBACK\tVERSION")
 
 	var unavailableNodes int
 	for _, jobStatus := range jobStatuses {
 		if jobStatus.NodeStatus == NODE_STATUS_OFFLINE || jobStatus.NodeStatus == NODE_STATUS_UNAUTHENTICATED {
-			out := fmt.Sprintf("%s\t%s\t%d/%d\t%t", jobStatus.Node.Name, jobStatus.NodeStatus, 0, 0, false)
+			out := fmt.Sprintf("%s\t%s\t%d/%d\t%t\t%s", jobStatus.Node.Name, jobStatus.NodeStatus, 0, 0, false, "")
 			fmt.Fprintln(nodeStatusesTable, out)
 
 			unavailableNodes++
@@ -141,11 +141,21 @@ func (a *App) showRollbackJobStatuses(jobStatuses []JobStatus) error {
 
 		nodeName := jobStatus.Node.Name
 
-		if jobStatus.TotalContainers == 0 {
-			nodeName += "*"
+		if jobStatus.CanRollback {
+			out := fmt.Sprintf("%s\t%s\t%d/%d\t%t\t%s -> %s", nodeName, NODE_STATUS_ONLINE, jobStatus.RunningContainers, jobStatus.TotalContainers, jobStatus.CanRollback, jobStatus.CurrentVersion[:7], jobStatus.OldVersion[:7])
+			fmt.Fprintln(nodeStatusesTable, out)
+
+			continue
 		}
 
-		out := fmt.Sprintf("%s\t%s\t%d/%d\t%t", nodeName, NODE_STATUS_ONLINE, jobStatus.RunningContainers, jobStatus.TotalContainers, jobStatus.CanRollback)
+		if jobStatus.TotalContainers == 0 {
+			out := fmt.Sprintf("%s\t%s\t%d/%d\t%t\t%s", nodeName, NODE_STATUS_ONLINE, jobStatus.RunningContainers, jobStatus.TotalContainers, jobStatus.CanRollback, "")
+			fmt.Fprintln(nodeStatusesTable, out)
+
+			continue
+		}
+
+		out := fmt.Sprintf("%s\t%s\t%d/%d\t%t\t%s", nodeName, NODE_STATUS_ONLINE, jobStatus.RunningContainers, jobStatus.TotalContainers, jobStatus.CanRollback, jobStatus.CurrentVersion[:7])
 		fmt.Fprintln(nodeStatusesTable, out)
 	}
 

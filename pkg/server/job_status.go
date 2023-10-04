@@ -25,6 +25,7 @@ func (s *Server) GetJobStatus(ctx context.Context, in *pb.Job) (*pb.JobStatus, e
 		s.Logger.Error("failed to create temporary container", zap.Error(err))
 		return nil, err
 	}
+	defer s.Controller.ContainerRemove(temporaryContainer)
 
 	s.Logger.Debug("temporary container created successfully", zap.String("containerId", temporaryContainer))
 	temporaryContainerConfig, err := s.Controller.ContainerInspect(temporaryContainer)
@@ -32,8 +33,6 @@ func (s *Server) GetJobStatus(ctx context.Context, in *pb.Job) (*pb.JobStatus, e
 		s.Logger.Error("could not inspect temporary container", zap.Error(err))
 		return nil, err
 	}
-
-	defer s.Controller.ContainerRemove(temporaryContainer)
 
 	newVersionHash := version.Hash(temporaryContainerConfig)
 
@@ -69,8 +68,6 @@ func (s *Server) GetJobStatus(ctx context.Context, in *pb.Job) (*pb.JobStatus, e
 		return nil, err
 	}
 
-	currentVersionHash := version.Hash(containerConfig)
-
 	s.Logger.Debug("checking if configs are different")
 	isDifferent := s.Controller.IsConfigDifferent(containerConfig, temporaryContainerConfig)
 
@@ -78,13 +75,29 @@ func (s *Server) GetJobStatus(ctx context.Context, in *pb.Job) (*pb.JobStatus, e
 
 	s.Logger.Debug("should update job", zap.Bool("shouldUpdate", isDifferent))
 
+	currentVersionHash := version.Hash(containerConfig)
+
+	canRollback := len(rollbackContainers) != 0
+
+	var oldVersion string
+	if canRollback {
+		rollbackContainerConfig, err := s.Controller.ContainerInspect(rollbackContainers[0].ID)
+		if err != nil {
+			s.Logger.Debug("could not inspect rollback container", zap.Error(err), zap.String("containerId", rollbackContainerConfig.ID))
+			return nil, err
+		}
+
+		oldVersion = version.Hash(rollbackContainerConfig)
+	}
+
 	response := &pb.JobStatus{
 		TotalContainers:   int32(len(totalContainers)),
 		RunningContainers: int32(len(runningContainers)),
 		ShouldUpdate:      isDifferent,
-		CanRollback:       len(rollbackContainers) != 0,
+		CanRollback:       canRollback,
 		CurrentVersion:    currentVersionHash,
 		NewVersion:        newVersionHash,
+		OldVersion:        oldVersion,
 	}
 
 	return response, nil

@@ -56,6 +56,7 @@ func (a *App) getJobStatus(job *config.Job, node config.Node) (JobStatus, error)
 		CanRollback:       jobStatusResponse.CanRollback,
 		CurrentVersion:    jobStatusResponse.CurrentVersion,
 		NewVersion:        jobStatusResponse.NewVersion,
+		OldVersion:        jobStatusResponse.OldVersion,
 	}
 
 	return jobStatus, nil

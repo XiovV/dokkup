@@ -65,4 +65,5 @@ message JobStatus {
   bool canRollback = 4;
   string currentVersion = 5;
   string newVersion = 6;
+  string oldVersion = 7;
 }
