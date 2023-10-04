@@ -14,6 +14,5 @@ func (s *Server) StopJob(request *pb.StopJobRequest, stream pb.Dokkup_StopJobSer
 		return err
 	}
 
-	stream.Send(&pb.StopJobResponse{Message: "Job stopped successfully"})
 	return nil
 }

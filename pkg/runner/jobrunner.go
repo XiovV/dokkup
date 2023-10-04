@@ -112,6 +112,11 @@ func (j *JobRunner) StopJob(request *pb.StopJobRequest, stream pb.Dokkup_StopJob
 		return err
 	}
 
+	if len(containers) == 0 {
+		stream.Send(&pb.StopJobResponse{Message: "No running containers available"})
+		return nil
+	}
+
 	j.Logger.Info("stopping job containers")
 	for i, container := range containers {
 		stream.Send(&pb.StopJobResponse{Message: fmt.Sprintf("Stopping container (%d/%d)", i+1, len(containers))})
@@ -156,6 +161,8 @@ func (j *JobRunner) StopJob(request *pb.StopJobRequest, stream pb.Dokkup_StopJob
 			return err
 		}
 	}
+
+	stream.Send(&pb.StopJobResponse{Message: "Job stopped successfully"})
 
 	return nil
 }
