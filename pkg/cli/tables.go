@@ -101,7 +101,7 @@ func (a *App) showContainersTable(containers []*pb.ContainerInfo) {
 	fmt.Fprintln(nodeInfoTable, "CONTAINER ID\tNAME\tSTATUS\tPORTS")
 
 	for _, container := range containers {
-		out := fmt.Sprintf("%s\t%s\t%s\t%s", container.Id[:12], container.Name, container.Status, "TODO")
+		out := fmt.Sprintf("%s\t%s\t%s\t%s", container.Id[:12], container.Name, container.Status, container.Ports)
 		fmt.Fprintln(nodeInfoTable, out)
 	}
 
