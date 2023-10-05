@@ -6,7 +6,6 @@ service Dokkup {
   rpc DeployJob(Job) returns (stream DeployJobResponse) {}
   rpc StopJob(StopJobRequest) returns (stream StopJobResponse) {}
   rpc RollbackJob(Job) returns (stream RollbackJobResponse) {}
-  rpc GetNodeStatus(GetNodeStatusRequest) returns (NodeStatus) {}
   rpc GetJobStatus(Job) returns (JobStatus) {}
 }
 
@@ -46,16 +45,6 @@ message Container {
 message Port {
   string in = 1;
   string out = 2;
-}
-
-message GetNodeStatusRequest {
-
-}
-
-message NodeStatus {
-  int32 runningContainers = 1;
-  int32 totalContainers = 2;
-  bool shouldUpdate = 3;
 }
 
 message JobStatus {
