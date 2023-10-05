@@ -2,6 +2,8 @@ package server
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	pb "github.com/XiovV/dokkup/pkg/grpc"
 	"github.com/XiovV/dokkup/pkg/version"
@@ -41,10 +43,16 @@ func (s *Server) GetJobStatus(ctx context.Context, job *pb.Job) (*pb.JobStatus, 
 
 	containers := []*pb.ContainerInfo{}
 	for _, container := range jobContainers.TotalContainers {
+		ports := []string{}
+		for _, port := range container.Ports {
+			ports = append(ports, fmt.Sprintf("%s:%d->%d/%s", port.IP, port.PublicPort, port.PrivatePort, port.Type))
+		}
+
 		containers = append(containers, &pb.ContainerInfo{
 			Id:     container.ID,
 			Name:   container.Names[0][1:],
 			Status: container.Status,
+			Ports:  strings.Join(ports, ""),
 		})
 	}
 
