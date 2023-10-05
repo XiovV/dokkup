@@ -57,6 +57,8 @@ func (a *App) getJobStatus(job *config.Job, node config.Node) (JobStatus, error)
 		CurrentVersion:    jobStatusResponse.CurrentVersion,
 		NewVersion:        jobStatusResponse.NewVersion,
 		OldVersion:        jobStatusResponse.OldVersion,
+		Containers:        jobStatusResponse.Containers,
+		Image:             jobStatusResponse.Image,
 	}
 
 	return jobStatus, nil

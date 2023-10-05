@@ -8,17 +8,17 @@ import (
 	"go.uber.org/zap"
 )
 
-func (s *Server) GetJobStatus(ctx context.Context, in *pb.Job) (*pb.JobStatus, error) {
+func (s *Server) GetJobStatus(ctx context.Context, job *pb.Job) (*pb.JobStatus, error) {
 	s.Logger.Info("retreiving job status")
 
-	jobContainers, err := s.JobRunner.GetJobStatus(in)
+	jobContainers, err := s.JobRunner.GetJobStatus(job)
 	if err != nil {
 		s.Logger.Error("could not get job status", zap.Error(err))
 		return nil, err
 	}
 
 	s.Logger.Debug("creating temporary container")
-	temporaryContainer, err := s.Controller.CreateTemporaryContainer(in)
+	temporaryContainer, err := s.Controller.CreateTemporaryContainer(job)
 	if err != nil {
 		s.Logger.Error("failed to create temporary container", zap.Error(err))
 		return nil, err
@@ -28,7 +28,7 @@ func (s *Server) GetJobStatus(ctx context.Context, in *pb.Job) (*pb.JobStatus, e
 
 	newVersionHash := version.Hash(temporaryContainer)
 
-	if jobContainers.TotalContainers == 0 {
+	if len(jobContainers.TotalContainers) == 0 {
 		response := &pb.JobStatus{
 			ShouldUpdate: true,
 			NewVersion:   newVersionHash,
@@ -39,15 +39,26 @@ func (s *Server) GetJobStatus(ctx context.Context, in *pb.Job) (*pb.JobStatus, e
 
 	isDifferent := s.Controller.IsConfigDifferent(jobContainers.RunningContainerConfig, temporaryContainer)
 
+	containers := []*pb.ContainerInfo{}
+	for _, container := range jobContainers.TotalContainers {
+		containers = append(containers, &pb.ContainerInfo{
+			Id:     container.ID,
+			Name:   container.Names[0][1:],
+			Status: container.Status,
+		})
+	}
+
 	response := &pb.JobStatus{
-		TotalContainers:   int32(jobContainers.TotalContainers),
-		RunningContainers: int32(jobContainers.RunningContainers),
+		TotalContainers:   int32(len(jobContainers.TotalContainers)),
+		RunningContainers: int32(len(jobContainers.RunningContainers)),
 		ShouldUpdate:      isDifferent,
 		CurrentVersion:    version.Hash(jobContainers.RunningContainerConfig),
 		NewVersion:        newVersionHash,
+		Containers:        containers,
+		Image:             jobContainers.Image,
 	}
 
-	if jobContainers.RollbackContainers == 0 {
+	if len(jobContainers.RollbackContainers) == 0 {
 		response.CanRollback = false
 		return response, nil
 	}

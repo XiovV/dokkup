@@ -66,4 +66,13 @@ message JobStatus {
   string currentVersion = 5;
   string newVersion = 6;
   string oldVersion = 7;
+  repeated ContainerInfo containers = 8;
+  string image = 9;
+}
+
+message ContainerInfo {
+  string id = 1;
+  string name = 2;
+  string status = 3;
+  string ports = 4;
 }

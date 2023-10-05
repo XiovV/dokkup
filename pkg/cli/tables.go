@@ -5,6 +5,8 @@ import (
 	"os"
 	"text/tabwriter"
 
+	pb "github.com/XiovV/dokkup/pkg/grpc"
+
 	"github.com/XiovV/dokkup/pkg/config"
 )
 
@@ -18,6 +20,8 @@ type JobStatus struct {
 	CurrentVersion    string
 	NewVersion        string
 	OldVersion        string
+	Containers        []*pb.ContainerInfo
+	Image             string
 }
 
 func (a *App) showDeployJobStatuses(jobStatuses []JobStatus, job *config.Job) error {
@@ -72,6 +76,36 @@ func (a *App) showJobSummaryTable(job *config.Job) {
 	fmt.Fprintln(jobSummaryTable, out)
 
 	jobSummaryTable.Flush()
+}
+
+func (a *App) showJobInfoTable(jobStatuses []JobStatus, job *config.Job) {
+	for _, jobStatus := range jobStatuses {
+		a.showNodeInfoTable(jobStatus, job)
+		fmt.Print("\n\n")
+		a.showContainersTable(jobStatus.Containers)
+	}
+}
+
+func (a *App) showNodeInfoTable(jobStatus JobStatus, job *config.Job) {
+	nodeInfoTable := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
+	fmt.Fprintln(nodeInfoTable, "NODE\tLOCATION\tJOB\tIMAGE\tCONTAINERS\tVERSION")
+
+	out := fmt.Sprintf("%s\t%s\t%s\t%s\t%d/%d\t%s", jobStatus.Node.Name, jobStatus.Node.Location, job.Name, jobStatus.Image, jobStatus.RunningContainers, jobStatus.TotalContainers, jobStatus.CurrentVersion[:7])
+	fmt.Fprintln(nodeInfoTable, out)
+
+	nodeInfoTable.Flush()
+}
+
+func (a *App) showContainersTable(containers []*pb.ContainerInfo) {
+	nodeInfoTable := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
+	fmt.Fprintln(nodeInfoTable, "CONTAINER ID\tNAME\tSTATUS\tPORTS")
+
+	for _, container := range containers {
+		out := fmt.Sprintf("%s\t%s\t%s\t%s", container.Id[:12], container.Name, container.Status, "TODO")
+		fmt.Fprintln(nodeInfoTable, out)
+	}
+
+	nodeInfoTable.Flush()
 }
 
 func (a *App) showStopJobSummaryTable(job *config.Job) {
