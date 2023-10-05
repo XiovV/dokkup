@@ -79,10 +79,15 @@ func (a *App) showJobSummaryTable(job *config.Job) {
 }
 
 func (a *App) showJobInfoTable(jobStatuses []JobStatus, job *config.Job) {
-	for _, jobStatus := range jobStatuses {
+	for i, jobStatus := range jobStatuses {
 		a.showNodeInfoTable(jobStatus, job)
-		fmt.Print("\n\n")
+
+		fmt.Print("\n")
+
 		a.showContainersTable(jobStatus.Containers)
+		if i < len(jobStatuses)-1 {
+			fmt.Print("\n\n")
+		}
 	}
 }
 
