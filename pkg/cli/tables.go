@@ -24,7 +24,7 @@ type JobStatus struct {
 	Image             string
 }
 
-func (a *App) showDeployJobStatuses(jobStatuses []JobStatus, job *config.Job) error {
+func (a *App) showDeployJobStatuses(jobStatuses []JobStatus, job *config.Job) {
 	fmt.Print("Node statuses:\n\n")
 	nodeStatusesTable := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
 	fmt.Fprintln(nodeStatusesTable, "NAME\tSTATUS\tCONTAINERS\tUPDATE\tVERSION")
@@ -62,8 +62,6 @@ func (a *App) showDeployJobStatuses(jobStatuses []JobStatus, job *config.Job) er
 	nodeStatusesTable.Flush()
 
 	a.showWarningMessage(unavailableNodes)
-
-	return nil
 }
 
 func (a *App) showJobSummaryTable(job *config.Job) {
