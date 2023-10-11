@@ -13,7 +13,7 @@ import (
 func (s *Server) GetJobStatus(ctx context.Context, job *pb.Job) (*pb.JobStatus, error) {
 	s.Logger.Info("retreiving job status")
 
-	jobContainers, err := s.JobRunner.GetJobStatus(job)
+	jobStatus, err := s.JobRunner.GetJobStatus(job)
 	if err != nil {
 		s.Logger.Error("could not get job status", zap.Error(err))
 		return nil, err
@@ -30,7 +30,7 @@ func (s *Server) GetJobStatus(ctx context.Context, job *pb.Job) (*pb.JobStatus, 
 
 	newVersionHash := version.Hash(temporaryContainer)
 
-	if len(jobContainers.TotalContainers) == 0 {
+	if len(jobStatus.TotalContainers) == 0 {
 		response := &pb.JobStatus{
 			ShouldUpdate: true,
 			NewVersion:   newVersionHash,
@@ -39,10 +39,10 @@ func (s *Server) GetJobStatus(ctx context.Context, job *pb.Job) (*pb.JobStatus, 
 		return response, nil
 	}
 
-	isDifferent := s.Controller.IsConfigDifferent(jobContainers.RunningContainerConfig, temporaryContainer)
+	isDifferent := s.Controller.IsConfigDifferent(jobStatus.RunningContainerConfig, temporaryContainer)
 
 	containers := []*pb.ContainerInfo{}
-	for _, container := range jobContainers.TotalContainers {
+	for _, container := range jobStatus.TotalContainers {
 		ports := []string{}
 		for _, port := range container.Ports {
 			ports = append(ports, fmt.Sprintf("%s:%d->%d/%s", port.IP, port.PublicPort, port.PrivatePort, port.Type))
@@ -57,22 +57,22 @@ func (s *Server) GetJobStatus(ctx context.Context, job *pb.Job) (*pb.JobStatus, 
 	}
 
 	response := &pb.JobStatus{
-		TotalContainers:   int32(len(jobContainers.TotalContainers)),
-		RunningContainers: int32(len(jobContainers.RunningContainers)),
+		TotalContainers:   int32(len(jobStatus.TotalContainers)),
+		RunningContainers: int32(len(jobStatus.RunningContainers)),
 		ShouldUpdate:      isDifferent,
-		CurrentVersion:    version.Hash(jobContainers.RunningContainerConfig),
+		CurrentVersion:    version.Hash(jobStatus.RunningContainerConfig),
 		NewVersion:        newVersionHash,
 		Containers:        containers,
-		Image:             jobContainers.Image,
+		Image:             jobStatus.Image,
 	}
 
-	if len(jobContainers.RollbackContainers) == 0 {
+	if len(jobStatus.RollbackContainers) == 0 {
 		response.CanRollback = false
 		return response, nil
 	}
 
 	response.CanRollback = true
-	response.OldVersion = version.Hash(jobContainers.RollbackContainerConfig)
+	response.OldVersion = version.Hash(jobStatus.RollbackContainerConfig)
 
 	return response, nil
 }
