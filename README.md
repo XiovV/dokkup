@@ -218,15 +218,15 @@ demo     crccheck/hello-world     always      2         labs      bridge
 
 Node statuses:
 
-NAME     STATUS     CONTAINERS     UPDATE
-lab1     ONLINE     2/2            true
-lab2     ONLINE     2/2            true
+NAME     STATUS     CONTAINERS     UPDATE     VERSION
+lab1     ONLINE     2/2            true       55dab35 -> 9470cdc
+lab2     ONLINE     2/2            true       55dab35 -> 9470cdc
 
 Are you sure you want to proceed? (y/n) 
 ```
 Note: we omitted the -i inventory.yaml flag because dokkup automatically loads files called `inventory.yaml`.
 
-The update status is now true, meaning that dokkup is going to take down the currently running containers and deploy new ones. If something goes wrong during the update, dokkup will abort and run the old containers, ensuring minimum downtime in case something goes wrong.
+The update status is now true, meaning that dokkup is going to take down the currently running containers and deploy new ones. If something goes wrong during the update, dokkup will abort and run the old containers, ensuring minimum downtime in case something goes wrong. It also shows the new version hash.
 
 ## Canary update
 This is work in progress.
