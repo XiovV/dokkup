@@ -142,8 +142,6 @@ Are you sure you want to proceed? (y/n)
 
 The CLI will show a deployment summary, showing some basic information about the job and the container you are about to deploy. And it will display the nodes on which the job will be deployed. The asterisk next to the node name signifies that a job will be deployed from scratch.
 
-TODO: Show gif of the deployment process here.
-
 Now we can run `docker ps` on our nodes and see our containers (this is for demonstration purposes, you don't have to do this):
 ```shell
 $ docker ps
@@ -180,8 +178,6 @@ lab2     ONLINE     2/2            false
 Are you sure you want to proceed? (y/n) 
 ```
 The CLI will show how many containers are running and the update status which will signify if the job is going to be updated or not.
-
-TODO: insert gif of "already up to date" clip
 
 # Managing jobs
 
@@ -230,8 +226,6 @@ Note: we omitted the -i inventory.yaml flag because dokkup automatically loads f
 
 The update status is now true, meaning that dokkup is going to take down the currently running containers and deploy new ones. If something goes wrong during the update, dokkup will abort and run the old containers, ensuring minimum downtime in case something goes wrong.
 
-TODO: insert gif of the update process
-
 ## Canary update
 This is work in progress.
 
@@ -254,8 +248,6 @@ lab2     ONLINE     2/2            true
 
 Are you sure you want to proceed? (y/n)
 ```
-
-TODO: insert gif of the rollback process
 
 In case you've never done an update, the rollback field will be set to false, meaning that dokkup will not be able to do a rollback as there's no previous state to return to. 
 
