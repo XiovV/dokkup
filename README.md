@@ -23,6 +23,7 @@ It's ideal for use cases where you want to orchestrate containers accross one or
   - [Rollback](#rollback-a-job)
   - [Stop](#stop-a-job)
   - [Remove/purge](#removepurge-a-job)
+- [Show job status](#show-job-status)
 
 # Setup
 dokkup consists of two parts: the `agent` which runs on your servers, and the CLI tool which runs on your personal machine.
