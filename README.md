@@ -254,7 +254,7 @@ Are you sure you want to proceed? (y/n)
 In case you've never done an update, the rollback field will be set to false, meaning that dokkup will not be able to do a rollback as there's no previous state to return to. 
 
 ## Stop a job
-If you wish to stop a job, you can do so with the `dokkup stop job command`:
+If you wish to stop a job, you can do so with the `dokkup stop job` command:
 ```shell
 $ dokkup stop job demo.yaml
 ```
@@ -298,3 +298,28 @@ Are you sure you want to proceed? (y/n)
 The --purge flag will tell the `agent` to delete the containers after stopping them first.
 
 Note: The rollback command will not undo a purge, so be careful when running this command. The only way to return the containers is by running a deployment from scratch.
+
+# Show job status 
+If you would like to get some information about a job, you can do so with the `dokkup show job` command:
+
+```
+$ dokkup show job demo.yaml
+```
+```
+NODE     LOCATION              JOB      IMAGE                    CONTAINERS     VERSION
+lab1     192.168.0.99:8080     demo     crccheck/hello-world     2/2            9470cdc
+
+CONTAINER ID     NAME                                          STATUS                     PORTS
+99294b42a89d     demo-bbf84ca7-0a2b-4c65-9f39-f77fb8ce3624     Up 8 minutes (healthy)     0.0.0.0:32773->8000/tcp
+28de75e833c0     demo-a9e8525a-103a-4749-b441-df676976b62d     Up 8 minutes (healthy)     0.0.0.0:32772->8000/tcp
+
+
+NODE     LOCATION               JOB      IMAGE                    CONTAINERS     VERSION
+lab2     192.168.0.100:8080     demo     crccheck/hello-world     2/2            9470cdc
+
+CONTAINER ID     NAME                                          STATUS                     PORTS
+dc5fd3c210ed     demo-53fec61f-3eb6-4666-86d4-1d96b22d1291     Up 8 minutes (healthy)     0.0.0.0:32773->8000/tcp
+9d51076ddd5a     demo-28949bc3-fc57-46b0-8c36-86b06d8a2228     Up 8 minutes (healthy)     0.0.0.0:32772->8000/tcp
+```
+
+This will show the nodes which the job is running on, along with the job name, image, how many containers are running and the version of the job. It will also display some basic information about each container, such as the ID, name, status and the exposed ports.
