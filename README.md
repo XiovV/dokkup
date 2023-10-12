@@ -1,10 +1,10 @@
 # Overview
-dokkup is a simple container orchestration tool, designed to make managing containers across a cluster of servers as simple as possible.
+dokkup is a container orchestrator designed to make managing containers across a cluster of servers as simple as possible.
 
 It's ideal for use cases where you want to orchestrate containers accross one or multiple servers. Think of it as Nomad, Swarm or Kubernetes, but easier to use. 
 
 # Features
-- **Easy to use** - You can go from having a bunch of bare servers to production ready infrastructure in a matter of minutes.
+- **Easy to use** - Build production-ready infrastructure from bare servers in a matter of minutes.  
 - **Zero downtime** - Dokkup will ensure zero downtime while updating containers or in the event that something goes wrong.
 - **No master node** - There is no need for setting up a server just for a master node, your personal machine is all you need.
 - **Sky is the limit** - Got only one server? No problem. Got 10,000 servers? No problem.
