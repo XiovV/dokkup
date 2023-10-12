@@ -12,7 +12,7 @@ It's ideal for use cases where you want to orchestrate containers accross one or
 # Table of contents
 - [Setup](#setup)
   - [Agent setup](#agent)
-  - [CLI Setup](#cli)
+  - [CLI setup](#cli)
 - [Deploying jobs](#deploying-jobs)
   - [Inventory file](#inventory)
   - [Job specificaton](#job)
