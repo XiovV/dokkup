@@ -262,17 +262,18 @@ $ dokkup stop job demo.yaml
 Stop job summary:
 
 NAME     IMAGE                    GROUP
-test     crccheck/hello-world     local
+demo     crccheck/hello-world     labs
 
 Node statuses:
 
-NAME          STATUS     CONTAINERS     PURGE
-localNode     ONLINE     2/2            false
+NAME     STATUS     CONTAINERS     PURGE
+lab1     ONLINE     2 -> 0         false
+lab2     ONLINE     2 -> 0         false
 
-Are you sure you want to proceed? (y/n)
+Are you sure you want to proceed? (y/n) 
 ```
 
-The CLI tool will show how many containers it's going to stop. Keep in mind that this will not remove the containers, it will only stop them. If you wish to remove the containers as well, take a look at the next chapter.
+The CLI tool will show how many containers it's going to stop. Keep in mind that this will not remove the containers, it will only stop them (the PURGE flag is set to false). If you wish to remove the containers as well, take a look at [Remove/purge](#removepurge-a-job).
 
 ## Remove/purge a job
 If you wish to completely remove a job from your cluster of servers, you can do so with the `dokkup stop job --purge demo.yaml`:
