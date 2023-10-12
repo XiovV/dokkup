@@ -244,11 +244,11 @@ demo     crccheck/hello-world     always      2         labs      bridge
 
 Node statuses:
 
-NAME     STATUS     CONTAINERS     ROLLBACK
-lab1     ONLINE     2/2            true
-lab2     ONLINE     2/2            true
+NAME     STATUS     CONTAINERS     ROLLBACK     VERSION
+lab1     ONLINE     2/2            true         9470cdc -> 55dab35
+lab2     ONLINE     2/2            true         9470cdc -> 55dab35
 
-Are you sure you want to proceed? (y/n)
+Are you sure you want to proceed? (y/n) 
 ```
 
 In case you've never done an update, the rollback field will be set to false, meaning that dokkup will not be able to do a rollback as there's no previous state to return to. 
