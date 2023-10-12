@@ -131,16 +131,17 @@ demo     crccheck/hello-world     always      2         labs      bridge
 
 Node statuses:
 
-NAME      STATUS     CONTAINERS     UPDATE
-lab1*     ONLINE     0/0            true
-lab2*     ONLINE     0/0            true
+NAME      STATUS     CONTAINERS     UPDATE     VERSION
+lab1*     ONLINE     0 -> 2         true       55dab35
+lab2*     ONLINE     0 -> 2         true       55dab35
 
 Are you sure you want to proceed? (y/n) 
 ```
+
 - Tip 1: If there's an `inventory.yaml` in your current directory, you can omit the -i flag, dokkup loads `inventory.yaml` files by default. 
 - Tip 2: You can provide a -y or --yes flag to skip the confirmation prompt.
 
-The CLI will show a deployment summary, showing some basic information about the job and the container you are about to deploy. And it will display the nodes on which the job will be deployed. The asterisk next to the node name signifies that a job will be deployed from scratch.
+The CLI will show a deployment summary, showing some basic information about the job, such as how many containers it's going to run and the hashed version tag of the job, along with the nodes on which the job will be deployed. The asterisk next to the node name signifies that a job will be deployed from scratch.
 
 Now we can run `docker ps` on our nodes and see our containers (this is for demonstration purposes, you don't have to do this):
 ```shell
@@ -171,11 +172,12 @@ demo     crccheck/hello-world     always      2         labs      bridge
 
 Node statuses:
 
-NAME     STATUS     CONTAINERS     UPDATE
-lab1     ONLINE     2/2            false
-lab2     ONLINE     2/2            false
+NAME     STATUS     CONTAINERS     UPDATE     VERSION
+lab1     ONLINE     2/2            false      55dab35
+lab2     ONLINE     2/2            false      55dab35
 
 Are you sure you want to proceed? (y/n) 
+
 ```
 The CLI will show how many containers are running and the update status which will signify if the job is going to be updated or not.
 
