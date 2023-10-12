@@ -19,6 +19,7 @@ It's ideal for use cases where you want to orchestrate containers accross one or
   - [Deploy a job](#deploy-a-job)
 - [Managing jobs](#managing-jobs)
   - [Update](#update-a-job)
+  - [Canary update](#canary-update)
   - [Rollback](#rollback-a-job)
   - [Stop](#stop-a-job)
   - [Remove/purge](#removepurge-a-job)
@@ -230,6 +231,9 @@ Note: we omitted the -i inventory.yaml flag because dokkup automatically loads f
 The update status is now true, meaning that dokkup is going to take down the currently running containers and deploy new ones. If something goes wrong during the update, dokkup will abort and run the old containers, ensuring minimum downtime in case something goes wrong.
 
 TODO: insert gif of the update process
+
+## Canary update
+This is work in progress.
 
 ## Rollback a job
 In case you want to rollback an update (for example: you notice a serious issue with your new containers and want to return to the previous state as soon as possible), you can do so with the `dokkup rollback job` command:
