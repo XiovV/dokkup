@@ -24,10 +24,7 @@ func (a *App) jobCmd(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	err = a.showDeployJobStatuses(jobStatuses, job)
-	if err != nil {
-		log.Fatal("couldn't show node statuses: ", err)
-	}
+	a.showDeployJobStatuses(jobStatuses, job)
 
 	shouldContinue, err := a.showConfirmationPrompt(ctx)
 	if err != nil {
