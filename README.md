@@ -66,7 +66,27 @@ cd dokkup/cmd/dokkup
 go install
 ```
 
-Run `dokkup` in your terminal to verify it's installed.
+Run `dokkup` in your terminal to verify it's installed:
+```shell
+$ dokkup
+```
+```
+NAME:
+   dokkup - manage your containers with ease
+
+USAGE:
+   dokkup [global options] command [command options] [arguments...]
+
+COMMANDS:
+   run, r       Deploy, update or start containers
+   stop, s      Stop or remove a job
+   rollback, r  Rollback an update
+   show, s      Show the status of a running job
+   help, h      Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --help, -h  show help
+```
 
 # Deploying jobs
 Before we can start deploying jobs, we need an inventory and a job file.
