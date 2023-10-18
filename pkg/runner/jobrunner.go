@@ -31,21 +31,16 @@ func (j *JobRunner) StartContainers(containers []types.Container, stream pb.Dokk
 	return nil
 }
 
-func (j *JobRunner) ShouldUpdateJob(request *pb.Job) (bool, error) {
+func (j *JobRunner) ShouldUpdateJob(request *pb.Job, currentContainers []types.Container) (bool, error) {
+	if len(currentContainers) == 0 {
+		return false, nil
+	}
+
 	j.Logger.Debug("creating temporary container")
 	temporaryContainer, err := j.Controller.CreateTemporaryContainer(request)
 	if err != nil {
 		j.Logger.Error("failed to create temporary container", zap.Error(err))
 		return false, err
-	}
-
-	currentContainers, err := j.Controller.GetContainers(request.Name, docker.GetContainersOptions{Stopped: true})
-	if err != nil {
-		return false, err
-	}
-
-	if len(currentContainers) == 0 {
-		return false, nil
 	}
 
 	containerConfig, err := j.Controller.ContainerInspect(currentContainers[0].ID)
@@ -70,6 +65,15 @@ func (j *JobRunner) DoesJobExist(jobName string) bool {
 	return len(containers) != 0
 }
 
+func (j *JobRunner) UpscaleJob(count int, request *pb.Job, stream pb.Dokkup_DeployJobServer) error {
+	createdContainers, err := j.createContainersFromRequest(count, request, stream)
+	if err != nil {
+		return err
+	}
+
+	return j.startContainers(createdContainers, stream)
+}
+
 func (j *JobRunner) RunDeployment(stream pb.Dokkup_DeployJobServer, request *pb.Job) error {
 	j.Logger.Debug("attempting to pull image", zap.String("image", request.Container.Image))
 
@@ -79,7 +83,7 @@ func (j *JobRunner) RunDeployment(stream pb.Dokkup_DeployJobServer, request *pb.
 		return fmt.Errorf("failed to pull image: %w", err)
 	}
 
-	createdContainers, err := j.createContainersFromRequest(request, stream)
+	createdContainers, err := j.createContainersFromRequest(int(request.Count), request, stream)
 	if err != nil {
 		return err
 	}
@@ -87,9 +91,9 @@ func (j *JobRunner) RunDeployment(stream pb.Dokkup_DeployJobServer, request *pb.
 	return j.startContainers(createdContainers, stream)
 }
 
-func (j *JobRunner) createContainersFromRequest(request *pb.Job, stream pb.Dokkup_DeployJobServer) ([]string, error) {
+func (j *JobRunner) createContainersFromRequest(count int, request *pb.Job, stream pb.Dokkup_DeployJobServer) ([]string, error) {
 	createdContainers := []string{}
-	for i := 0; i < int(request.Count); i++ {
+	for i := 0; i < count; i++ {
 		stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Configuring container (%d/%d)", i+1, request.Count)})
 		containerConfig := j.Controller.ContainerSetupConfig(request.Name, request.Container)
 
@@ -196,7 +200,7 @@ func (j *JobRunner) RunUpdate(request *pb.Job, stream pb.Dokkup_DeployJobServer)
 	}
 
 	j.Logger.Debug("creating new containers")
-	newContainers, err := j.createContainersFromRequest(request, stream)
+	newContainers, err := j.createContainersFromRequest(int(request.Count), request, stream)
 	if err != nil {
 		j.Logger.Error("failed to create new containers", zap.Error(err))
 		return err

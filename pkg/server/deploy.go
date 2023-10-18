@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/XiovV/dokkup/pkg/docker"
 	pb "github.com/XiovV/dokkup/pkg/grpc"
 	"go.uber.org/zap"
 )
@@ -25,8 +26,20 @@ func (s *Server) DeployJob(request *pb.Job, stream pb.Dokkup_DeployJobServer) er
 		return nil
 	}
 
+	currentContainers, err := s.Controller.GetContainers(request.Name, docker.GetContainersOptions{Stopped: true})
+	if err != nil {
+		s.Logger.Error("could not get current containers", zap.Error(err))
+		return err
+	}
+
+	if int(request.Count) > len(currentContainers) {
+		s.Logger.Debug("upscaling job", zap.Int("currentCount", len(currentContainers)), zap.Int("targetCount", int(request.Count)))
+		count := int(request.Count) - len(currentContainers)
+		return s.JobRunner.UpscaleJob(count, request, stream)
+	}
+
 	s.Logger.Debug("checking if the job should be updated")
-	shouldUpdate, err := s.JobRunner.ShouldUpdateJob(request)
+	shouldUpdate, err := s.JobRunner.ShouldUpdateJob(request, currentContainers)
 	if err != nil {
 		s.Logger.Error("failed to check if an update should be run", zap.Error(err))
 		return err
