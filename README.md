@@ -275,6 +275,9 @@ container:
    # networks:
    # - mynetwork
 ```
+```shell
+$ dokkup run job demo.yaml
+```
 ```
 Deployment summary:
 
