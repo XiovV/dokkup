@@ -56,6 +56,10 @@ func (s *Server) GetJobStatus(ctx context.Context, job *pb.Job) (*pb.JobStatus, 
 		})
 	}
 
+	if len(jobStatus.TotalContainers) != int(job.Count) {
+		isDifferent = true
+	}
+
 	response := &pb.JobStatus{
 		TotalContainers:   int32(len(jobStatus.TotalContainers)),
 		RunningContainers: int32(len(jobStatus.RunningContainers)),
