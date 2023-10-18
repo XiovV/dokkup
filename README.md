@@ -255,6 +255,7 @@ This is work in progress.
 
 ## Upscale or downscale a job
 In case you want to change the number of running containers, you can do so by changing the `count` field in your job specification, then run the `dokkup run job` command: 
+`demo.yaml`
 ```yaml
 group: "labs"
 # count: 2
