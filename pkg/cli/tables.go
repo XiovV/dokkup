@@ -89,7 +89,7 @@ func (a *App) showJobInfoTable(jobStatuses []JobStatus, job *config.Job) {
 
 		fmt.Print("\n")
 
-		if jobStatus.NodeStatus == NODE_STATUS_OFFLINE || jobStatus.NodeStatus == NODE_STATUS_UNAUTHENTICATED {
+		if jobStatus.NodeStatus == NODE_STATUS_OFFLINE || jobStatus.NodeStatus == NODE_STATUS_UNAUTHENTICATED || jobStatus.CurrentVersion == "" {
 			continue
 		}
 
@@ -105,7 +105,7 @@ func (a *App) showNodeInfoTable(jobStatus JobStatus, job *config.Job) {
 	fmt.Fprintln(nodeInfoTable, "NODE\tLOCATION\tSTATUS\tJOB\tIMAGE\tCONTAINERS\tVERSION")
 
 	currentVersion := ""
-	if jobStatus.NodeStatus != NODE_STATUS_OFFLINE && jobStatus.NodeStatus != NODE_STATUS_UNAUTHENTICATED {
+	if jobStatus.NodeStatus != NODE_STATUS_OFFLINE && jobStatus.NodeStatus != NODE_STATUS_UNAUTHENTICATED && jobStatus.CurrentVersion != "" {
 		currentVersion = jobStatus.CurrentVersion[:7]
 	}
 
