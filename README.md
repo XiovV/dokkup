@@ -20,6 +20,7 @@ It's ideal for use cases where you want to orchestrate containers accross one or
 - [Managing jobs](#managing-jobs)
   - [Update](#update-a-job)
   - [Canary update](#canary-update)
+  - [Scaling](#upscale-or-downscale-a-job)
   - [Rollback](#rollback-a-job)
   - [Stop](#stop-a-job)
   - [Remove/purge](#removepurge-a-job)
@@ -251,6 +252,42 @@ The update status is now true, meaning that dokkup is going to take down the cur
 
 ## Canary update
 This is work in progress.
+
+## Upscale or downscale a job
+In case you want to change the number of running containers, you can do so by changing the `count` field in your job specification, then run the `dokkup run job` command: 
+```yaml
+group: "labs"
+# count: 2
+count: 5
+name: "demo"
+
+container:
+ - image: "crccheck/hello-world"
+   ports:
+    - in: 8000
+   restart: always 
+   labels:
+     - "my.label.test=demo"
+   environment:
+     - MYENV=ENVEXAMPLE
+   volumes:
+     - myvolume:/home
+   # networks:
+   # - mynetwork
+```
+```
+Deployment summary:
+
+NAME     IMAGE                    RESTART     COUNT     GROUP     NETWORK
+test     crccheck/hello-world     always      5         local     bridge
+
+Node statuses:
+
+NAME          STATUS     CONTAINERS     UPDATE     VERSION
+localNode     ONLINE     2 -> 5         true       fecc924
+
+Are you sure you want to proceed? (y/n) 
+```
 
 ## Rollback a job
 In case you want to rollback an update (for example: you notice a serious issue with your new containers and want to return to the previous state as soon as possible), you can do so with the `dokkup rollback job` command:
