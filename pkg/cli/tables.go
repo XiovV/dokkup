@@ -89,6 +89,10 @@ func (a *App) showJobInfoTable(jobStatuses []JobStatus, job *config.Job) {
 
 		fmt.Print("\n")
 
+		if jobStatus.NodeStatus == NODE_STATUS_OFFLINE || jobStatus.NodeStatus == NODE_STATUS_UNAUTHENTICATED {
+			continue
+		}
+
 		a.showContainersTable(jobStatus.Containers)
 		if i < len(jobStatuses)-1 {
 			fmt.Print("\n\n")
@@ -98,9 +102,14 @@ func (a *App) showJobInfoTable(jobStatuses []JobStatus, job *config.Job) {
 
 func (a *App) showNodeInfoTable(jobStatus JobStatus, job *config.Job) {
 	nodeInfoTable := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
-	fmt.Fprintln(nodeInfoTable, "NODE\tLOCATION\tJOB\tIMAGE\tCONTAINERS\tVERSION")
+	fmt.Fprintln(nodeInfoTable, "NODE\tLOCATION\tSTATUS\tJOB\tIMAGE\tCONTAINERS\tVERSION")
 
-	out := fmt.Sprintf("%s\t%s\t%s\t%s\t%d/%d\t%s", jobStatus.Node.Name, jobStatus.Node.Location, job.Name, jobStatus.Image, jobStatus.RunningContainers, jobStatus.TotalContainers, jobStatus.CurrentVersion[:7])
+	currentVersion := ""
+	if jobStatus.NodeStatus != NODE_STATUS_OFFLINE && jobStatus.NodeStatus != NODE_STATUS_UNAUTHENTICATED {
+		currentVersion = jobStatus.CurrentVersion[:7]
+	}
+
+	out := fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%d/%d\t%s", jobStatus.Node.Name, jobStatus.Node.Location, jobStatus.NodeStatus, job.Name, jobStatus.Image, jobStatus.RunningContainers, jobStatus.TotalContainers, currentVersion)
 	fmt.Fprintln(nodeInfoTable, out)
 
 	nodeInfoTable.Flush()
