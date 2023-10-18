@@ -289,6 +289,7 @@ lab2          ONLINE     2 -> 5         true       55dab32
 
 Are you sure you want to proceed? (y/n) 
 ```
+This will upscale the job, meaning that the agent will keep the already running containers and start up 3 more containers. Conversely, if you were to reduce the `count` value, the agent will remove the extra containers, effectively downscaling the job.
 
 ## Rollback a job
 In case you want to rollback an update (for example: you notice a serious issue with your new containers and want to return to the previous state as soon as possible), you can do so with the `dokkup rollback job` command:
