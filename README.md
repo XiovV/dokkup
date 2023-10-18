@@ -284,7 +284,8 @@ test     crccheck/hello-world     always      5         local     bridge
 Node statuses:
 
 NAME          STATUS     CONTAINERS     UPDATE     VERSION
-localNode     ONLINE     2 -> 5         true       fecc924
+lab1          ONLINE     2 -> 5         true       55dab32
+lab2          ONLINE     2 -> 5         true       55dab32
 
 Are you sure you want to proceed? (y/n) 
 ```
