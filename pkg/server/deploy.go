@@ -34,8 +34,17 @@ func (s *Server) DeployJob(request *pb.Job, stream pb.Dokkup_DeployJobServer) er
 
 	if int(request.Count) > len(currentContainers) {
 		s.Logger.Debug("upscaling job", zap.Int("currentCount", len(currentContainers)), zap.Int("targetCount", int(request.Count)))
+
 		count := int(request.Count) - len(currentContainers)
 		return s.JobRunner.UpscaleJob(count, request, stream)
+	}
+
+	if int(request.Count) < len(currentContainers) {
+		s.Logger.Debug("downscaling job", zap.Int("currentCount", len(currentContainers)), zap.Int("targetCount", int(request.Count)))
+
+		count := len(currentContainers) - int(request.Count)
+
+		return s.JobRunner.DownscaleJob(count, currentContainers, stream)
 	}
 
 	s.Logger.Debug("checking if the job should be updated")

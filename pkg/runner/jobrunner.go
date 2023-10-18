@@ -74,6 +74,30 @@ func (j *JobRunner) UpscaleJob(count int, request *pb.Job, stream pb.Dokkup_Depl
 	return j.startContainers(createdContainers, stream)
 }
 
+func (j *JobRunner) DownscaleJob(count int, currentContainers []types.Container, stream pb.Dokkup_DeployJobServer) error {
+	j.Logger.Info("stopping job containers")
+	for i := 0; i < count; i++ {
+		stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Stopping container (%d/%d)", i+1, count)})
+		err := j.Controller.ContainerStop(currentContainers[i].ID)
+		if err != nil {
+			j.Logger.Error("could not stop container", zap.Error(err), zap.String("containerId", currentContainers[i].ID))
+			return err
+		}
+	}
+
+	j.Logger.Info("deleting job containers")
+	for i := 0; i < count; i++ {
+		stream.Send(&pb.DeployJobResponse{Message: fmt.Sprintf("Removing container (%d/%d)", i+1, count)})
+		err := j.Controller.ContainerRemove(currentContainers[i].ID)
+		if err != nil {
+			j.Logger.Error("could not remove job container", zap.Error(err), zap.String("containerId", currentContainers[i].ID))
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (j *JobRunner) RunDeployment(stream pb.Dokkup_DeployJobServer, request *pb.Job) error {
 	j.Logger.Debug("attempting to pull image", zap.String("image", request.Container.Image))
 
