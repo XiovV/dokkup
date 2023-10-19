@@ -8,6 +8,8 @@ import (
 	"go.uber.org/zap"
 )
 
+const version = "v1.0.0"
+
 func main() {
 	logger, _ := zap.NewDevelopment()
 	defer logger.Sync()
@@ -33,7 +35,7 @@ func main() {
 
 	srv := server.Server{Config: config, Controller: controller, JobRunner: jobRunner, Logger: logger}
 
-	logger.Info("server is listening...", zap.String("port", config.Port))
+	logger.Info("server is listening...", zap.String("port", config.Port), zap.String("version", version))
 	if err := srv.Serve(); err != nil {
 		logger.Fatal("could not start server", zap.Error(err))
 	}
