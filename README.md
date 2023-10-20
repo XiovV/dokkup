@@ -72,7 +72,7 @@ go install
 
 Run `dokkup` in your terminal to verify it's installed:
 ```shell
-$ dokkup
+$ dokkup version
 ```
 ```
 Dokkup v0.1.0-beta, build fd13a57
