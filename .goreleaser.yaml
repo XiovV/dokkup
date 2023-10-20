@@ -6,6 +6,9 @@
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj
 
+project_name: "dokkup"
+
+
 before:
   hooks:
     # You may remove this if you don't use go modules.
@@ -20,6 +23,8 @@ builds:
       - linux
       - windows
       - darwin
+    
+    main: ./cmd/dokkup
 
     ldflags:
       - -s -w -X github.com/XiovV/dokkup/pkg/cli.Version={{.Version}} -X github.com/XiovV/dokkup/pkg/cli.Commit={{.Commit}}
