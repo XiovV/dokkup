@@ -94,6 +94,12 @@ func NewApp() *App {
 					},
 				},
 			},
+			{
+				Name:    "version",
+				Aliases: []string{"v"},
+				Usage:   "Get the current version",
+				Action:  app.getVersion,
+			},
 		},
 	}
 
