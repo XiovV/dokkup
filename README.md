@@ -55,6 +55,9 @@ Take note of that API key as it will not be printed out the next time the agent 
 ## CLI
 The CLI is used to execute jobs and to tell the `agent` what to do.
 
+### Install from Releases
+Go to [Releases](https://github.com/XiovV/dokkup/releases) and download the binary for your OS and CPU architecture.
+
 ### Install from source
 Clone the repository:
 ```shell
@@ -72,21 +75,7 @@ Run `dokkup` in your terminal to verify it's installed:
 $ dokkup
 ```
 ```
-NAME:
-   dokkup - manage your containers with ease
-
-USAGE:
-   dokkup [global options] command [command options] [arguments...]
-
-COMMANDS:
-   run, r       Deploy, update or start containers
-   stop, s      Stop or remove a job
-   rollback, r  Rollback an update
-   show, s      Show the status of a running job
-   help, h      Shows a list of commands or help for one command
-
-GLOBAL OPTIONS:
-   --help, -h  show help
+Dokkup v0.1.0-beta, build fd13a57
 ```
 
 # Deploying jobs
