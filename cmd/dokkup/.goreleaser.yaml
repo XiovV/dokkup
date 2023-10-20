@@ -22,7 +22,7 @@ builds:
       - darwin
 
     ldflags:
-      - -s -w -X github.com/XiovV/dokkup/pkg/cli.Version={{.Version}} -X github.com/XiovV/dokkup/pkg/cli.Commit={{.Commit}} -X github.com/XiovV/dokkup/pkg/cli.Date={{.Date}}
+      - -s -w -X github.com/XiovV/dokkup/pkg/cli.Version={{.Version}} -X github.com/XiovV/dokkup/pkg/cli.Commit={{.Commit}}
 
 archives:
   - format: tar.gz
