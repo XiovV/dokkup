@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const version = "v0.1.1-beta"
+const version = "v0.2.0-beta"
 
 func main() {
 	logger, _ := zap.NewDevelopment()
