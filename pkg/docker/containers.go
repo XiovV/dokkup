@@ -7,6 +7,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/go-connections/nat"
 	"github.com/google/uuid"
 
@@ -91,6 +92,7 @@ func (c *Controller) ContainerSetupConfig(jobName string, config *pb.Container) 
 		ExposedPorts: nat.PortSet{},
 		Env:          config.Environment,
 		Labels:       labels,
+		Cmd:          strslice.StrSlice(config.Command),
 	}
 
 	hostConfig := &container.HostConfig{
@@ -99,7 +101,7 @@ func (c *Controller) ContainerSetupConfig(jobName string, config *pb.Container) 
 		RestartPolicy: container.RestartPolicy{
 			Name: config.Restart,
 		},
-		NetworkMode: container.NetworkMode(config.Network),
+		NetworkMode: container.NetworkMode(config.Networks[0]),
 	}
 
 	for _, port := range config.Ports {
