@@ -35,11 +35,12 @@ message RollbackJobResponse {
 message Container {
   string image = 1;
   repeated Port ports = 2;
-  string network = 3;
+  repeated string networks = 3;
   repeated string volumes = 4;
   repeated string environment = 5;
   string restart = 6;
   repeated string labels = 7;
+  repeated string command = 8;
 }
 
 message Port {

@@ -147,11 +147,12 @@ func (a *App) jobToDeployJobRequest(job *config.Job) *pb.Job {
 		Container: &pb.Container{
 			Image:       container.Image,
 			Ports:       ports,
-			Network:     container.Network,
+			Networks:    container.Networks,
 			Volumes:     container.Volumes,
 			Environment: container.Environment,
 			Restart:     container.Restart,
 			Labels:      container.Labels,
+			Command:     container.Command,
 		},
 	}
 }

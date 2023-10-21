@@ -17,11 +17,12 @@ type Job struct {
 type Container struct {
 	Image       string   `yaml:"image"`
 	Ports       []Port   `yaml:"ports"`
-	Network     string   `yaml:"network"`
+	Networks    []string `yaml:"network"`
 	Volumes     []string `yaml:"volumes"`
 	Environment []string `yaml:"environment"`
 	Restart     string   `yaml:"restart"`
 	Labels      []string `yaml:"labels"`
+	Command     []string `yaml:"command"`
 }
 
 type Port struct {
@@ -47,11 +48,12 @@ func ReadJob(filename string) (*Job, error) {
 }
 
 func (j *Job) setDefaults() {
-	if len(j.Container[0].Network) == 0 {
-		j.Container[0].Network = "bridge"
+	container := &j.Container[0]
+	if len(j.Container[0].Networks) == 0 {
+		container.Networks = []string{"bridge"}
 	}
 
-	if j.Container[0].Restart == "" {
-		j.Container[0].Restart = "always"
+	if container.Restart == "" {
+		container.Restart = "always"
 	}
 }
