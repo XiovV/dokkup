@@ -138,7 +138,7 @@ func (a *App) jobToDeployJobRequest(job *config.Job) *pb.Job {
 	ports := []*pb.Port{}
 
 	for _, port := range container.Ports {
-		ports = append(ports, &pb.Port{In: port.In})
+		ports = append(ports, &pb.Port{In: port.In, Out: port.Out})
 	}
 
 	return &pb.Job{
