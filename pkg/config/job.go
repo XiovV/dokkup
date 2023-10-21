@@ -17,7 +17,7 @@ type Job struct {
 type Container struct {
 	Image       string   `yaml:"image"`
 	Ports       []Port   `yaml:"ports"`
-	Networks    []string `yaml:"network"`
+	Networks    []string `yaml:"networks"`
 	Volumes     []string `yaml:"volumes"`
 	Environment []string `yaml:"environment"`
 	Restart     string   `yaml:"restart"`
@@ -49,7 +49,7 @@ func ReadJob(filename string) (*Job, error) {
 
 func (j *Job) setDefaults() {
 	container := &j.Container[0]
-	if len(j.Container[0].Networks) == 0 {
+	if len(container.Networks) == 0 {
 		container.Networks = []string{"bridge"}
 	}
 
