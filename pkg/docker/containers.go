@@ -104,9 +104,11 @@ func (c *Controller) ContainerSetupConfig(jobName string, config *pb.Container) 
 
 	for _, port := range config.Ports {
 		internalPort := fmt.Sprintf("%s/tcp", port.In)
+		exposedPort := fmt.Sprintf("%s/tcp", port.Out)
+		fmt.Println("EXPOSED PORT", exposedPort)
 		containerConfig.ExposedPorts[nat.Port(internalPort)] = struct{}{}
 
-		hostConfig.PortBindings[nat.Port(internalPort)] = []nat.PortBinding{{HostIP: "0.0.0.0"}}
+		hostConfig.PortBindings[nat.Port(internalPort)] = []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: exposedPort}}
 	}
 
 	return &ContainerConfig{
