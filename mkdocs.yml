@@ -3,6 +3,7 @@ theme:
   name: material
   features:
     - navigation.sections
+    - content.code.copy
 
 markdown_extensions:
   - pymdownx.highlight:
