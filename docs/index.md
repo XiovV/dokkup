@@ -17,4 +17,4 @@ The CLI requires two files, the inventory and the job files:
 - **job** contains the configuration for the containers you want to deploy, it closely resembles a standard [docker-compose](https://docs.docker.com/compose) file.
 
 ## Where do I start?
-You can start by reading [Agent setup](agent-setup) and going on from there. 
+You can start by reading [Agent setup](agent-setup.md) and going on from there. 
