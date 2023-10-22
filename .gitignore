@@ -7,3 +7,4 @@ cmd/dokkup/job.yaml
 cmd/dokkup/dokkup
 cmd/dokkup/dist/
 dist/
+site/
