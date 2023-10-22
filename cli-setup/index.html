@@ -9,20 +9,22 @@
       
       
       
+        <link rel="prev" href="../agent-setup/">
       
-        <link rel="next" href="agent-setup/">
+      
+        <link rel="next" href="../deploying_jobs/inventory/">
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.6">
     
     
       
-        <title>Dokkup</title>
+        <title>CLI setup - Dokkup</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.35e1ed30.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.35e1ed30.min.css">
       
       
 
@@ -41,7 +43,7 @@
       
     
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -63,7 +65,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#getting-started" class="md-skip">
+        <a href="#cli-setup" class="md-skip">
           Skip to content
         </a>
       
@@ -79,7 +81,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="Dokkup" class="md-header__button md-logo" aria-label="Dokkup" data-md-component="logo">
+    <a href=".." title="Dokkup" class="md-header__button md-logo" aria-label="Dokkup" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -99,7 +101,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Getting started
+              CLI setup
             
           </span>
         </div>
@@ -171,7 +173,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="Dokkup" class="md-nav__button md-logo" aria-label="Dokkup" data-md-component="logo">
+    <a href=".." title="Dokkup" class="md-nav__button md-logo" aria-label="Dokkup" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -181,6 +183,44 @@
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Agent setup
+  </span>
+  
+
+      </a>
+    </li>
+  
+
     
       
       
@@ -201,18 +241,18 @@
           
   
   <span class="md-ellipsis">
-    Getting started
+    CLI setup
   </span>
   
 
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <a href="." class="md-nav__link md-nav__link--active">
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
-    Getting started
+    CLI setup
   </span>
   
 
@@ -234,23 +274,29 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-is-dokkup" class="md-nav__link">
-    What is dokkup?
+  <a href="#install" class="md-nav__link">
+    Install
+  </a>
+  
+    <nav class="md-nav" aria-label="Install">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#install-from-releases" class="md-nav__link">
+    Install from Releases
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#how-does-it-work" class="md-nav__link">
-    How does it work?
+        
+          <li class="md-nav__item">
+  <a href="#install-from-source" class="md-nav__link">
+    Install from source:
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#where-do-i-start" class="md-nav__link">
-    Where do I start?
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -258,44 +304,6 @@
   
 </nav>
       
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="agent-setup/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Agent setup
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="cli-setup/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    CLI setup
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -345,7 +353,7 @@
   
   
     <li class="md-nav__item">
-      <a href="deploying_jobs/inventory/" class="md-nav__link">
+      <a href="../deploying_jobs/inventory/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -365,7 +373,7 @@
   
   
     <li class="md-nav__item">
-      <a href="deploying_jobs/job/" class="md-nav__link">
+      <a href="../deploying_jobs/job/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -385,7 +393,7 @@
   
   
     <li class="md-nav__item">
-      <a href="deploying_jobs/deploy-job/" class="md-nav__link">
+      <a href="../deploying_jobs/deploy-job/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -433,23 +441,29 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-is-dokkup" class="md-nav__link">
-    What is dokkup?
+  <a href="#install" class="md-nav__link">
+    Install
+  </a>
+  
+    <nav class="md-nav" aria-label="Install">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#install-from-releases" class="md-nav__link">
+    Install from Releases
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#how-does-it-work" class="md-nav__link">
-    How does it work?
+        
+          <li class="md-nav__item">
+  <a href="#install-from-source" class="md-nav__link">
+    Install from source:
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#where-do-i-start" class="md-nav__link">
-    Where do I start?
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -468,23 +482,24 @@
                   
 
 
-<h1 id="getting-started">Getting started</h1>
-<h2 id="what-is-dokkup">What is dokkup?</h2>
-<p>dokkup is a container orchestrator designed to make managing containers across a cluster of servers as simple as possible.</p>
-<p>It's ideal for use cases where you want to orchestrate containers accross one or multiple servers. Think of it as Nomad, Swarm or Kubernetes.</p>
-<h2 id="how-does-it-work">How does it work?</h2>
-<p>dokkup consists of two parts, the agent and the CLI tool:</p>
-<ul>
-<li><strong>agent</strong> runs on the servers/nodes where you want to run your containers. It listens for incoming job requests and executes them.</li>
-<li><strong>CLI</strong> is used to dispatch job requests to the servers/nodes.</li>
-</ul>
-<p>The CLI requires two files, the inventory and the job files:</p>
-<ul>
-<li><strong>inventory</strong> contains information about your nodes, such as their agent's API key, URL and name.</li>
-<li><strong>job</strong> contains the configuration for the containers you want to deploy, it closely resembles a standard <a href="https://docs.docker.com/compose">docker-compose</a> file.</li>
-</ul>
-<h2 id="where-do-i-start">Where do I start?</h2>
-<p>You can start by reading <a href="agent-setup/">Agent setup</a> and <a href="CLI-setup.md">CLI setup</a> then reading through the Deploying jobs section.</p>
+<h1 id="cli-setup">CLI Setup</h1>
+<p>The CLI is used to execute jobs and to tell the agent what to do.</p>
+<h2 id="install">Install</h2>
+<h3 id="install-from-releases">Install from Releases</h3>
+<p>Go to <a href="https://github.com/XiovV/dokkup/releases">Releases</a> and download the binary for your OS and CPU architecture.</p>
+<h3 id="install-from-source">Install from source:</h3>
+<p>Clone the repository:
+<div class="language-shell highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/XiovV/dokkup.git
+</span></code></pre></div></p>
+<p>Install the binary:
+<div class="language-shell highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">cd</span><span class="w"> </span>dokkup/cmd/dokkup
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>go<span class="w"> </span>install
+</span></code></pre></div></p>
+<p>Run <code>dokkup</code> in your terminal to verify it's installed:
+<div class="language-shell highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$<span class="w"> </span>dokkup<span class="w"> </span>version
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>Dokkup<span class="w"> </span>v0.1.0-beta,<span class="w"> </span>build<span class="w"> </span>fd13a57
+</span></code></pre></div></p>
 
 
 
@@ -523,10 +538,10 @@
     </div>
     
     
-    <script id="__config" type="application/json">{"base": ".", "features": ["navigation.sections", "content.code.copy"], "search": "assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.sections", "content.code.copy"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="assets/javascripts/bundle.aecac24b.min.js"></script>
+      <script src="../assets/javascripts/bundle.aecac24b.min.js"></script>
       
     
   </body>
