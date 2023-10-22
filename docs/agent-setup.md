@@ -16,8 +16,7 @@ You can retrieve the API key through the logs. Please note that the API key will
 
 ```shell
 $ docker logs dokkup-agent
-```
-```shell
+
 Your new API key is: jy9DbtDlfi5VJuAkbZYd4Kt0c2cQY8iQ
 2023-09-22T10:31:42.175+0200    INFO    agent/main.go:36        server is listening...  {"port": "8080"}
 ```
