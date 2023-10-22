@@ -13,4 +13,12 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+ 
+nav:
+  - Getting started: index.md
+  - Agent setup: agent-setup.md
+  - CLI setup: cli-setup.md
 
+  - Deploying jobs:
+     - Inventory: deploying_jobs/inventory.md
+     - Job: deploying_jobs/job.md
