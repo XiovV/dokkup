@@ -21,4 +21,5 @@ nav:
 
   - Deploying jobs:
      - Inventory: deploying_jobs/inventory.md
-     - Job: deploying_jobs/job.md
+     - Job specification: deploying_jobs/job.md
+     - Deploy a job: deploying_jobs/deploy-job.md
