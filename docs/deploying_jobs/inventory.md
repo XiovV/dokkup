@@ -21,7 +21,7 @@ The nodes field is an array of nodes (or servers, both terms are used interchang
 
 - **name** is the custom name you want to give to a node.
 - **location** is the URL where the agent is running.
-- **key** is the Agen's API key.
+- **key** is the Agent's API key.
 
 ## Groups
 The groups field is an array of groups, where you can group together multiple nodes to avoid referring to them individually. It consists of the following items:
