@@ -1,0 +1,5 @@
+site_name: Dokkup
+theme:
+  name: material
+  features:
+    - navigation.sections
