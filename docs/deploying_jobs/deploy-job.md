@@ -78,6 +78,7 @@ Are you sure you want to proceed? (y/n)
 
 The CLI will show a deployment summary, showing some basic information about the job, such as how many containers it's going to run and the hashed version tag of the job, along with the nodes on which the job will be deployed. The asterisk next to the node name signifies that a job will be deployed from scratch.
 
+## Show the containers
 Now we can run `docker ps` on our nodes and see our containers (this is for demonstration purposes, you don't have to do this):
 ```
 $ docker ps
