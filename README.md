@@ -190,7 +190,7 @@ lab2     ONLINE     2/2            false      55dab35
 Are you sure you want to proceed? (y/n) 
 
 ```
-The CLI will show how many containers are running and the update status which will signify if the job is going to be updated or not.
+The CLI will show how many containers are running and the update status which will signify whether the job is going to be updated or not.
 
 # Managing jobs
 
