@@ -1,6 +1,6 @@
 # Job
 
-The job specification contains the configuration for the containers you want to deploy.
+The job specification contains the configuration for the containers you want to deploy. It closely resembles a standard [docker-compose](https://docs.docker.com/compose) file.
 
 ```yaml title="job.yaml"
 # The group where you want to deploy the job.
