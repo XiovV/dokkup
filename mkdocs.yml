@@ -23,3 +23,15 @@ nav:
      - Inventory: deploying_jobs/inventory.md
      - Job specification: deploying_jobs/job.md
      - Deploy a job: deploying_jobs/deploy-job.md
+  
+  - Managing jobs:
+     - Update: managing_jobs/update.md
+     - Canary update: managing_jobs/canary_update.md
+     - Rollback: managing_jobs/rollback.md
+     - Scaling: managing_jobs/scaling.md
+     - Stop: managing_jobs/stop.md
+     - Remove/purge: managing_jobs/remove.md
+     - Show job status: managing_jobs/show_status.md
+
+  - Examples:
+     - Reverse Proxy & Load Balancing with TLS using Traefik: examples/traefik.md
