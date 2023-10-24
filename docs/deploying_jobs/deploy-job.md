@@ -141,4 +141,4 @@ The CLI will show how many containers are running and the update status (in our 
 
 And that's it! You have successfully deployed 4 instances of a container spread accross 2 nodes. 
 
-Read [Reverse Proxy & Load Balancing with TLS using Traefik](/examples/traefik) to learn more. 
+Read the Managing jobs section and [Reverse Proxy & Load Balancing with TLS using Traefik](/examples/traefik) to learn more. 
