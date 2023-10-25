@@ -19,9 +19,6 @@ container:
      - MYENV=ENVEXAMPLE
    volumes:
      - myvolume:/home
-   # networks:
-   # - mynetwork
-
 ```
 
 ```shell
@@ -42,3 +39,5 @@ lab2     ONLINE     2/2            true       55dab35 -> 9470cdc
 
 Are you sure you want to proceed? (y/n) 
 ```
+
+The update field will be set to true, which confirms that an update will be run. The summary will also show you the new version hash. 
