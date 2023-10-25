@@ -12,7 +12,8 @@ $ docker run -d --name dokkup-agent -p 8080:8080 \
 ```
 
 ## Retrieve the API key
-You can retrieve the API key through the logs. Please note that the API key will not be printed out the next time you run the agent.
+!!! note
+    The API key will not be printed out the next time you run the agent.
 
 ```
 $ docker logs dokkup-agent
