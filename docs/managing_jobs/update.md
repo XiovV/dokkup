@@ -21,6 +21,11 @@ container:
      - myvolume:/home
 ```
 
+!!! note
+    Dokkup will execute the update with zero downtime.
+
+    In the event that something goes wrong during the update, dokkup will abort and return the previous containers, ensuring minimum downtime in the event of an error.
+
 ```shell
 $ dokkup run job demo.yaml
 ```
@@ -40,4 +45,4 @@ lab2     ONLINE     2/2            true       55dab35 -> 9470cdc
 Are you sure you want to proceed? (y/n) 
 ```
 
-The update field will be set to true, which confirms that an update will be run. The summary will also show you the new version hash. 
+The update status is now true, meaning that dokkup is going to take down the currently running containers and deploy new ones. The new version hash is also shown. 
