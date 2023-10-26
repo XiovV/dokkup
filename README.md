@@ -10,6 +10,7 @@ It's ideal for use cases where you want to orchestrate containers accross one or
 - 🚀 **Sky is the limit** - Got only one server? No problem. Got 10,000 servers? No problem.
 
 # Table of contents
+- [Documentation](#documentation)
 - [Setup](#setup)
   - [Agent setup](#agent)
   - [CLI setup](#cli)
@@ -25,6 +26,9 @@ It's ideal for use cases where you want to orchestrate containers accross one or
   - [Stop](#stop-a-job)
   - [Remove/purge](#removepurge-a-job)
 - [Show job status](#show-job-status)
+
+# Documentation
+More detailed documentation can be found [here](https://xiovv.github.io/dokkup). However, this README will suffice if you're just getting started.
 
 # Setup
 dokkup consists of two parts: the agent and the CLI tool:
