@@ -414,7 +414,7 @@ groups:
 
 ### Traefik setup 
 #### Traefik job specification
-Learn more about job specifications [here](http://localhost:8000/deploying_jobs/job).
+Learn more about job specifications [here](#job).
 
 Let's write the job specification for Traefik:
 
