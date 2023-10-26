@@ -73,13 +73,13 @@ lab2*     ONLINE     0 -> 2         true       55dab35
 Are you sure you want to proceed? (y/n)
 ```
 
-- Tip 1: If there's an `inventory.yaml` in your current directory, you can omit the -i flag, dokkup loads `inventory.yaml` files by default.
-- Tip 2: You can provide a -y or --yes flag to skip the confirmation prompt.
+!!! tip
+    - If there's an `inventory.yaml` in your current directory, you can omit the -i flag, dokkup loads `inventory.yaml` files by default.
+    - You can provide a -y or --yes flag to skip the confirmation prompt.
 
 The CLI will show a deployment summary, showing some basic information about the job, such as how many containers it's going to run and the hashed version tag of the job, along with the nodes on which the job will be deployed. The asterisk next to the node name signifies that a job will be deployed from scratch.
 
 !!! note
-
     In case you run the `dokkup run job` command without making any changes, you don't have to worry about dokkup wiping your existing containers and re-deploying them again, it will detect that nothing has changed and it won't do anything.
 
 ## Show the containers
