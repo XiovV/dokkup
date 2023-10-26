@@ -795,11 +795,18 @@
 </span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
 </span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>Are you sure you want to proceed? (y/n)
 </span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
 <ul>
-<li>Tip 1: If there's an <code>inventory.yaml</code> in your current directory, you can omit the -i flag, dokkup loads <code>inventory.yaml</code> files by default.</li>
-<li>Tip 2: You can provide a -y or --yes flag to skip the confirmation prompt.</li>
+<li>If there's an <code>inventory.yaml</code> in your current directory, you can omit the -i flag, dokkup loads <code>inventory.yaml</code> files by default.</li>
+<li>You can provide a -y or --yes flag to skip the confirmation prompt.</li>
 </ul>
+</div>
 <p>The CLI will show a deployment summary, showing some basic information about the job, such as how many containers it's going to run and the hashed version tag of the job, along with the nodes on which the job will be deployed. The asterisk next to the node name signifies that a job will be deployed from scratch.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In case you run the <code>dokkup run job</code> command without making any changes, you don't have to worry about dokkup wiping your existing containers and re-deploying them again, it will detect that nothing has changed and it won't do anything.</p>
+</div>
 <h2 id="show-the-containers">Show the containers</h2>
 <p>Now we can run <code>docker ps</code> on our nodes and see our containers (this is for demonstration purposes, you don't have to do this):
 <div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>$ docker ps
@@ -832,23 +839,6 @@
 </span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>cf00cd390db3     demo-d71fc907-6b29-4287-aab8-d29a5fe4e821     Up 34 seconds (healthy)     0.0.0.0:32793-&gt;8000/tcp
 </span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>0e8e013adea2     demo-4d2c8f50-48e7-4817-b380-4b790196d34f     Up 35 seconds (healthy)     0.0.0.0:32792-&gt;8000/tcp
 </span></code></pre></div></p>
-<p>In case you run the dokkup run job command without making any changes, you don't have to worry about dokkup wiping your existing containers and re-deploying them again, it will detect that nothing has changed and it won't do anything:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>$ dokkup run job demo.yaml
-</span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>Deployment summary:
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>NAME     IMAGE                    RESTART     COUNT     GROUP     NETWORK
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>demo     crccheck/hello-world     always      2         labs      bridge
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>Node statuses:
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>NAME     STATUS     CONTAINERS     UPDATE     VERSION
-</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>lab1     ONLINE     2/2            false      55dab35
-</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>lab2     ONLINE     2/2            false      55dab35
-</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
-</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>Are you sure you want to proceed? (y/n) 
-</span></code></pre></div></p>
-<p>The CLI will show how many containers are running and the update status (in our case it's going to be set to false as we haven't changed anything) which will signify whether the job is going to be updated or not.</p>
 <p>And that's it! You have successfully deployed 4 instances of a container spread accross 2 nodes. </p>
 <p>Read the Managing jobs section and <a href="/examples/traefik">Reverse Proxy &amp; Load Balancing with TLS using Traefik</a> to learn more. </p>
 
