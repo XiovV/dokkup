@@ -371,7 +371,7 @@ If you would like to get some information about a job, you can do so with the `d
 
 ```
 $ dokkup show job demo.yaml
-gy```
+```
 ```
 NODE     LOCATION              STATUS     JOB      IMAGE                    CONTAINERS     VERSION
 lab1     192.168.0.99:8080     ONLINE     demo     crccheck/hello-world     2/2            9470cdc
