@@ -664,4 +664,4 @@ The Hostname value is different each time we make a request, which shows that lo
 
 And that is it, you have successfully used dokkup to deploy multiple containers and put them behind a load balancer, and all of that with free TLS! 
 
-Now you can use [scaling](../managing_jobs/scaling.md) to add or remove containers, and they will be automatically load balanced by Traefik!
+Now you can use [scaling](#upscale-or-downscale-a-job) to add or remove containers, and they will be automatically load balanced by Traefik!
