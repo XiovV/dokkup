@@ -20,5 +20,3 @@ CONTAINER ID     NAME                                          STATUS           
 dc5fd3c210ed     demo-53fec61f-3eb6-4666-86d4-1d96b22d1291     Up 8 minutes (healthy)     0.0.0.0:32773->8000/tcp
 9d51076ddd5a     demo-28949bc3-fc57-46b0-8c36-86b06d8a2228     Up 8 minutes (healthy)     0.0.0.0:32772->8000/tcp
 ```
-
-This will show the nodes which the job is running on, along with the job name, image, how many containers are running and the version of the job. It will also display some basic information about each container, such as the ID, name, status and the exposed ports.
